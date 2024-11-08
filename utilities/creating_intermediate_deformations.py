@@ -1,4 +1,4 @@
-from CCF_translator.deformation.forward_transform import invert_deformation
+from ccf_translator.deformation.forward_transform import invert_deformation
 import numpy as np
 from glob import glob
 import nibabel as nib
@@ -13,14 +13,14 @@ import math
 key_ages = [56, 28, 21, 14, 7, 4]
 space_name = "Demba"
 voxel_size_micron = 20
-save_path = f"CCF_translator/metadata/deformation_fields/{space_name}"
+save_path = f"ccf_translator/metadata/deformation_fields/{space_name}"
 if not os.path.exists(save_path):
     os.mkdir(save_path)
 
 
 def open_deformation_field(deformation):
     """this function opens the elastix deformation
-    and returns it in the format expected by CCF_translator"""
+    and returns it in the format expected by ccf_translator"""
     deformation_arr = np.asanyarray(deformation.dataobj)
     def_header_dict = dict(deformation.header)
     x_sign = math.copysign(1, def_header_dict["qoffset_x"])

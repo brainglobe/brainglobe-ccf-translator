@@ -1,7 +1,7 @@
 import numpy as np
 import nibabel as nib
 import ast
-import CCF_translator.Volume as Volume
+import ccf_translator.Volume as Volume
 
 
 def save_volume(CCFT_vol, save_path):

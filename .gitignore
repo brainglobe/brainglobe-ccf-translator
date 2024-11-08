@@ -1,12 +1,12 @@
-CCF_translator/metadata/deformation_fields
-CCF_translator/metadata/deformation_fields_old
+ccf_translator/metadata/deformation_fields
+ccf_translator/metadata/deformation_fields_old
 
 demo_data
 create_transformation_for_ages/deformations_from_elastix
 create_transformation_for_ages/
 # Byte-compiled / optimized / DLL files
 __pycache__/
-CCF_translator/__pycache__/
+ccf_translator/__pycache__/
 *.py[cod]
 *$py.class
 

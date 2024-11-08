@@ -1,12 +1,12 @@
 # import os
 # import sys
-# sys.path.append(os.path.abspath("/home/harryc/github/CCF_translator/"))
+# sys.path.append(os.path.abspath("/home/harryc/github/ccf_translator/"))
 
 import unittest
 import numpy as np
 import json
 import os
-from CCF_translator import Volume
+from ccf_translator import Volume
 
 
 
