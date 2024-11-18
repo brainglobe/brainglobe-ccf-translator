@@ -9,7 +9,7 @@ setup(
     version="0.21",
     packages=find_packages(),
     license="MIT",
-    description="a package to translate data between common coordinate templates",
+    description="a package to translate data between common coordinate frameworks",
     long_description=long_description,
     long_description_content_type="text/markdown",
     package_data={"brainglobe_ccf_translator": ["metadata/translation_metadata.csv"]},
