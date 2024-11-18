@@ -42,7 +42,8 @@ def invert_transformation_volume(forward_arr):
     ]
     return output
 
-def invert_deformation(deformation_arr_transpose, output_shape = None):
+
+def invert_deformation(deformation_arr_transpose, output_shape=None):
     if output_shape is None:
         output_shape = deformation_arr_transpose.shape[1:]
     deformed_coords = create_deformation_coords(deformation_arr_transpose)

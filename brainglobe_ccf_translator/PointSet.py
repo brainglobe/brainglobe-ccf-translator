@@ -27,12 +27,17 @@ class PointSet:
         target = f"{target_space}_P{target_age}"
         G = route_calculation.create_G(self.metadata)
         route = route_calculation.calculate_route(target, source, G)
-        deform_arr, pad_sum, flip_sum, dim_order_sum, final_voxel_size = apply_deformation.combine_route(
-            route, self.voxel_size_micron, base_path, self.metadata
+        deform_arr, pad_sum, flip_sum, dim_order_sum, final_voxel_size = (
+            apply_deformation.combine_route(
+                route, self.voxel_size_micron, base_path, self.metadata
+            )
         )
-        previous = '_'.join(route[1].split('_')[:-1])
+        previous = "_".join(route[1].split("_")[:-1])
         space_size_micron = (
-            self.metadata[(self.metadata["source_space"] == target_space) & (self.metadata["target_space"] == previous)]
+            self.metadata[
+                (self.metadata["source_space"] == target_space)
+                & (self.metadata["target_space"] == previous)
+            ]
             .iloc[0][
                 [
                     row_template.format("X"),
@@ -74,7 +79,6 @@ class PointSet:
         for i in range(len(flip_sum_reorder)):
             if flip_sum_reorder[i]:
                 values[:, i] = space_size_voxels[i] - values[:, i]
-
 
         self.values = values
         self.age_PND = target_age

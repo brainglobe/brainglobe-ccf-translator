@@ -1,4 +1,9 @@
-from .deformation.route_calculation import find_hamiltonian_path, calculate_route,  find_path_through_nodes, create_G
+from .deformation.route_calculation import (
+    find_hamiltonian_path,
+    calculate_route,
+    find_path_through_nodes,
+    create_G,
+)
 import os
 import pandas as pd
 import nibabel as nib
@@ -8,6 +13,7 @@ from .Volume import Volume
 from pathlib import Path
 
 base_path = os.path.dirname(__file__)
+
 
 class VolumeSeries:
     def __init__(self, Volumes):
@@ -27,26 +33,31 @@ class VolumeSeries:
         # target_mask = self.metadata.apply(lambda row: (row['target_space'], str(row['target_age_pnd'])) in space_and_ages_set, axis=1)
         # filtered_metadata = self.metadata[source_mask & target_mask]
         G = create_G(self.metadata)
-        #find route
+        # find route
         route = find_path_through_nodes(G, terminals)
         return route
 
     def split_volume_name(self, volume_name):
-        parts = volume_name.split('_P')
+        parts = volume_name.split("_P")
         age = int(parts[-1])
-        space = '_'.join(parts[:-1])
+        space = "_".join(parts[:-1])
         return age, space
 
     def find_volume_by_age_and_space(self, age, space):
-        return next((vol for vol in self.Volumes if vol.age_PND == age and vol.space == space), None)
+        return next(
+            (vol for vol in self.Volumes if vol.age_PND == age and vol.space == space),
+            None,
+        )
 
     def filter_metadata(self):
-        mask = np.abs(self.metadata['vector']) == 1
+        mask = np.abs(self.metadata["vector"]) == 1
         return self.metadata[mask]
 
     def interpolate_series(self):
         route = self.calculate_hamiltonian()
-        existing_route = [i for i in route if i in [f"{i.space}_P{i.age_PND}" for i in self.Volumes]]
+        existing_route = [
+            i for i in route if i in [f"{i.space}_P{i.age_PND}" for i in self.Volumes]
+        ]
         if not route:
             print("No valid route was found. Exiting.")
             return
@@ -91,11 +102,12 @@ class VolumeSeries:
                     space=target_space,
                     voxel_size_micron=left_volume_temp.voxel_size_micron,
                     age_PND=target_age,
-                    segmentation_file=left_volume_temp.segmentation_file
+                    segmentation_file=left_volume_temp.segmentation_file,
                 )
                 self.Volumes.append(target_volume)
                 print(f"appended P{target_age}")
                 print(len(self.Volumes))
+
     def save(self, output_dir):
         if not output_dir:
             raise ValueError("Output directory cannot be an empty string")

@@ -7,7 +7,10 @@ import math
 import pandas as pd
 import numpy as np
 from brainglobe_ccf_translator.deformation.forward_transform import invert_deformation
-from brainglobe_ccf_translator.deformation.apply_deformation import resize_input, apply_transform
+from brainglobe_ccf_translator.deformation.apply_deformation import (
+    resize_input,
+    apply_transform,
+)
 import os
 import matplotlib.pyplot as plt
 
@@ -49,32 +52,27 @@ target_spaces = ["allen_mouse"]
 original_elastix_volume_paths = [
     f"{root_path}/output_directory/deformationField.nii.gz"
 ]
- 
+
 for i in range(len(original_elastix_volume_paths)):
     original_elastix_volume_path = original_elastix_volume_paths[i]
     source = source_spaces[i]
     target = target_spaces[i]
     elastix_img = nib.load(original_elastix_volume_path)
     elastix_arr = open_deformation_field(elastix_img).astype(np.float32)
-    elastix_arr = resize_input(
-    elastix_arr, (1, *current_input_size), elastix_arr.shape
-    )
+    elastix_arr = resize_input(elastix_arr, (1, *current_input_size), elastix_arr.shape)
 
-    elastix_arr = elastix_arr[:,:,:,::-1]
+    elastix_arr = elastix_arr[:, :, :, ::-1]
     elastix_arr[2] *= -1
-    elastix_arr = resize_input(
-        elastix_arr, elastix_arr.shape, (1, *new_input_size)
-    )
-    elastix_arr = np.transpose(elastix_arr, [0,2,1,3])
-    elastix_arr = elastix_arr[[1,0,2]]
-    
+    elastix_arr = resize_input(elastix_arr, elastix_arr.shape, (1, *new_input_size))
+    elastix_arr = np.transpose(elastix_arr, [0, 2, 1, 3])
+    elastix_arr = elastix_arr[[1, 0, 2]]
+
     save_path = f"/home/harryc/github/brainglobe_ccf_translator/brainglobe_ccf_translator/metadata/deformation_fields/{source}/"
     if not os.path.isdir(save_path):
         os.mkdir(save_path)
     save_volume(elastix_arr, f"{save_path}/{source}_pull_{target}.nii.gz")
-    inverted_arr = invert_deformation(elastix_arr, new_input_size[[1,0,2]])
+    inverted_arr = invert_deformation(elastix_arr, new_input_size[[1, 0, 2]])
     save_path = f"/home/harryc/github/brainglobe_ccf_translator/brainglobe_ccf_translator/metadata/deformation_fields/{target}/"
     if not os.path.isdir(save_path):
         os.mkdir(save_path)
     save_volume(inverted_arr, f"{save_path}/{target}_pull_{source}.nii.gz")
-

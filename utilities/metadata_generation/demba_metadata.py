@@ -12,9 +12,13 @@ space_name = "demba_dev_mouse"
 
 import nibabel as nib
 
-img = nib.load(r"/home/harryc/github/brainglobe_ccf_translator_local/demo_data/DeMBA_P56_double.nii.gz")
+img = nib.load(
+    r"/home/harryc/github/brainglobe_ccf_translator_local/demo_data/DeMBA_P56_double.nii.gz"
+)
 demba_dev_mouse_size_micron = np.array(img.shape) * 20
-img, header = nrrd.read(r"/home/harryc/github/brainglobe_ccf_translator_local/demo_data//annotation_10.nrrd")
+img, header = nrrd.read(
+    r"/home/harryc/github/brainglobe_ccf_translator_local/demo_data//annotation_10.nrrd"
+)
 allen_size_micron = np.array(img.shape) * 10
 key_ages = np.array([4, 7, 14, 21, 28, 56])
 dim_flip = [False, False, False]

@@ -13,7 +13,9 @@ from scipy.ndimage import zoom
 from brainglobe_ccf_translator.deformation.interpolation.NearestNDInterpolator import (
     NearestNDInterpolator,
 )
-from brainglobe_ccf_translator.deformation.forward_transform import create_deformation_coords
+from brainglobe_ccf_translator.deformation.forward_transform import (
+    create_deformation_coords,
+)
 from scipy.ndimage import binary_dilation, binary_erosion
 
 

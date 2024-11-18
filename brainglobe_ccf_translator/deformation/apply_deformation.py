@@ -6,11 +6,13 @@ import os
 from scipy.ndimage import map_coordinates
 import requests
 
+
 def invert_dim_order(order):
     inverse = [0] * len(order)
     for i, o in enumerate(order):
         inverse[o] = i
     return inverse
+
 
 def create_deformation_coords(deformation_arr):
     coords = np.mgrid[
@@ -159,7 +161,9 @@ def handle_padding(deform_arr, temp_padding, original_voxel_size):
     return deform_arr, temp_padding
 
 
-def handle_dim_order(deform_arr, dim_order, target_shape, pad_sum, temp_padding, dim_order_sum):
+def handle_dim_order(
+    deform_arr, dim_order, target_shape, pad_sum, temp_padding, dim_order_sum
+):
     dim_order = list(map(int, dim_order[1:-1].split(", ")))
     pad_sum = pad_sum[dim_order]
     if temp_padding is not None:

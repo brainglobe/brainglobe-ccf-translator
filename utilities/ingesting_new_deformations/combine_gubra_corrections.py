@@ -15,7 +15,9 @@ import json
 import os
 from scipy.ndimage import map_coordinates
 import requests
-from brainglobe_ccf_translator.deformation.forward_transform import create_deformation_coords
+from brainglobe_ccf_translator.deformation.forward_transform import (
+    create_deformation_coords,
+)
 from brainglobe_ccf_translator.deformation.interpolation.NearestNDInterpolator import (
     NearestNDInterpolator,
 )
