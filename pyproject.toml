@@ -1,0 +1,114 @@
+
+[project]
+name = "brainglobe_ccf_translator"
+description = "a package to translate data between common coordinate frameworks"
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Harry Carey", email = "harry.carey@medisin.uio.no" }
+]
+dynamic = ["version"]
+keywords = ["neuroinformatics", "brain", "atlas", "brainglobe", "neuroscience"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python"
+]
+urls = { "Homepage" = "https://github.com/brainglobe/brainglobe-ccf-translator" }
+
+dependencies = [
+    "numpy",
+    "nibabel",
+    "scipy",
+    "networkx",
+    "pandas",
+    "requests"
+]
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "pytest-cov",
+  "coverage",
+  "tox",
+  "mypy",
+  "pre-commit",
+  "ruff",
+  "setuptools_scm",
+]
+[tool.setuptools]
+include-package-data = true
+[tool.setuptools.packages.find]
+include = ["brainglobe_ccf_translator*"]
+exclude = ["tests*"]
+[tool.setuptools.package-data]
+"brainglobe_ccf_translator" = ["metadata/translation_metadata.csv"]
+
+[build-system]
+requires = [
+    "setuptools>=45",
+    "wheel",
+    "setuptools_scm[toml]>=6.2",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+addopts = "--cov=brainglobe_ccf_translator"
+filterwarnings = [
+    "error",
+]
+
+[tool.setuptools_scm]
+
+[tool.check-manifest]
+ignore = [
+  ".yaml",
+  "tox.ini",
+  "tests/",
+  "tests/test_unit/",
+  "tests/test_integration/",
+]
+
+[tool.ruff]
+line-length = 79
+exclude = ["__init__.py", "build", ".eggs"]
+lint.select = [
+  "E",   # pycodestyle errors
+  "F",   # Pyflakes
+  "I",   # isort
+  # You can see what all the rules do here: https://docs.astral.sh/ruff/rules/
+  # Some additional ruff rules that might be useful (uncomment to enable)
+  #"UP",  # pyupgrade
+  #"B",   # flake8 bugbear
+  #"SIM", # flake8 simplify
+  #"C90", # McCabe complexity
+]
+fix = true
+
+[tool.ruff.format]
+docstring-code-format = true # Also format code in docstrings (e.g. examples)
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py{39,310,311}
+isolated_build = True
+
+[gh-actions]
+python =
+    3.9: py39
+    3.10: py310
+    3.11: py311
+
+[testenv]
+extras =
+    dev
+commands =
+    pytest -v --color=yes --cov=brainglobe_ccf_translator --cov-report=xml
+"""
+
+
+[tool.codespell]
+skip = '.git'
+check-hidden = true
