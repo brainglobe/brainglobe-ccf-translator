@@ -33,7 +33,7 @@ import numpy as np
 import brainglobe_ccf_translator
 
 points = np.array([(286,250,267), (414,247,452)])
-pset = CCF translator.PointSet(points, 'demba_dev_mouse', voxel_size_micron=20, age_PND=56)
+pset = brainglobe_ccf_translator.PointSet(points, 'demba_dev_mouse', voxel_size_micron=20, age_PND=56)
 pset.transform(target_age=56, target_space='allen_mouse')
 print(f"new points are {pset.values}")
 
@@ -60,7 +60,7 @@ atlas = BrainGlobeAtlas("{space_name}_{voxel_size_micron}um")
 source_age = 56
 target_age= 32
 
-CCFT_vol = CCF translator.Volume(
+ccft_vol = brainglobe_ccf_translator.Volume(
     values = atlas.reference,
     space = 'allen_mouse',
     voxel_size_micron=voxel_size_micron,
@@ -68,8 +68,8 @@ CCFT_vol = CCF translator.Volume(
     age_PND = source_age
 )
 
-CCFT_vol.transform(target_age, 'demba_dev_mouse')
-CCFT_vol.save(rf"demo_data/P{target_age}_template_{voxel_size_micron}um.nii.gz")
+ccft_vol.transform(target_age, 'demba_dev_mouse')
+ccft_vol.save(rf"demo_data/P{target_age}_template_{voxel_size_micron}um.nii.gz")
 ```
 ## Contributing
 If you would like to add a new space or connect an existing one, please create a deformation matrix and/or describe the required reorientation, flipping, cropping, and padding of the axis between this space and one that already exists in the network, and then open an issue in this repository.  Ideally, choose a space which covers all the areas which are covered in your space. While the Allen CCFv3 is very popular, it is missing the anterior olfactory bulb and the caudal portion of the cerebellum and brain stem, so it is not the optimal choice. 
