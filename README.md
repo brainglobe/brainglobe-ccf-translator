@@ -1,7 +1,7 @@
-# ccf-translator
+# brainglobe-ccf-translator
 ![PyPI - Version](https://img.shields.io/pypi/v/CCF-translator)
 
-CCF translator (ccf-translator) is a tool for translating between common coordinate frameworks using deformation matrices. 
+CCF translator (brainglobe-ccf-translator) is a tool for translating between common coordinate frameworks using deformation matrices. 
 A longstanding problem in NeuroInformatics has been the inability to easily translate data between common coordinate frameworks. CCF translator aims to solve this. By connecting each new space to an existing one, we can construct a graph of deformations. This means that data can be translated as long as there is a route from one space to another, even if that route passes through multiple other spaces. Now, when new templates for new modalities, strains, or ages are released, users will not be subdivided into unrelated spaces. As long as they are connected to a space which exists in our network, they will be fully connected to all other spaces.  
 
 CCF translator can also interpolate between spaces and create a new intermediate space. This is primarily useful for development, where, for instance, the midpoint between day 5 and day 7 can be taken and used as a postnatal day 6 reference. It could also be useful for making references of disease progression.  
@@ -30,7 +30,7 @@ the name in CCF translator aims to copy the name of atlases in the brainglobe_at
 To take a coordinate in one volume and find the equivalent coordinate in a second volume is quite simple in CCF translator. 
 ```python
 import numpy as np
-import CCF translator
+import brainglobe_ccf_translator
 
 points = np.array([(286,250,267), (414,247,452)])
 pset = CCF translator.PointSet(points, 'demba_dev_mouse', voxel_size_micron=20, age_PND=56)
@@ -51,7 +51,7 @@ pip install brainglobe-atlasapi
 Transforming a volume is equally simple, here we get the volume from the brainglobe api, but you can load it however you like. In the Demba space the valid ages are from 4 to 56, and all of these are valid targets for transformation. 
 ```python
 from brainglobe_atlasapi.bg_atlas import BrainGlobeAtlas
-import CCF translator
+import brainglobe_ccf_translator
 
 
 voxel_size_micron = 10
