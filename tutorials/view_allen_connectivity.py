@@ -25,7 +25,7 @@ adult_atlas = BrainGlobeAtlas(f"{space_name}_{voxel_size_micron}um")
 source_age = 56
 target_age = 9
 
-CCFT_vol = brainglobe_ccf_translator.Volume(
+ccft_vol = brainglobe_ccf_translator.Volume(
     values=pd_vals,
     space=space_name,
     voxel_size_micron=voxel_size_micron,
@@ -33,11 +33,11 @@ CCFT_vol = brainglobe_ccf_translator.Volume(
     age_PND=source_age,
 )
 # transform to demba space
-CCFT_vol.transform(target_space="demba_dev_mouse", target_age=source_age)
-P56_projection = CCFT_vol.values
+ccft_vol.transform(target_space="demba_dev_mouse", target_age=source_age)
+P56_projection = ccft_vol.values
 # transform to young space
-CCFT_vol.transform(target_space="demba_dev_mouse", target_age=target_age)
-young_projection = CCFT_vol.values
+ccft_vol.transform(target_space="demba_dev_mouse", target_age=target_age)
+young_projection = ccft_vol.values
 
 adult_vol = brainglobe_ccf_translator.Volume(
     values=adult_atlas.reference,

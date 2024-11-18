@@ -46,7 +46,7 @@ def save_volume(volume, file_name):
 
 for i in range(len(key_ages) - 1):
     age = key_ages[i + 1]
-    # using CCFT terminology we would say that the elastix deform is in
+    # using ccft terminology we would say that the elastix deform is in
     # the 28 space pulling values in from 56 (for the p28 volume that is)
     original_elastix_volume_path = (
         rf"demo_data/key_age_data/P{age}/script_with_metadata/deformationField.nii.gz"

@@ -2,6 +2,7 @@ from .deformation import apply_deformation, route_calculation
 import pandas as pd
 import os
 import numpy as np
+from . import config
 
 base_path = os.path.dirname(__file__)
 
@@ -12,8 +13,19 @@ class PointSet:
         self.space = space
         self.voxel_size_micron = voxel_size_micron
         self.age_PND = age_PND
-        metadata_path = os.path.join(base_path, "metadata", "translation_metadata.csv")
-        metadata = pd.read_csv(metadata_path)
+        # Setup brainglobe dir
+        self.deformation_dir = config.setup_deformation_dir()
+        # Load metadata
+        metadata_path = os.path.join(
+            os.path.dirname(__file__), "metadata", "translation_metadata.csv"
+        )
+        try:
+            metadata = pd.read_csv(metadata_path)
+        except FileNotFoundError:
+            raise FileNotFoundError(f"Metadata file not found at {metadata_path}")
+        except pd.errors.ParserError:
+            raise ValueError(f"Error parsing metadata file at {metadata_path}")
+
         self.metadata = metadata
 
     def transform(self, target_age=None, target_space=None):
@@ -29,7 +41,7 @@ class PointSet:
         route = route_calculation.calculate_route(target, source, G)
         deform_arr, pad_sum, flip_sum, dim_order_sum, final_voxel_size = (
             apply_deformation.combine_route(
-                route, self.voxel_size_micron, base_path, self.metadata
+                route, self.voxel_size_micron, self.deformation_dir, self.metadata
             )
         )
         previous = "_".join(route[1].split("_")[:-1])

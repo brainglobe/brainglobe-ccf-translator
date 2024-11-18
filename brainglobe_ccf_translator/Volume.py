@@ -1,11 +1,13 @@
 import numpy as np
 from .deformation import apply_deformation, route_calculation
+from . import config
 import pandas as pd
 import json
 import os
 import nibabel as nib
+from typing import Any
 
-base_path = os.path.dirname(__file__)
+
 """
 At present the order of transformations is:
 transpose 
@@ -19,15 +21,42 @@ So the transform should be in the shape of the output
 
 class Volume:
     def __init__(
-        self, values, space, voxel_size_micron, age_PND, segmentation_file=False
+        self,
+        values: Any,
+        space: str,
+        voxel_size_micron: float,
+        age_PND: int,
+        segmentation_file: bool = False,
     ):
+        """
+        Initialize the Volume object.
+
+        Parameters:
+        values (Any): The values for the volume.
+        space (str): The space in which the volume exists.
+        voxel_size_micron (float): The size of the voxel in microns.
+        age_PND (int): The age in postnatal days.
+        segmentation_file (bool): Flag indicating if a segmentation file is used.
+        """
         self.values = values
         self.space = space
         self.voxel_size_micron = voxel_size_micron
         self.age_PND = age_PND
         self.segmentation_file = segmentation_file
-        metadata_path = os.path.join(base_path, "metadata", "translation_metadata.csv")
-        metadata = pd.read_csv(metadata_path)
+
+        # Setup brainglobe dir
+        self.deformation_dir = config.setup_deformation_dir()
+        # Load metadata
+        metadata_path = os.path.join(
+            os.path.dirname(__file__), "metadata", "translation_metadata.csv"
+        )
+        try:
+            metadata = pd.read_csv(metadata_path)
+        except FileNotFoundError:
+            raise FileNotFoundError(f"Metadata file not found at {metadata_path}")
+        except pd.errors.ParserError:
+            raise ValueError(f"Error parsing metadata file at {metadata_path}")
+
         self.metadata = metadata
 
     def transform(self, target_age, target_space):
@@ -41,7 +70,7 @@ class Volume:
         route = route_calculation.calculate_route(source, target, G)
         deform_arr, pad_sum, flip_sum, dim_order_sum, final_voxel_size = (
             apply_deformation.combine_route(
-                route, self.voxel_size_micron, base_path, self.metadata
+                route, self.voxel_size_micron, self.deformation_dir, self.metadata
             )
         )
         array = np.transpose(array, dim_order_sum)

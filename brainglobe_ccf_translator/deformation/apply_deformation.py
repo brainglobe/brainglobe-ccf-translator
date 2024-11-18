@@ -327,8 +327,6 @@ def combine_route(route, original_voxel_size, base_path, metadata):
             vector = int(translation_metadata["vector"][0])
             deform_path = os.path.join(
                 base_path,
-                "metadata",
-                "deformation_fields",
                 translation_metadata["source_space"][0],
                 translation_metadata["file_name"][0],
             )

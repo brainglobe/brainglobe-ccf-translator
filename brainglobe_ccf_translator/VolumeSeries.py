@@ -12,13 +12,13 @@ import numpy as np
 from .Volume import Volume
 from pathlib import Path
 
-base_path = os.path.dirname(__file__)
-
 
 class VolumeSeries:
     def __init__(self, Volumes):
         self.Volumes = Volumes
-        metadata_path = os.path.join(base_path, "metadata", "translation_metadata.csv")
+        metadata_path = os.path.join(
+            os.path.dirname(__file__), "metadata", "translation_metadata.csv"
+        )
         metadata = pd.read_csv(metadata_path)
         self.metadata = metadata
 

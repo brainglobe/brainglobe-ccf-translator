@@ -89,7 +89,7 @@ def resize_input(arr, original_input_shape, new_input_shape):
 
 
 root_path = r"/home/harryc/github/gubra/Multimodal_mouse_brain_atlas_files"
-out_path = r"/home/harryc/github/brainglobe_ccf_translator/brainglobe_ccf_translator/"
+out_path = r"~/.brainglobe/"
 
 ##set the origin as zero in the transform file if you want to use that with these files
 ##here we just remove the offsets from the volume that is to be registered
@@ -148,7 +148,7 @@ arr = np.squeeze(arr, 3)
 # arr = resize_input(arr, arr.shape, (1,*source_arr.shape))
 # arr = np.transpose(arr, [1,2,3,0])
 out_im = nib.Nifti1Image(arr, img.affine, img.header)
-save_path = f"{out_path}/metadata/deformation_fields/perens_stpt_mouse/"
+save_path = f"{out_path}/deformation_fields/perens_stpt_mouse/"
 if not os.path.exists(save_path):
     os.makedirs(save_path)
 nib.save(out_im, f"{save_path}/perens_mri_mouse_pull_perens_stpt_mouse.nii.gz")
@@ -187,7 +187,7 @@ for i in range(3):
 arr = resize_input(arr, arr.shape, (1, *source_arr.shape))
 arr = np.transpose(arr, [1, 2, 3, 0])
 out_im = nib.Nifti1Image(arr, img.affine, img.header)
-save_path = f"{out_path}/metadata/deformation_fields/perens_stpt_mouse/"
+save_path = f"{out_path}/deformation_fields/perens_stpt_mouse/"
 if not os.path.exists(save_path):
     os.makedirs(save_path)
 nib.save(out_im, f"{save_path}/perens_lsfm_mouse_pull_perens_stpt_mouse.nii.gz")
@@ -231,7 +231,7 @@ arr = np.transpose(arr, [3, 0, 1, 2])
 # arr = resize_input(arr, arr.shape, (1,*source_arr.shape))
 arr = np.transpose(arr, [1, 2, 3, 0])
 out_im = nib.Nifti1Image(arr, img.affine, img.header)
-save_path = f"{out_path}/metadata/deformation_fields/perens_mri_mouse/"
+save_path = f"{out_path}/deformation_fields/perens_mri_mouse/"
 if not os.path.exists(save_path):
     os.makedirs(save_path)
 nib.save(out_im, f"{save_path}/perens_mri_mouse_pull_allen_mouse.nii.gz")
@@ -241,34 +241,34 @@ nib.save(out_im, f"{save_path}/perens_mri_mouse_pull_allen_mouse.nii.gz")
 output_shape = nib.load(
     f"{root_path}/AIBS_CCFv3_space_oriented/ccfv3_temp.nii.gz"
 ).shape
-save_path = f"{out_path}/metadata/deformation_fields/perens_stpt_mouse/"
+save_path = f"{out_path}/deformation_fields/perens_stpt_mouse/"
 img = nib.load(f"{save_path}/perens_mri_mouse_pull_perens_stpt_mouse.nii.gz")
 arr = img.get_fdata()
 arr = np.transpose(arr, [3, 0, 1, 2])
 invert_arr = invert_deformation(arr, output_shape)
 invert_arr = np.transpose(invert_arr, [1, 2, 3, 0])
 out_im = nib.Nifti1Image(invert_arr, img.affine, img.header)
-save_path = f"{out_path}/metadata/deformation_fields/perens_mri_mouse/"
+save_path = f"{out_path}/deformation_fields/perens_mri_mouse/"
 nib.save(out_im, f"{save_path}/perens_stpt_mouse_pull_perens_mri_mouse.nii.gz")
 
 
 output_shape = nib.load(
     f"{root_path}/AIBS_CCFv3_space_oriented/ccfv3_temp.nii.gz"
 ).shape
-save_path = f"{out_path}/metadata/deformation_fields/perens_stpt_mouse/"
+save_path = f"{out_path}/deformation_fields/perens_stpt_mouse/"
 img = nib.load(f"{save_path}/perens_lsfm_mouse_pull_perens_stpt_mouse.nii.gz")
 arr = img.get_fdata()
 arr = np.transpose(arr, [3, 0, 1, 2])
 invert_arr = invert_deformation(arr, output_shape)
 invert_arr = np.transpose(invert_arr, [1, 2, 3, 0])
 out_im = nib.Nifti1Image(invert_arr, img.affine, img.header)
-save_path = f"{out_path}/metadata/deformation_fields/perens_lsfm_mouse/"
+save_path = f"{out_path}/deformation_fields/perens_lsfm_mouse/"
 nib.save(out_im, f"{save_path}/perens_stpt_mouse_pull_perens_lsfm_mouse.nii.gz")
 
 output_shape = nib.load(
     f"{root_path}/AIBS_CCFv3_space_oriented/ccfv3_temp.nii.gz"
 ).shape
-save_path = f"{out_path}/metadata/deformation_fields/allen_mouse/"
+save_path = f"{out_path}/deformation_fields/allen_mouse/"
 img = nib.load(f"{save_path}/perens_mri_mouse_pull_allen_mouse.nii.gz")
 arr = img.get_fdata()
 arr = np.transpose(arr, [3, 0, 1, 2])
@@ -276,5 +276,5 @@ invert_arr = invert_deformation(arr, output_shape)
 invert_arr = np.transpose(invert_arr, [1, 2, 3, 0])
 invert_arr = invert_arr[:, 70:-70, :, :]
 out_im = nib.Nifti1Image(invert_arr, img.affine, img.header)
-save_path = f"{out_path}/metadata/deformation_fields/perens_mri_mouse/"
+save_path = f"{out_path}/deformation_fields/perens_mri_mouse/"
 nib.save(out_im, f"{save_path}/allen_mouse_pull_perens_mri_mouse.nii.gz")

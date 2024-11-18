@@ -138,6 +138,13 @@ def cli_modify_config(key=0, value=0, show=False):
     click.echo(_print_config())
 
 
+def setup_deformation_dir():
+    brainglobe_dir = get_brainglobe_dir()
+    deformation_dir = os.path.join(brainglobe_dir, "deformation_fields")
+    os.makedirs(deformation_dir, exist_ok=True)
+    return deformation_dir
+
+
 def _print_config():
     """Print configuration."""
     config = read_config()

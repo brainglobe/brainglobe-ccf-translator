@@ -172,13 +172,13 @@ def resize_input(arr, original_input_shape, new_input_shape):
 perens_stpt = nib.load(f"{root_path}/AIBS_CCFv3_space_original/ccfv3_orig_temp.nii.gz")
 perens_stpt_arr = perens_stpt.get_fdata()
 
-save_path = r"/home/harryc/github/brainglobe_ccf_translator/brainglobe_ccf_translator_local/metadata/deformation_fields/perens_mri_mouse/"
+save_path = r"~/.brainglobe/deformation_fields/perens_mri_mouse/"
 first = nib.load(f"{save_path}/perens_mri_mouse_pull_allen_mouse.nii.gz")
 ##here we correct the deformation matrix so it has an origin of zero
 first_arr = first.get_fdata()
 first_arr = np.transpose(first_arr, (3, 0, 1, 2))
 
-save_path = r"/home/harryc/github/brainglobe_ccf_translator/brainglobe_ccf_translator_local/metadata/deformation_fields/perens_stpt_mouse/"
+save_path = r"~/.brainglobe/deformation_fields/perens_stpt_mouse/"
 second = nib.load(f"{save_path}/perens_stpt_mouse_pull_perens_mri_mouse.nii.gz")
 second_arr = second.get_fdata()
 second_arr = np.transpose(second_arr, (3, 0, 1, 2))
@@ -200,7 +200,7 @@ ccf2orig = resize_input(
 ccf2orig = np.transpose(ccf2orig, [1, 2, 3, 0])
 transform_out = nib.Nifti1Image(ccf2orig, np.eye(4))
 
-save_path = r"/home/harryc/github/brainglobe_ccf_translator/brainglobe_ccf_translator_local/metadata/deformation_fields/perens_stpt_mouse"
+save_path = r"~/.brainglobe/deformation_fields/perens_stpt_mouse"
 nib.save(transform_out, f"{save_path}/perens_stpt_mouse_pull_allen_mouse.nii.gz")
 img = nib.load(f"{save_path}/perens_stpt_mouse_pull_allen_mouse.nii.gz")
 arr = img.get_fdata()
@@ -232,5 +232,5 @@ out_arr[1] *= -1
 out_arr = np.transpose(out_arr, [1, 2, 3, 0])
 nib.save(
     nib.Nifti1Image(out_arr, np.eye(4)),
-    f"/home/harryc/github/brainglobe_ccf_translator/brainglobe_ccf_translator_local/metadata/deformation_fields/allen_mouse/allen_mouse_pull_perens_stpt_mouse.nii.gz",
+    f"~/.brainglobe/deformation_fields/allen_mouse/allen_mouse_pull_perens_stpt_mouse.nii.gz",
 )
