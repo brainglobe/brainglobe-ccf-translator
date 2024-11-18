@@ -4,7 +4,7 @@ and view it in a different space. In this case we will look at projection inform
 transformed down to a P9 brain. 
 """
 from brainglobe_atlasapi.bg_atlas import BrainGlobeAtlas
-import ccf_translator
+import brainglobe_ccf_translator
 from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -23,7 +23,7 @@ adult_atlas = BrainGlobeAtlas(f"{space_name}_{voxel_size_micron}um")
 source_age = 56
 target_age = 9
 
-CCFT_vol = ccf_translator.Volume(
+CCFT_vol = brainglobe_ccf_translator.Volume(
     values=pd_vals,
     space=space_name,
     voxel_size_micron=voxel_size_micron,
@@ -43,7 +43,7 @@ CCFT_vol.transform(
 )
 young_projection = CCFT_vol.values
 
-adult_vol = ccf_translator.Volume(
+adult_vol = brainglobe_ccf_translator.Volume(
     values=adult_atlas.reference,
     space=space_name,
     voxel_size_micron=voxel_size_micron,
@@ -56,7 +56,7 @@ adult_vol.transform(
     target_age= source_age
 )
 demba_adult_template = adult_vol.values
-demba_young_template = nib.load(rf"/home/harryc/github/ccf_translator_local/demo_data/demba_vols/DeMBA_P{target_age}.nii.gz").get_fdata()
+demba_young_template = nib.load(rf"/home/harryc/github/brainglobe_ccf_translator_local/demo_data/demba_vols/DeMBA_P{target_age}.nii.gz").get_fdata()
 #rescale to 25µm
 rescaled_demba_young_template = zoom(demba_young_template, 20/25, order=1)  # order=1 for bilinear interpolation
 
@@ -84,7 +84,7 @@ axes[1].set_title(f'Post natal day {target_age}')
 axes[1].axis('off')  # Remove axes and ticks
 
 # Add text and an arrow between the plots
-fig.text(0.5, 0.55, 'ccf_translator', ha='center', fontsize=12)
+fig.text(0.5, 0.55, 'brainglobe_ccf_translator', ha='center', fontsize=12)
 
 # Add an arrow between the plots
 arrow = patches.FancyArrowPatch((0.45, 0.5), (0.55, 0.5), transform=fig.transFigure,

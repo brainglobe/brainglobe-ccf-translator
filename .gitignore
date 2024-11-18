@@ -1,12 +1,12 @@
-ccf_translator/metadata/deformation_fields
-ccf_translator/metadata/deformation_fields_old
+brainglobe_ccf_translator/metadata/deformation_fields
+brainglobe_ccf_translator/metadata/deformation_fields_old
 
 demo_data
 create_transformation_for_ages/deformations_from_elastix
 create_transformation_for_ages/
 # Byte-compiled / optimized / DLL files
 __pycache__/
-ccf_translator/__pycache__/
+brainglobe_ccf_translator/__pycache__/
 *.py[cod]
 *$py.class
 
