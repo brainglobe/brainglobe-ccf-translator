@@ -1,22 +1,22 @@
 import os
 import sys
-sys.path.append(os.path.abspath("/home/harryc/github/CCF_translator/"))
+sys.path.append(os.path.abspath("/home/harryc/github/brainglobe_ccf_translator/"))
 
 import os 
 import sys
 
 
-import CCF_translator
+import brainglobe_ccf_translator
 import numpy as np
 
 
 # test_data_dir = os.path.dirname(__file__)
-test_data_dir = r"/home/harryc/github/CCF_translator/tests/test_data/"
+test_data_dir = r"/home/harryc/github/brainglobe_ccf_translator/tests/test_data/"
 
 princeton_atlas = np.load(os.path.join(test_data_dir, 'volumes', 'princeton_mouse_200um.npz'))
 reference = princeton_atlas['reference']
 annotation = princeton_atlas['annotation']
-volume = CCF_translator.Volume(
+volume = brainglobe_ccf_translator.Volume(
     values = reference,
     space = 'princeton_mouse',
     age_PND = 56,
@@ -28,7 +28,7 @@ volume.transform(
 )
 reference_transformed = volume.values
 
-volume = CCF_translator.Volume(
+volume = brainglobe_ccf_translator.Volume(
     values = annotation,
     space = 'princeton_mouse',
     age_PND = 56,
@@ -47,7 +47,7 @@ np.savez_compressed(os.path.join(test_data_dir,'expected_outputs', 'princeton_mo
 allen_atlas = np.load(os.path.join(test_data_dir, 'volumes', 'allen_mouse_200um.npz'))
 reference = allen_atlas['reference']
 annotation = allen_atlas['annotation']
-volume = CCF_translator.Volume(
+volume = brainglobe_ccf_translator.Volume(
     values = reference,
     space = 'allen_mouse',
     age_PND = 56,
@@ -60,7 +60,7 @@ volume.transform(
 
 reference_transformed = volume.values
 
-volume = CCF_translator.Volume(
+volume = brainglobe_ccf_translator.Volume(
     values = annotation,
     space = 'allen_mouse',
     age_PND = 56,
@@ -82,7 +82,7 @@ np.savez_compressed(os.path.join(test_data_dir,'expected_outputs', 'allen_mouse_
 allen_atlas = np.load(os.path.join(test_data_dir, 'volumes', 'allen_mouse_200um.npz'))
 reference = allen_atlas['reference']
 annotation = allen_atlas['annotation']
-volume = CCF_translator.Volume(
+volume = brainglobe_ccf_translator.Volume(
     values = reference,
     space = 'allen_mouse',
     age_PND = 56,
@@ -95,7 +95,7 @@ volume.transform(
 
 reference_transformed = volume.values
 
-volume = CCF_translator.Volume(
+volume = brainglobe_ccf_translator.Volume(
     values = annotation,
     space = 'allen_mouse',
     age_PND = 56,
@@ -117,7 +117,7 @@ np.savez_compressed(os.path.join(test_data_dir,'expected_outputs', 'allen_mouse_
 
 demba_p4 = np.load(os.path.join(test_data_dir, 'volumes', 'demba_P4_mouse_200um.npz'))
 demba_p4 = demba_p4['reference']
-volume_p4 = CCF_translator.Volume(
+volume_p4 = brainglobe_ccf_translator.Volume(
     values = demba_p4,
     space = 'demba_dev_mouse',
     age_PND = 4,
@@ -125,7 +125,7 @@ volume_p4 = CCF_translator.Volume(
 )
 demba_p7 = np.load(os.path.join(test_data_dir, 'volumes', 'demba_P7_mouse_200um.npz'))
 demba_p7 = demba_p7['reference']
-volume_p7 = CCF_translator.Volume(
+volume_p7 = brainglobe_ccf_translator.Volume(
     values = demba_p7,
     space = 'demba_dev_mouse',
     age_PND = 7,
@@ -135,14 +135,14 @@ volume_p7 = CCF_translator.Volume(
 
 demba_p8 = np.load(os.path.join(test_data_dir, 'volumes', 'demba_P8_mouse_200um.npz'))
 demba_p8 = demba_p8['reference']
-volume_p8 = CCF_translator.Volume(
+volume_p8 = brainglobe_ccf_translator.Volume(
     values = demba_p8,
     space = 'demba_dev_mouse',
     age_PND = 8,
     voxel_size_micron=200
 )
 
-series = CCF_translator.VolumeSeries([volume_p7, volume_p4, ])
+series = brainglobe_ccf_translator.VolumeSeries([volume_p7, volume_p4, ])
 series.interpolate_series()
 
 for volume in series.Volumes:
@@ -172,7 +172,7 @@ plt.imshow(reference_transformed[30])
 # allen_atlas = np.load(os.path.join(test_data_dir, 'volumes', 'allen_mouse_200um.npz'))
 # reference = allen_atlas['reference']
 # annotation = allen_atlas['annotation']
-# volume = CCF_translator.Volume(
+# volume = brainglobe_ccf_translator.Volume(
 #     values = reference,
 #     space = 'allen_mouse',
 #     age_PND = 56,
@@ -185,7 +185,7 @@ plt.imshow(reference_transformed[30])
 
 # reference_transformed = volume.values
 
-# volume = CCF_translator.Volume(
+# volume = brainglobe_ccf_translator.Volume(
 #     values = annotation,
 #     space = 'allen_mouse',
 #     age_PND = 56,

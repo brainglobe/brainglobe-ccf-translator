@@ -10,10 +10,10 @@ import nibabel as nib
 import os
 import numpy as np
 from scipy.ndimage import zoom
-from CCF_translator.deformation.interpolation.NearestNDInterpolator import (
+from brainglobe_ccf_translator.deformation.interpolation.NearestNDInterpolator import (
     NearestNDInterpolator,
 )
-from CCF_translator.deformation.forward_transform import create_deformation_coords
+from brainglobe_ccf_translator.deformation.forward_transform import create_deformation_coords
 from scipy.ndimage import binary_dilation, binary_erosion
 
 
@@ -87,7 +87,7 @@ def resize_input(arr, original_input_shape, new_input_shape):
 
 
 root_path = r"/home/harryc/github/gubra/Multimodal_mouse_brain_atlas_files"
-out_path = r"/home/harryc/github/CCF_translator/CCF_translator/"
+out_path = r"/home/harryc/github/brainglobe_ccf_translator/brainglobe_ccf_translator/"
 
 ##set the origin as zero in the transform file if you want to use that with these files
 ##here we just remove the offsets from the volume that is to be registered

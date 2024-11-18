@@ -1,12 +1,12 @@
 # import os
 # import sys
 
-# sys.path.append(os.path.abspath("/home/harryc/github/CCF_translator/"))
+# sys.path.append(os.path.abspath("/home/harryc/github/brainglobe_ccf_translator/"))
 import unittest
 import numpy as np
 import json
 import os
-from CCF_translator import PointSet
+from brainglobe_ccf_translator import PointSet
 
 class TestPointset(unittest.TestCase):
     def setUp(self):

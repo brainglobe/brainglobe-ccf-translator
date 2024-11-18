@@ -1,12 +1,12 @@
 import os
 import sys
-sys.path.append(os.path.abspath("/home/harryc/github/CCF_translator/"))
+sys.path.append(os.path.abspath("/home/harryc/github/brainglobe_ccf_translator/"))
 
 import unittest
 import nibabel as nib
 import numpy as np
 import json
-from CCF_translator import VolumeSeries, Volume
+from brainglobe_ccf_translator import VolumeSeries, Volume
 
 class TestVolumeSeries(unittest.TestCase):
     def setUp(self):

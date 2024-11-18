@@ -2,7 +2,7 @@ import os
 
 # os.chdir("..")
 from brainglobe_atlasapi.bg_atlas import BrainGlobeAtlas
-import CCF_translator
+import brainglobe_ccf_translator
 
 
 voxel_size_micron = 20
@@ -11,7 +11,7 @@ atlas = BrainGlobeAtlas(f"{space_name}_{voxel_size_micron}um")
 source_age = 56
 target_age = 56
 
-CCFT_vol = CCF_translator.Volume(
+CCFT_vol = brainglobe_ccf_translator.Volume(
     values=atlas.reference,
     space="princeton_mouse",
     voxel_size_micron=voxel_size_micron,
@@ -27,7 +27,7 @@ import os
 
 # os.chdir("..")
 from brainglobe_atlasapi.bg_atlas import BrainGlobeAtlas
-import CCF_translator
+import brainglobe_ccf_translator
 
 
 voxel_size_micron = 25
@@ -36,7 +36,7 @@ atlas = BrainGlobeAtlas(f"{space_name}_{voxel_size_micron}um")
 source_age = 56
 target_age = 56
 
-CCFT_vol = CCF_translator.Volume(
+CCFT_vol = brainglobe_ccf_translator.Volume(
     values=atlas.reference,
     space=space_name,
     voxel_size_micron=voxel_size_micron,

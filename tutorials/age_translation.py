@@ -1,7 +1,7 @@
 import os
 
 os.chdir("..")
-import CCF_translator as CCFT
+import brainglobe_ccf_translator as CCFT
 import nibabel as nib
 import numpy as np
 

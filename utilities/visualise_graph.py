@@ -6,7 +6,7 @@ import pandas as pd
 import os
 import pygraphviz as pgv
 
-base_path = r"/home/harryc/github/CCF_translator/CCF_translator"
+base_path = r"/home/harryc/github/brainglobe_ccf_translator/brainglobe_ccf_translator"
 
 def calculate_route(source, target, metadata):
     G = nx.DiGraph()
