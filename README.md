@@ -6,10 +6,10 @@ A longstanding problem in NeuroInformatics has been the inability to easily tran
 
 CCF translator can also interpolate between spaces and create a new intermediate space. This is primarily useful for development, where, for instance, the midpoint between day 5 and day 7 can be taken and used as a postnatal day 6 reference. It could also be useful for making references of disease progression.  
 
-![a graph of all the available spaces and how they are connected. the spaces are nodes with the space name written on top of them, the edges show which spaces are connected to which other spaces.](https://raw.githubusercontent.com/Neural-Systems-at-UIO/CCF translator/main/media/graph.png)
+![a graph of all the available spaces and how they are connected. the spaces are nodes with the space name written on top of them, the edges show which spaces are connected to which other spaces.](https://raw.githubusercontent.com/brainglobe/brainglobe-ccf-translator/main/media/graph.png)
 ## Use Cases
 One way you can use CCF translator is to view data from one space, in another space. For instance the allen connectivity dataset shows projections from viral tracing studies in the adult brain. We can take any of these projection datasets and view them in the developing brain, for instance post natal day 9.
-![an image which shows a viral tracing study overlaid on the allen adult ccfv3 template. it shows that same viral tracing data transformed and overlaid on a post natal day 9 template. between the two images is an arrow pointing from the adult to the post natal day 9 brain, above which is text saying CCF translator, implying that CCF translator was used to transform the data from adult to post natal day 9.](https://raw.githubusercontent.com/Neural-Systems-at-UIO/CCF translator/main/media/allen_connectivity_transform.png)
+![an image which shows a viral tracing study overlaid on the allen adult ccfv3 template. it shows that same viral tracing data transformed and overlaid on a post natal day 9 template. between the two images is an arrow pointing from the adult to the post natal day 9 brain, above which is text saying CCF translator, implying that CCF translator was used to transform the data from adult to post natal day 9.](https://raw.githubusercontent.com/brainglobe/brainglobe-ccf-translator/main/media/allen_connectivity_transform.png)
 ## Installation
 CCF translator can be installed by running 
 ```
