@@ -1,5 +1,5 @@
 {
-    "@context": "https://w3id.org/codemeta/3.0",
+    "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
     "type": "SoftwareSourceCode",
     "author": [
         {
@@ -14,13 +14,35 @@
             "givenName": "Harry"
         },
         {
-            "type": "Role",
+            "type": "schema:Role",
             "schema:author": "https://orcid.org/0000-0002-4111-6259"
+        },
+        {
+            "id": "https://orcid.org/0000-0002-2926-6836",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "Pennsylvania State University"
+            },
+            "email": "i.e.bjerke@medisin.uio.no",
+            "familyName": "Bjerke",
+            "givenName": "Ingvild "
+        },
+        {
+            "id": "https://orcid.org/0000-0002-4458-6870",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "Sainsbury Wellcome Centre"
+            },
+            "email": "adam@adamltyson.com",
+            "familyName": "Tyson",
+            "givenName": "Adam"
         }
     ],
     "codeRepository": "https://github.com/brainglobe/brainglobe-ccf-translator",
     "dateCreated": "2024-05-24",
-    "description": "A tool for translating between common coordinate frameworks using deformation matrices. ",
+    "description": "CCF translator (brainglobe-ccf-translator) is a tool for translating between common coordinate frameworks using deformation matrices. A longstanding problem in NeuroInformatics has been the inability to easily translate data between common coordinate frameworks. CCF translator aims to solve this. By connecting each new space to an existing one, we can construct a graph of deformations. This means that data can be translated as long as there is a route from one space to another, even if that route passes through multiple other spaces. Now, when new templates for new modalities, strains, or ages are released, users will not be subdivided into unrelated spaces. As long as they are connected to a space which exists in our network, they will be fully connected to all other spaces.\n\nCCF translator can also interpolate between spaces and create a new intermediate space. This is primarily useful for development, where, for instance, the midpoint between day 5 and day 7 can be taken and used as a postnatal day 6 reference. It could also be useful for making references of disease progression.",
     "funder": {
         "type": "Organization",
         "name": "European Union "
@@ -36,5 +58,6 @@
     "programmingLanguage": "Python 3",
     "developmentStatus": "wip",
     "funding": "European Union’s Horizon 2020 Framework Program for Research and Innovation under the Specific Grant Agreement No. 945539 (Human Brain Project SGA3) ",
-    "issueTracker": "https://github.com/brainglobe/brainglobe-ccf-translator/issues"
+    "issueTracker": "https://github.com/brainglobe/brainglobe-ccf-translator/issues",
+    "referencePublication": "https://doi.org/10.1101/2024.06.14.598876"
 }
