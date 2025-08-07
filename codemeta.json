@@ -42,7 +42,9 @@
     ],
     "codeRepository": "https://github.com/brainglobe/brainglobe-ccf-translator",
     "dateCreated": "2024-05-24",
+    "dateModified": "2024-11-18",
     "description": "CCF translator (brainglobe-ccf-translator) is a tool for translating between common coordinate frameworks using deformation matrices. A longstanding problem in NeuroInformatics has been the inability to easily translate data between common coordinate frameworks. CCF translator aims to solve this. By connecting each new space to an existing one, we can construct a graph of deformations. This means that data can be translated as long as there is a route from one space to another, even if that route passes through multiple other spaces. Now, when new templates for new modalities, strains, or ages are released, users will not be subdivided into unrelated spaces. As long as they are connected to a space which exists in our network, they will be fully connected to all other spaces.\n\nCCF translator can also interpolate between spaces and create a new intermediate space. This is primarily useful for development, where, for instance, the midpoint between day 5 and day 7 can be taken and used as a postnatal day 6 reference. It could also be useful for making references of disease progression.",
+    "downloadUrl": "https://files.pythonhosted.org/packages/c2/24/677f016dbc9041e450329cc16c582cffd39ac4f79685de994596ea9da62f/brainglobe_ccf_translator-0.21.tar.gz",
     "funder": {
         "type": "Organization",
         "name": "European Union "
@@ -56,6 +58,8 @@
     "license": "https://spdx.org/licenses/MIT",
     "name": "brainglobe-ccf-translator",
     "programmingLanguage": "Python 3",
+    "relatedLink": "https://pypi.org/project/brainglobe-ccf-translator/",
+    "version": "0.21.0",
     "developmentStatus": "wip",
     "funding": "European Union’s Horizon 2020 Framework Program for Research and Innovation under the Specific Grant Agreement No. 945539 (Human Brain Project SGA3) ",
     "issueTracker": "https://github.com/brainglobe/brainglobe-ccf-translator/issues",
