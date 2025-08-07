@@ -1,0 +1,40 @@
+{
+    "@context": "https://w3id.org/codemeta/3.0",
+    "type": "SoftwareSourceCode",
+    "author": [
+        {
+            "id": "https://orcid.org/0000-0002-4111-6259",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "Division of Anatomy, University of Oslo"
+            },
+            "email": "harry.carey@medisin.uio.no",
+            "familyName": "Carey",
+            "givenName": "Harry"
+        },
+        {
+            "type": "Role",
+            "schema:author": "https://orcid.org/0000-0002-4111-6259"
+        }
+    ],
+    "codeRepository": "https://github.com/brainglobe/brainglobe-ccf-translator",
+    "dateCreated": "2024-05-24",
+    "description": "A tool for translating between common coordinate frameworks using deformation matrices. ",
+    "funder": {
+        "type": "Organization",
+        "name": "European Union "
+    },
+    "keywords": [
+        "Neuroscience",
+        "Neuroinformatics",
+        "atlasing",
+        "CCF"
+    ],
+    "license": "https://spdx.org/licenses/MIT",
+    "name": "brainglobe-ccf-translator",
+    "programmingLanguage": "Python 3",
+    "developmentStatus": "wip",
+    "funding": "European Union’s Horizon 2020 Framework Program for Research and Innovation under the Specific Grant Agreement No. 945539 (Human Brain Project SGA3) ",
+    "issueTracker": "https://github.com/brainglobe/brainglobe-ccf-translator/issues"
+}
