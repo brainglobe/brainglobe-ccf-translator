@@ -126,7 +126,8 @@ mri_dir = root_path / "MRI_space_oriented"
 ccfv3_oriented_dir = root_path / "AIBS_CCFv3_space_oriented"
 ccfv3_original_dir = root_path / "AIBS_CCFv3_space_original"
 deformation_dir = root_path / "Deformation_fields"
-perens_stpt_dir = out_path / "deformation_fields" / "perens_stpt_mouse"
+allen_mouse_dir = out_path / "deformation_fields" / "allen_mouse"
+def_out_dir = out_path / "deformation_fields"
 perens_mri_dir = out_path / "deformation_fields" / "perens_mri_mouse"
 perens_lsfm_dir = out_path / "deformation_fields" / "perens_lsfm_mouse"
 
@@ -221,28 +222,28 @@ ccfv3_original_shape = zero_origin_image(
 
 process_deformation_field(
     deformation_dir / "ccfv3_orig_2_mri_deffield.nii.gz",
-    perens_mri_dir / f"perens_stereotaxic_mri_mouse_pull_allen_mouse_v{VERSION}.nii.gz",
+    def_out_dir / "perens_stereotaxic_mri_mouse" / f"perens_stereotaxic_mri_mouse_pull_allen_mouse_v{VERSION}.nii.gz",
     ccfv3_original_shape,
 )
 
 invert_and_save(
     perens_mri_dir / f"perens_stereotaxic_mri_mouse_pull_allen_mouse_v{VERSION}.nii.gz",
     ccfv3_template,
-    perens_mri_dir / f"allen_mouse_pull_perens_stereotaxic_mri_mouse_v{VERSION}.nii.gz",
+    def_out_dir / "allen_mouse" / f"allen_mouse_pull_perens_stereotaxic_mri_mouse_v{VERSION}.nii.gz",
     crop={1: slice(70, -70)},
 )
 
 
 process_deformation_field(
     deformation_dir / "ccfv3_orig_2_lsfm_deffield.nii.gz",
-    perens_mri_dir / f"perens_multimodal_lsfm_mouse_pull_allen_mouse_v{VERSION}.nii.gz",
+    def_out_dir / "perens_multimodal_lsfm_mouse" / f"perens_multimodal_lsfm_mouse_pull_allen_mouse_v{VERSION}.nii.gz",
     ccfv3_original_shape,
 )
 
 invert_and_save(
     perens_mri_dir / f"perens_multimodal_lsfm_mouse_pull_allen_mouse_v{VERSION}.nii.gz",
     ccfv3_template,
-    perens_mri_dir / f"allen_mouse_pull_perens_multimodal_lsfm_mouse_v{VERSION}.nii.gz",
+    def_out_dir / "allen_mouse" / f"allen_mouse_pull_perens_multimodal_lsfm_mouse_v{VERSION}.nii.gz",
     crop={1: slice(70, -70)},
 )
 
@@ -254,7 +255,30 @@ pd.DataFrame([
         transformation_resolution_micron=25,
         source_age_pnd=56,
         target_age_pnd=56,
-        out_dir=perens_mri_dir
+        out_dir=def_out_dir / "allen_mouse"
         ),
-
-])
+    create_metadata_dict(
+        source_space = "allen_mouse",
+        target_space = "perens_multimodal_lsfm_mouse",
+        transformation_resolution_micron=25,
+        source_age_pnd=56,
+        target_age_pnd=56,
+        out_dir=def_out_dir / "perens_multimodal_lsfm_mouse"
+        ),
+    create_metadata_dict(
+        source_space = "perens_stereotaxic_mri_mouse",
+        target_space = "allen_mouse",
+        transformation_resolution_micron=25,
+        source_age_pnd=56,
+        target_age_pnd=56,
+        out_dir=def_out_dir / "allen_mouse"
+        ),
+    create_metadata_dict(
+        source_space = "allen_mouse",
+        target_space = "perens_stereotaxic_mri_mouse",
+        transformation_resolution_micron=25,
+        source_age_pnd=56,
+        target_age_pnd=56,
+        out_dir=def_out_dir / "perens_stereotaxic_mri_mouse"
+        ),
+    ]).to_csv(f"{root_path}/translation_metadata.csv")
