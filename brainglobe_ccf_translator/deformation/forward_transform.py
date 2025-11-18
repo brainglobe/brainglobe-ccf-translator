@@ -15,6 +15,8 @@ def interpolate_volume(volume, mask):
     mask = mask.flatten()
     values = volume.flatten()
     nan_pos = np.isnan(values)
+    if np.sum(nan_pos) == 0:
+        return volume
     interp_mask = ~nan_pos & mask
     # Create the interpolator
     interpolator = NearestNDInterpolator(points[interp_mask], values[interp_mask])

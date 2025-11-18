@@ -1,8 +1,8 @@
-"""I wanted to include the Gubra multimodal atlas but ran into a few issues. 
+"""I wanted to include the Gubra multimodal atlas but ran into a few issues.
 First the origin of the volumes is not zero so this had to be corrected for in the deformations.
-Second, they transform between two volumes of different resolutions, something which I suspect may cause 
-problems for CCF translator in the future, here is my attempt to correct for these issues. 
-In the end it is close to the Gubra result, maybe off by less than 1 voxel. 
+Second, they transform between two volumes of different resolutions, something which I suspect may cause
+problems for CCF translator in the future, here is my attempt to correct for these issues.
+In the end it is close to the Gubra result, maybe off by less than 1 voxel.
 """
 
 import matplotlib.pyplot as plt
