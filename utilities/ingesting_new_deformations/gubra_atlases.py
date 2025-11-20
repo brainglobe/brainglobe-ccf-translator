@@ -10,6 +10,7 @@ import numpy as np
 from pathlib import Path
 import sys
 import pandas as pd
+from brainglobe_atlasapi.bg_atlas import BrainGlobeAtlas
 
 VERSION = "1.1"
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -68,6 +69,26 @@ def _resize_vector_field(
     vec = resize_input(vec, vec.shape, (1, *source_shape))
     return np.transpose(vec, [1, 2, 3, 0])
 
+def _reorient_vector_field(arr, source_shape, new_order, flips):
+    vec = np.transpose(arr, [3, 0, 1, 2])
+    vec = resize_input(vec, (1, *source_shape), vec.shape)
+    new_order = np.array(new_order)
+    vec = np.transpose(vec, [0,*(new_order + 1)])
+    vec = vec[new_order]
+    if flips[0]:
+        vec = vec[:,::-1]
+        vec[0] *= -1
+    if flips[1]:
+        vec = vec[:,:,::-1]
+        vec[1] *= -1
+    if flips[2]:
+        vec = vec[:,:,:,::-1]
+        vec[2] *= -1
+    source_shape = np.array(source_shape)
+    source_shape = source_shape[new_order]
+    vec = resize_input(vec, vec.shape, (1, *source_shape))
+    vec = np.transpose(vec, [1, 2, 3, 0])
+    return vec
 
 def process_deformation_field(
     input_path: Path,
@@ -78,6 +99,10 @@ def process_deformation_field(
     mask_label: str | None = None,
     resize_to_source: bool = False,
     fill_missing: bool = False,
+    crop_input = [[0,0], [0,0], [0,0]],
+    crop_output = [[0,0], [0,0], [0,0]],
+    new_order = [0,1,2],
+    flips = [False, False, False]
 ) -> None:
     img = nib.load(str(input_path))
     arr = img.get_fdata()
@@ -85,6 +110,11 @@ def process_deformation_field(
     arr[:, :, :, :, 0] -= img.affine[0, 0] * diff[0]
     arr[:, :, :, :, 1] -= img.affine[1, 1] * diff[1]
     arr[:, :, :, :, 2] -= img.affine[2, 2] * diff[2]
+
+    arr = arr[crop_output[0][0]:(arr.shape[0]-crop_output[0][1]),crop_output[1][0]:(arr.shape[1]-crop_output[1][1]),crop_output[2][0]:(arr.shape[2]-crop_output[2][1]),:,:]
+    arr[:,:,:,:,0] -= crop_input[0][0]
+    arr[:,:,:,:,1] -= crop_input[1][0]
+    arr[:,:,:,:,2] -= crop_input[2][0]
     if mask_fn:
         mask = mask_fn(arr)
         arr[mask, :] = np.nan
@@ -94,6 +124,7 @@ def process_deformation_field(
     arr = np.squeeze(arr, axis=3)
     if resize_to_source:
         arr = _resize_vector_field(arr, source_shape, fill_missing)
+    arr = _reorient_vector_field(arr, source_shape, new_order, flips)
     _reset_offsets(img)
     _ensure_parent(output_path)
     nib.save(nib.Nifti1Image(arr, img.affine, img.header), str(output_path))
@@ -103,33 +134,21 @@ def invert_and_save(
     input_path: Path,
     reference_path: Path,
     output_path: Path,
+    output_shape,
     *,
-    crop: dict[int, slice] | None = None,
+    crop_input = [[0,0], [0,0], [0,0]],
+    crop_output = [[0,0], [0,0], [0,0]],
 ) -> None:
-    output_shape = nib.load(str(reference_path)).shape
     img = nib.load(str(input_path))
     arr = np.transpose(img.get_fdata(), [3, 0, 1, 2])
     invert_arr = invert_deformation(arr, output_shape)
     invert_arr = np.transpose(invert_arr, [1, 2, 3, 0])
-    if crop:
-        slices = [slice(None)] * invert_arr.ndim
-        for axis, axis_slice in crop.items():
-            slices[axis] = axis_slice
-        invert_arr = invert_arr[tuple(slices)]
+    invert_arr = invert_arr[crop_output[0][0]:(invert_arr.shape[0]-crop_output[0][1]),crop_output[1][0]:(invert_arr.shape[1]-crop_output[1][1]),crop_output[2][0]:(invert_arr.shape[2]-crop_output[2][1]),:]
+    invert_arr[:,:,:,0] -= crop_input[0][0]
+    invert_arr[:,:,:,1] -= crop_input[1][0]
+    invert_arr[:,:,:,2] -= crop_input[2][0]
     _ensure_parent(output_path)
     nib.save(nib.Nifti1Image(invert_arr, img.affine, img.header), str(output_path))
-
-
-root_path = Path("/home/harryc/github/gubra/Multimodal_mouse_brain_atlas_files")
-out_path = Path("~/.brainglobe/").expanduser()
-mri_dir = root_path / "MRI_space_oriented"
-ccfv3_oriented_dir = root_path / "AIBS_CCFv3_space_oriented"
-ccfv3_original_dir = root_path / "AIBS_CCFv3_space_original"
-deformation_dir = root_path / "Deformation_fields"
-allen_mouse_dir = out_path / "deformation_fields" / "allen_mouse"
-def_out_dir = out_path / "deformation_fields"
-perens_mri_dir = out_path / "deformation_fields" / "perens_mri_mouse"
-perens_lsfm_dir = out_path / "deformation_fields" / "perens_lsfm_mouse"
 
 def create_metadata_dict(
     source_space,
@@ -137,22 +156,22 @@ def create_metadata_dict(
     source_age_pnd,
     target_age_pnd,
     transformation_resolution_micron,
-    affine=np.eye(4),
-    dim_order=np.arange(3),
+    affine="[[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0],[0.0, 0.0, 0.0, 1.0]]",
+    dim_order="[0, 1, 2]",
     key_age=True,
     source_key_age=False,
     target_key_age=False,
-    padding_micron="[[0,0], [0,0], [0,0]]",
+    padding_micron="[[0, 0], [0, 0], [0, 0]]",
     dim_flip="[False, False, False]",
     vector=1,
     out_dir = ""
 ):
-    filename = f"{source_space}_pull_{target_space}_v{VERSION}.nii.gz"
-    img = nib.load(f"{out_dir}/{filename}")
+    filename = f"{target_space}_pull_{source_space}_v{VERSION}.nii.gz"
+    img = nib.load(f"{out_dir}/{target_space}/{filename}")
     X_physical_size_micron,Y_physical_size_micron,Z_physical_size_micron,_ = np.array(img.shape) * transformation_resolution_micron
 
-    filename = f"{target_space}_pull_{source_space}_v{VERSION}.nii.gz"
-    img = nib.load(f"{out_dir}/{filename}")
+    filename = f"{source_space}_pull_{target_space}_v{VERSION}.nii.gz"
+    img = nib.load(f"{out_dir}/{source_space}/{filename}")
     target_X_physical_size_micron,target_Y_physical_size_micron,target_Z_physical_size_micron,_ = np.array(img.shape) * transformation_resolution_micron
     return {
         "filename": filename,
@@ -176,6 +195,17 @@ def create_metadata_dict(
         "dim_flip": dim_flip,
         "vector": vector,
     }
+
+root_path = Path("/home/harryc/github/gubra/Multimodal_mouse_brain_atlas_files")
+out_path = Path("~/.brainglobe/").expanduser()
+mri_dir = root_path / "MRI_space_oriented"
+ccfv3_oriented_dir = root_path / "AIBS_CCFv3_space_oriented"
+ccfv3_original_dir = root_path / "AIBS_CCFv3_space_original"
+deformation_dir = root_path / "Deformation_fields"
+allen_mouse_dir = out_path / "deformation_fields" / "allen_mouse"
+def_out_dir = out_path / "deformation_fields"
+
+
 
 
 zero_origin_image(mri_dir / "mri_temp.nii.gz", mri_dir / "mri_new_header.nii.gz")
@@ -224,46 +254,66 @@ process_deformation_field(
     deformation_dir / "ccfv3_orig_2_mri_deffield.nii.gz",
     def_out_dir / "perens_stereotaxic_mri_mouse" / f"perens_stereotaxic_mri_mouse_pull_allen_mouse_v{VERSION}.nii.gz",
     ccfv3_original_shape,
-)
+    resize_to_source=True,
+    crop_input= [[0,0],[70,70],[0,0]],
+    new_order = [1, 2, 0],
+    flips=[False, True, False]
+
+    )
+
+
+atlas = BrainGlobeAtlas(f"allen_mouse_25um")
 
 invert_and_save(
-    perens_mri_dir / f"perens_stereotaxic_mri_mouse_pull_allen_mouse_v{VERSION}.nii.gz",
+    def_out_dir / "perens_stereotaxic_mri_mouse" / f"perens_stereotaxic_mri_mouse_pull_allen_mouse_v{VERSION}.nii.gz",
     ccfv3_template,
-    def_out_dir / "allen_mouse" / f"allen_mouse_pull_perens_stereotaxic_mri_mouse_v{VERSION}.nii.gz",
-    crop={1: slice(70, -70)},
-)
+    def_out_dir /  "allen_mouse"  / f"allen_mouse_pull_perens_stereotaxic_mri_mouse_v{VERSION}.nii.gz",
+    atlas.shape,
+    crop_input=[[0,0],[0,0],[0,0]],
+    crop_output=[[0,0],[0,0],[0,0]],
+    )
+
 
 
 process_deformation_field(
     deformation_dir / "ccfv3_orig_2_lsfm_deffield.nii.gz",
-    def_out_dir / "perens_multimodal_lsfm_mouse" / f"perens_multimodal_lsfm_mouse_pull_allen_mouse_v{VERSION}.nii.gz",
+    def_out_dir / "perens_multimodal_lsfm" / f"perens_multimodal_lsfm_pull_allen_mouse_v{VERSION}.nii.gz",
     ccfv3_original_shape,
+    resize_to_source=True,
+    crop_input= [[0,0],[70,70],[0,0]],
+    mask_fn=_lsfm_mask,
+    new_order = [1, 2, 0],
+    flips=[False, True, False]
 )
-
 invert_and_save(
-    perens_mri_dir / f"perens_multimodal_lsfm_mouse_pull_allen_mouse_v{VERSION}.nii.gz",
+    def_out_dir /"perens_multimodal_lsfm" /f"perens_multimodal_lsfm_pull_allen_mouse_v{VERSION}.nii.gz",
     ccfv3_template,
-    def_out_dir / "allen_mouse" / f"allen_mouse_pull_perens_multimodal_lsfm_mouse_v{VERSION}.nii.gz",
-    crop={1: slice(70, -70)},
-)
+    def_out_dir /  "allen_mouse" / f"allen_mouse_pull_perens_multimodal_lsfm_v{VERSION}.nii.gz",
+    atlas.shape,
+    crop_input=[[0,0],[0,0],[0,0]],
+    crop_output=[[0,0],[0,0],[0,0]],
+    )
+
+
+
 
 
 pd.DataFrame([
     create_metadata_dict(
-        source_space = "perens_multimodal_lsfm_mouse",
+        source_space = "perens_multimodal_lsfm",
         target_space = "allen_mouse",
         transformation_resolution_micron=25,
         source_age_pnd=56,
         target_age_pnd=56,
-        out_dir=def_out_dir / "allen_mouse"
+        out_dir=def_out_dir
         ),
     create_metadata_dict(
         source_space = "allen_mouse",
-        target_space = "perens_multimodal_lsfm_mouse",
+        target_space = "perens_multimodal_lsfm",
         transformation_resolution_micron=25,
         source_age_pnd=56,
         target_age_pnd=56,
-        out_dir=def_out_dir / "perens_multimodal_lsfm_mouse"
+        out_dir=def_out_dir
         ),
     create_metadata_dict(
         source_space = "perens_stereotaxic_mri_mouse",
@@ -271,7 +321,7 @@ pd.DataFrame([
         transformation_resolution_micron=25,
         source_age_pnd=56,
         target_age_pnd=56,
-        out_dir=def_out_dir / "allen_mouse"
+        out_dir=def_out_dir
         ),
     create_metadata_dict(
         source_space = "allen_mouse",
@@ -279,6 +329,6 @@ pd.DataFrame([
         transformation_resolution_micron=25,
         source_age_pnd=56,
         target_age_pnd=56,
-        out_dir=def_out_dir / "perens_stereotaxic_mri_mouse"
+        out_dir=def_out_dir
         ),
-    ]).to_csv(f"{root_path}/translation_metadata.csv")
+    ]).to_csv(f"{root_path}/translation_metadata.csv", index=False)

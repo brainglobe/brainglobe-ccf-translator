@@ -8,12 +8,6 @@ voxel_size_micron = 25
 space_name = r"perens_stereotaxic_mri_mouse"
 atlas = BrainGlobeAtlas(f"{space_name}_{voxel_size_micron}um")
 
-path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/MRI_space_oriented/mri_temp.nii.gz"
-og_vol = nib.load(path).get_fdata()
-
-og_vol = og_vol.transpose(1, 2, 0)
-og_vol = og_vol[:, ::-1, :]
-
 
 ccft_vol = brainglobe_ccf_translator.Volume(
     values=atlas.reference,
@@ -23,8 +17,9 @@ ccft_vol = brainglobe_ccf_translator.Volume(
 )
 
 
-ccft_vol.transform(56, "perens_stpt_mouse")
+ccft_vol.transform(56, "allen_mouse")
 
+plt.imshow(ccft_vol.values[:, 200], cmap="gray")
 
 import matplotlib.pyplot as plt
 
@@ -50,7 +45,7 @@ img = nib.load(in_path)
 data = img.get_fdata()
 data = np.transpose(data, [1, 2, 0, 3])
 
-data = data[:, :, :, [1, 2, 0]]
+data = data[    :, :, :, [1, 2, 0]]
 
 data = data[:, ::-1, :, :]
 data[:, :, :, 1] *= -1
@@ -93,3 +88,448 @@ ref = nib.load(path).get_fdata().transpose(1, 2, 0)[:, ::-1, :]
 plt.imshow(ref[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
 plt.imshow(ref[200], cmap="gray")
 plt.imshow(ccft_vol.values[200], cmap="gray")
+
+
+
+#####Showing how it worked previously
+
+import nibabel as nib
+import brainglobe_ccf_translator
+import matplotlib.pyplot as plt
+
+voxel_size_micron = 25
+
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/MRI_space_oriented/mri_temp.nii.gz"
+og_vol = nib.load(path).get_fdata()
+ccft_vol = brainglobe_ccf_translator.Volume(
+    values=og_vol,
+    space="perens_stereotaxic_mri_mouse",
+    voxel_size_micron=voxel_size_micron,
+    age_PND=56,
+)
+ccft_vol.transform(56, "allen_mouse")
+
+
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/AIBS_CCFv3_space_original/ccfv3_orig_temp.nii.gz"
+ref = nib.load(path).get_fdata()#[:,70:-70,:]
+plt.imshow(ref[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
+plt.imshow(ref[:, 200] + ccft_vol.values[:,  200], cmap="gray")
+plt.imshow(ref[200] + ccft_vol.values[ 200], cmap="gray")
+
+plt.imshow(ref[:,:,200], cmap="gray")
+plt.imshow(ccft_vol.values[:,:,200], cmap="gray")
+
+
+
+
+#####Showing how it worked previously
+
+import nibabel as nib
+import brainglobe_ccf_translator
+import matplotlib.pyplot as plt
+
+voxel_size_micron = 25
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/AIBS_CCFv3_space_original/ccfv3_orig_temp.nii.gz"
+
+og_vol = nib.load(path).get_fdata()[:,70:-70,:]
+ccft_vol = brainglobe_ccf_translator.Volume(
+    values=og_vol,
+    space="allen_mouse",
+    voxel_size_micron=voxel_size_micron,
+    age_PND=56,
+)
+ccft_vol.transform(56, "perens_stereotaxic_mri_mouse")
+
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/MRI_space_oriented/mri_temp.nii.gz"
+
+ref = nib.load(path).get_fdata()#[:,70:-70,:]
+plt.imshow(ref[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
+plt.show()
+plt.imshow(ref[:, :, 200] , cmap="gray")
+plt.show()
+plt.imshow(ccft_vol.values[:, :, 200], cmap='gray')
+plt.show()
+
+
+
+#####Showing how it worked previously
+
+import nibabel as nib
+import brainglobe_ccf_translator
+import matplotlib.pyplot as plt
+
+voxel_size_micron = 25
+
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/MRI_space_oriented/mri_temp.nii.gz"
+og_vol = nib.load(path).get_fdata()
+ccft_vol = brainglobe_ccf_translator.Volume(
+    values=og_vol,
+    space="perens_stereotaxic_mri_mouse",
+    voxel_size_micron=voxel_size_micron,
+    age_PND=56,
+)
+ccft_vol.transform(56, "allen_mouse")
+
+
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/AIBS_CCFv3_space_original/ccfv3_orig_temp.nii.gz"
+ref = nib.load(path).get_fdata()[:,70:-70,:]
+plt.imshow(ref[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
+plt.imshow(ref[:, 200] + ccft_vol.values[:,  200], cmap="gray")
+plt.imshow(ref[200] + ccft_vol.values[ 200], cmap="gray")
+
+plt.imshow(ref[:,:,200], cmap="gray")
+plt.imshow(ccft_vol.values[:,:,200], cmap="gray")
+
+
+
+
+
+#####Showing how it worked previously
+
+import nibabel as nib
+import brainglobe_ccf_translator
+import matplotlib.pyplot as plt
+
+voxel_size_micron = 25
+
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/LSFM_space_oriented/lsfm_temp.nii.gz"
+og_vol = nib.load(path).get_fdata()
+ccft_vol = brainglobe_ccf_translator.Volume(
+    values=og_vol,
+    space="perens_multimodal_lsfm",
+    voxel_size_micron=voxel_size_micron,
+    age_PND=56,
+)
+ccft_vol.transform(56, "allen_mouse")
+
+
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/AIBS_CCFv3_space_original/ccfv3_orig_temp.nii.gz"
+ref = nib.load(path).get_fdata()[:,70:-70,:]
+plt.imshow(ref[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
+plt.imshow(ref[:, 200] + ccft_vol.values[:,  200], cmap="gray")
+plt.imshow(ref[200] + ccft_vol.values[ 200], cmap="gray")
+
+plt.imshow(ref[:,:,200], cmap="gray")
+plt.imshow(ccft_vol.values[:,:,200], cmap="gray")
+
+#####Showing how it worked previously
+
+import nibabel as nib
+import brainglobe_ccf_translator
+import matplotlib.pyplot as plt
+
+voxel_size_micron = 25
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/AIBS_CCFv3_space_original/ccfv3_orig_temp.nii.gz"
+
+og_vol = nib.load(path).get_fdata()[:,70:-70,:]
+ccft_vol = brainglobe_ccf_translator.Volume(
+    values=og_vol,
+    space="allen_mouse",
+    voxel_size_micron=voxel_size_micron,
+    age_PND=56,
+)
+ccft_vol.transform(56, "perens_multimodal_lsfm")
+
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/LSFM_space_oriented/lsfm_temp.nii.gz"
+
+ref = nib.load(path).get_fdata()#[:,70:-70,:]
+plt.imshow(ref[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
+plt.show()
+plt.imshow(ref[:, :, 200] , cmap="gray")
+plt.show()
+plt.imshow(ccft_vol.values[:, :, 200], cmap='gray')
+plt.show()
+
+
+
+#######################
+
+space_name = r"allen_mouse"
+atlas = BrainGlobeAtlas(f"{space_name}_{voxel_size_micron}um")
+
+
+ccft_vol = brainglobe_ccf_translator.Volume(
+    values=atlas.reference,
+    space="allen_mouse",
+    voxel_size_micron=voxel_size_micron,
+    age_PND=56,
+)
+
+
+ccft_vol.transform(56, "perens_stereotaxic_mri_mouse")
+
+space_name = r"perens_stereotaxic_mri_mouse"
+
+atlas = BrainGlobeAtlas(f"{space_name}_{voxel_size_micron}um")
+plt.imshow(atlas.reference[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
+plt.imshow( ccft_vol.values[:, :, 200], cmap="gray")
+
+
+
+#####Showing how it worked previously
+
+import nibabel as nib
+import brainglobe_ccf_translator
+import matplotlib.pyplot as plt
+
+voxel_size_micron = 25
+
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/MRI_space_oriented/mri_temp.nii.gz"
+og_vol = nib.load(path).get_fdata()
+ccft_vol = brainglobe_ccf_translator.Volume(
+    values=og_vol,
+    space="perens_stereotaxic_mri_mouse",
+    voxel_size_micron=voxel_size_micron,
+    age_PND=56,
+)
+ccft_vol.transform(56, "allen_mouse")
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/AIBS_CCFv3_space_original/ccfv3_orig_temp.nii.gz"
+ref = nib.load(path).get_fdata()#[:,70:-70,:]
+plt.imshow(ref[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
+plt.imshow(ref[:, 200] + ccft_vol.values[:,  200], cmap="gray")
+plt.imshow(ref[200] + ccft_vol.values[ 200], cmap="gray")
+
+plt.imshow(ref[:,:,200], cmap="gray")
+plt.imshow(ccft_vol.values[:,:,200], cmap="gray")
+plt.imshow(ref[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
+plt.imshow(ccft_vol.values[:,:,200], cmap="gray")
+#####Showing how it worked previously
+
+import nibabel as nib
+import brainglobe_ccf_translator
+import matplotlib.pyplot as plt
+
+voxel_size_micron = 25
+
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/MRI_space_oriented/mri_temp.nii.gz"
+og_vol = nib.load(path).get_fdata()
+ccft_vol = brainglobe_ccf_translator.Volume(
+    values=og_vol,
+    space="perens_stereotaxic_mri_mouse",
+    voxel_size_micron=voxel_size_micron,
+    age_PND=56,
+)
+ccft_vol.transform(56, "allen_mouse")
+
+
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/AIBS_CCFv3_space_original/ccfv3_orig_temp.nii.gz"
+ref = nib.load(path).get_fdata()#[:,70:-70,:]
+plt.imshow(ref[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
+plt.imshow(ref[:, 200] + ccft_vol.values[:,  200], cmap="gray")
+plt.imshow(ref[200] + ccft_vol.values[ 200], cmap="gray")
+
+plt.imshow(ref[:,:,200], cmap="gray")
+plt.imshow(ccft_vol.values[:,:,200], cmap="gray")
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/AIBS_CCFv3_space_original/ccfv3_orig_temp.nii.gz"
+ref = nib.load(path).get_fdata()[:,70:-70,:]
+plt.imshow(ref[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
+plt.imshow(ref[:, 200] + ccft_vol.values[:,  200], cmap="gray")
+plt.imshow(ref[200] + ccft_vol.values[ 200], cmap="gray")
+
+plt.imshow(ref[:,:,200], cmap="gray")
+plt.imshow(ccft_vol.values[:,:,200], cmap="gray")
+plt.imshow(ref[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
+#####Showing how it worked previously
+
+import nibabel as nib
+import brainglobe_ccf_translator
+import matplotlib.pyplot as plt
+
+voxel_size_micron = 25
+
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/MRI_space_oriented/mri_temp.nii.gz"
+og_vol = nib.load(path).get_fdata()
+ccft_vol = brainglobe_ccf_translator.Volume(
+    values=og_vol,
+    space="perens_stereotaxic_mri_mouse",
+    voxel_size_micron=voxel_size_micron,
+    age_PND=56,
+)
+ccft_vol.transform(56, "allen_mouse")
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/AIBS_CCFv3_space_original/ccfv3_orig_temp.nii.gz"
+ref = nib.load(path).get_fdata()[:,70:-70,:]
+plt.imshow(ref[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
+plt.imshow(ref[:,:,200], cmap="gray")
+plt.imshow(ccft_vol.values[:,:,200], cmap="gray")
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/LSFM_space_oriented/mrlsfm_temp.nii.gz"
+og_vol = nib.load(path).get_fdata()
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/LSFM_space_oriented/lsfm_temp.nii.gz"
+og_vol = nib.load(path).get_fdata()
+ccft_vol = brainglobe_ccf_translator.Volume(
+    values=og_vol,
+    space="perens_multimodal_lsfm",
+    voxel_size_micron=voxel_size_micron,
+    age_PND=56,
+)
+ccft_vol.transform(56, "allen_mouse")
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/LSFM_space_oriented/lsfm_temp.nii.gz"
+og_vol = nib.load(path).get_fdata()
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/AIBS_CCFv3_space_original/ccfv3_orig_temp.nii.gz"
+ref = nib.load(path).get_fdata()[:,70:-70,:]
+plt.imshow(ref[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
+plt.imshow(ref[:, 200] + ccft_vol.values[:,  200], cmap="gray")
+plt.imshow(ref[200] + ccft_vol.values[ 200], cmap="gray")
+plt.imshow(ref[:,:,200], cmap="gray")
+plt.imshow(ccft_vol.values[:,:,200], cmap="gray")
+import nibabel as nib
+import brainglobe_ccf_translator
+import matplotlib.pyplot as plt
+
+voxel_size_micron = 25
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/AIBS_CCFv3_space_original/ccfv3_orig_temp.nii.gz"
+
+og_vol = nib.load(path).get_fdata()[:,70:-70,:]
+ccft_vol = brainglobe_ccf_translator.Volume(
+    values=og_vol,
+    space="allen_mouse",
+    voxel_size_micron=voxel_size_micron,
+    age_PND=56,
+)
+ccft_vol.transform(56, "perens_multimodal_lsfm")
+
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/MRI_space_oriented/lsfm_temp.nii.gz"
+
+ref = nib.load(path).get_fdata()[:,70:-70,:]
+plt.imshow(ref[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/LSFM_space_oriented/lsfm_temp.nii.gz"
+
+ref = nib.load(path).get_fdata()[:,70:-70,:]
+plt.imshow(ref[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
+ref = nib.load(path).get_fdata()#[:,70:-70,:]
+plt.imshow(ref[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
+plt.imshow(ref[:, :, 200] , cmap="gray")
+plt.imshow(ccft_vol.values[:, :, 200], cmap='gray')
+from brainglobe_atlasapi.bg_atlas import BrainGlobeAtlas
+import brainglobe_ccf_translator
+from nibabel.orientations import axcodes2ornt, ornt_transform, apply_orientation
+import numpy as np
+import nibabel as nib
+
+voxel_size_micron = 25
+space_name = r"perens_stereotaxic_mri_mouse"
+atlas = BrainGlobeAtlas(f"{space_name}_{voxel_size_micron}um")
+
+
+ccft_vol = brainglobe_ccf_translator.Volume(
+    values=atlas.reference,
+    space="perens_stereotaxic_mri_mouse",
+    voxel_size_micron=voxel_size_micron,
+    age_PND=56,
+)
+
+
+ccft_vol.transform(56, "allen_mouse")
+plt.imshow(ccft_vol.values[:, 200], cmap="gray")
+#####Showing how it worked previously
+
+import nibabel as nib
+import brainglobe_ccf_translator
+import matplotlib.pyplot as plt
+
+voxel_size_micron = 25
+
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/MRI_space_oriented/mri_temp.nii.gz"
+og_vol = nib.load(path).get_fdata()
+ccft_vol = brainglobe_ccf_translator.Volume(
+    values=og_vol,
+    space="perens_stereotaxic_mri_mouse",
+    voxel_size_micron=voxel_size_micron,
+    age_PND=56,
+)
+ccft_vol.transform(56, "allen_mouse")
+
+
+path = "/home/harryc/brainglobe_workingdir/perens_stereotaxic_mri_mouse/downloads/atlas_files/Multimodal_mouse_brain_atlas_files/AIBS_CCFv3_space_original/ccfv3_orig_temp.nii.gz"
+ref = nib.load(path).get_fdata()[:,70:-70,:]
+plt.imshow(ref[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
+#######################
+
+space_name = r"allen_mouse"
+atlas = BrainGlobeAtlas(f"{space_name}_{voxel_size_micron}um")
+
+
+ccft_vol = brainglobe_ccf_translator.Volume(
+    values=atlas.reference,
+    space="allen_mouse",
+    voxel_size_micron=voxel_size_micron,
+    age_PND=56,
+)
+
+
+ccft_vol.transform(56, "perens_stereotaxic_mri_mouse")
+
+space_name = r"perens_stereotaxic_mri_mouse"
+
+atlas = BrainGlobeAtlas(f"{space_name}_{voxel_size_micron}um")
+plt.imshow(atlas.reference[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
+plt.show()
+
+
+
+#######################
+
+space_name = r"perens_stereotaxic_mri_mouse"
+atlas = BrainGlobeAtlas(f"{space_name}_{voxel_size_micron}um")
+
+
+ccft_vol = brainglobe_ccf_translator.Volume(
+    values=atlas.reference,
+    space="perens_stereotaxic_mri_mouse",
+    voxel_size_micron=voxel_size_micron,
+    age_PND=56,
+)
+
+
+ccft_vol.transform(56, "allen_mouse")
+
+space_name = r"allen_mouse"
+
+atlas = BrainGlobeAtlas(f"{space_name}_{voxel_size_micron}um")
+plt.imshow(atlas.reference[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
+plt.show()
+
+#######################
+
+space_name = r"allen_mouse"
+atlas = BrainGlobeAtlas(f"{space_name}_{voxel_size_micron}um")
+
+
+ccft_vol = brainglobe_ccf_translator.Volume(
+    values=atlas.reference,
+    space="allen_mouse",
+    voxel_size_micron=voxel_size_micron,
+    age_PND=56,
+)
+
+
+ccft_vol.transform(56, "perens_multimodal_lsfm")
+
+space_name = r"perens_multimodal_lsfm"
+
+atlas = BrainGlobeAtlas(f"{space_name}_{voxel_size_micron}um")
+plt.imshow( atlas.reference[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
+plt.show()
+
+
+#######################
+import matplotlib.pyplot as plt
+space_name = r"perens_multimodal_lsfm"
+atlas = BrainGlobeAtlas(f"{space_name}_{voxel_size_micron}um")
+plt.imshow(atlas.reference[:, :, 200], cmap="gray")
+plt.show()
+
+ccft_vol = brainglobe_ccf_translator.Volume(
+    values=atlas.reference,
+    space="perens_multimodal_lsfm",
+    voxel_size_micron=voxel_size_micron,
+    age_PND=56,
+)
+
+
+ccft_vol.transform(56, "allen_mouse")
+
+space_name = r"allen_mouse"
+
+atlas = BrainGlobeAtlas(f"{space_name}_{voxel_size_micron}um")
+plt.imshow( atlas.reference[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
+plt.show()
