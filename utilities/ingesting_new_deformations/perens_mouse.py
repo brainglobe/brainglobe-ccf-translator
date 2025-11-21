@@ -3,6 +3,10 @@ First the origin of the volumes is not zero so this had to be corrected for in t
 Second, they transform between two volumes of different resolutions, something which I suspect may cause
 problems for CCF translator in the future, here is my attempt to correct for these issues.
 In the end it is close to the Gubra result, maybe off by less than 1 voxel.
+
+
+This script assumes you have downloaded the Gubra atlas files available from:
+https://www.neuropedia.dk/wp-content/uploads/Multimodal_mouse_brain_atlas_files_v2.7z
 """
 
 import nibabel as nib
