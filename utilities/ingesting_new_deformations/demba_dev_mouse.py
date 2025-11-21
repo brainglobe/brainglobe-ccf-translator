@@ -13,7 +13,6 @@ import urllib
 # for instance the dataset titled Allen Mouse Brain CCFv3 segmentations transformed to P7 population-averaged serial two-photon tomography data
 # Their path is script_with_metadata/deformationField.nii.gz
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-print(PROJECT_ROOT)
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
