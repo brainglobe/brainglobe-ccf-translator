@@ -1,6 +1,10 @@
-from scipy.interpolate.interpnd import NDInterpolatorBase, _ndim_coords_from_arrays
+from scipy.interpolate.interpnd import NDInterpolatorBase
 from scipy.spatial import cKDTree
 import numpy as np
+
+def _ndim_coords_from_arrays(points):
+    # points is a sequence of arrays
+    return np.vstack([p.ravel() for p in points]).T
 
 
 class NearestNDInterpolator(NDInterpolatorBase):

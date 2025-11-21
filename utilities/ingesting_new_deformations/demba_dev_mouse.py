@@ -1,15 +1,23 @@
-from brainglobe_ccf_translator.deformation.forward_transform import invert_deformation
 import numpy as np
 from glob import glob
 import nibabel as nib
 import os
 import math
+from pathlib import Path
+import sys
 
 # Here we have a recreation of the intermediate volumes
 # We start from the files which came out of elastix
 # These can be found in the EBRAINS datasets ie;
 # for instance the dataset titled Allen Mouse Brain CCFv3 segmentations transformed to P7 population-averaged serial two-photon tomography data
 # Their path is script_with_metadata/deformationField.nii.gz
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+print(PROJECT_ROOT)
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from brainglobe_ccf_translator.deformation.forward_transform import invert_deformation
+
 VERSION = "1.1"
 
 
