@@ -218,36 +218,10 @@ ccfv3_shape = zero_origin_image(
     ccfv3_oriented_dir / "ccfv3_new_header.nii.gz",
 )
 
-# process_deformation_field(
-#     deformation_dir / "ccfv3_2_mri_deffield.nii.gz",
-#     perens_stpt_dir / "perens_mri_mouse_pull_perens_stpt_mouse.nii.gz",
-#     ccfv3_shape,
-# )
 
-# process_deformation_field(
-#     deformation_dir / "ccfv3_2_lsfm_deffield.nii.gz",
-#     perens_stpt_dir / "perens_lsfm_mouse_pull_perens_stpt_mouse.nii.gz",
-#     ccfv3_shape,
-#     mask_fn=_lsfm_mask,
-#     mask_label="lsfm nan percent",
-#     resize_to_source=True,
-#     fill_missing=True,
-# )
 
 
 ccfv3_template = ccfv3_oriented_dir / "ccfv3_temp.nii.gz"
-
-# invert_and_save(
-#     perens_stpt_dir / "perens_mri_mouse_pull_perens_stpt_mouse.nii.gz",
-#     ccfv3_template,
-#     perens_mri_dir / "perens_stpt_mouse_pull_perens_mri_mouse.nii.gz",
-# )
-
-# invert_and_save(
-#     perens_stpt_dir / "perens_lsfm_mouse_pull_perens_stpt_mouse.nii.gz",
-#     ccfv3_template,
-#     perens_lsfm_dir / "perens_stpt_mouse_pull_perens_lsfm_mouse.nii.gz",
-# )
 
 ccfv3_original_shape = zero_origin_image(
     ccfv3_original_dir / "ccfv3_orig_temp.nii.gz",
