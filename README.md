@@ -16,7 +16,7 @@ CCF translator can be installed by running
 pip install brainglobe-ccf-translator
 ```
 ## Currently supported spaces
-the name in CCF translator aims to copy the name of atlases in the brainglobe_atlasapi when possible. 
+the name in CCF translator always copies the name of the atlas in the brainglobe atlasapi. 
 | Framework Name | name in api | supported age range
 | -------------- | ----------- | ----------- 
 | Allen mouse CCFv3 | allen_mouse | 56
@@ -41,7 +41,7 @@ print(f"new points are {pset.values}")
 new points are [[267 250 286] [452 247 414]]
  ```
 **Transforming volumes**
-
+All of our transforms assume you retrieved the atlas from the brianglobe-atlasapi. 
 To run the volume examples you will want to install brainglobe-atlasapi using the following
 ```
 pip install brainglobe-atlasapi
