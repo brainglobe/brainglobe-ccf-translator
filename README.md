@@ -21,9 +21,8 @@ the name in CCF translator aims to copy the name of atlases in the brainglobe_at
 | -------------- | ----------- | ----------- 
 | Allen mouse CCFv3 | allen_mouse | 56
 | Demba developmental mouse | demba_dev_mouse| 4-56
-| Gubra lightsheet mouse | perens_lsfm_mouse| 56
-| Gubra MRI mouse | perens_mri_mouse| 56
-| Gubra STPT mouse | perens_stpt_mouse| 56
+| Gubra lightsheet mouse | perens_multimodal_lsfm| 56
+| Gubra MRI mouse | perens_stereotaxic_mri_mouse| 56
 | Princeton lightsheet mouse | princeton_mouse| 56
 ## Usage
 **Transforming points**

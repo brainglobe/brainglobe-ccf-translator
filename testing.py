@@ -533,3 +533,54 @@ space_name = r"allen_mouse"
 atlas = BrainGlobeAtlas(f"{space_name}_{voxel_size_micron}um")
 plt.imshow( atlas.reference[:, :, 200] + ccft_vol.values[:, :, 200], cmap="gray")
 plt.show()
+
+
+
+#######################
+import matplotlib.pyplot as plt
+space_name = r"princeton_mouse"
+atlas = BrainGlobeAtlas(f"{space_name}_20um")
+plt.imshow(atlas.reference[:, :, 200], cmap="gray")
+plt.show()
+
+ccft_vol = brainglobe_ccf_translator.Volume(
+    values=atlas.reference,
+    space="princeton_mouse",
+    voxel_size_micron=20,
+    age_PND=56,
+)
+
+
+ccft_vol.transform(56, "allen_mouse")
+
+space_name = r"allen_mouse"
+
+atlas = BrainGlobeAtlas(f"{space_name}_25um")
+plt.imshow( ccft_vol.values[:, :, int(200 * (25/20))], cmap="gray")
+plt.imshow( atlas.reference[:, :, 200], cmap="gray")
+plt.show()
+
+
+#######################
+import matplotlib.pyplot as plt
+space_name = r"allen_mouse"
+atlas = BrainGlobeAtlas(f"{space_name}_25um")
+plt.imshow(atlas.reference[:, :, 200], cmap="gray")
+plt.show()
+
+ccft_vol = brainglobe_ccf_translator.Volume(
+    values=atlas.reference,
+    space="allen_mouse",
+    voxel_size_micron=25,
+    age_PND=56,
+)
+
+
+ccft_vol.transform(56, "princeton_mouse")
+
+space_name = r"princeton_mouse"
+
+atlas = BrainGlobeAtlas(f"{space_name}_20um")
+plt.imshow( ccft_vol.values[:, :, int(200 * (20/25))], cmap="gray")
+plt.imshow( atlas.reference[:, :, 200], cmap="gray")
+plt.show()
