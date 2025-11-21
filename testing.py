@@ -584,3 +584,6 @@ atlas = BrainGlobeAtlas(f"{space_name}_20um")
 plt.imshow( ccft_vol.values[:, :, int(200 * (20/25))], cmap="gray")
 plt.imshow( atlas.reference[:, :, 200], cmap="gray")
 plt.show()
+
+
+deformation_volumes = glob(r"")
