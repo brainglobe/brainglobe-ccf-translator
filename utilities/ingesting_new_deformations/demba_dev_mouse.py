@@ -5,6 +5,7 @@ import os
 import math
 from pathlib import Path
 import sys
+import urllib
 
 # Here we have a recreation of the intermediate volumes
 # We start from the files which came out of elastix
@@ -31,12 +32,14 @@ deformation_urls = {
     }
 
 key_ages = [56, 28, 21, 14, 7, 4]
-space_name = "Demba"
+space_name = "demba_dev_mouse"
 voxel_size_micron = 20
-save_path = f"brainglobe_ccf_translator/metadata/deformation_fields/{space_name}"
+save_path = os.path.expanduser(f"~/.brainglobe/deformation_fields/{space_name}")
+working_path = os.path.expanduser(f"~/brainglobe_workingdir/{space_name}/")
 if not os.path.exists(save_path):
-    os.mkdir(save_path)
-
+    os.makedirs(save_path, exist_ok=True)
+if not os.path.exists(working_path):
+    os.makedirs(working_path, exist_ok=True)
 
 def open_deformation_field(deformation):
     """this function opens the elastix deformation
@@ -68,7 +71,13 @@ for i in range(len(key_ages) - 1):
     age = key_ages[i + 1]
     # using ccft terminology we would say that the elastix deform is in
     # the 28 space pulling values in from 56 (for the p28 volume that is)
-    original_elastix_volume_path = deformation_urls[age]
+    url = deformation_urls[age]
+    original_elastix_volume_path = os.path.join(working_path, f"downloaded_deformation_{age}.nii.gz")
+
+    if not os.path.exists(original_elastix_volume_path):
+        print(f"Downloading deformation for age {age}...")
+        urllib.request.urlretrieve(url, original_elastix_volume_path)
+
     elastix_img = nib.load(original_elastix_volume_path)
     elastix_arr = open_deformation_field(elastix_img).astype(np.float32)
     elastix_arr = elastix_arr[[2,1,0]]
