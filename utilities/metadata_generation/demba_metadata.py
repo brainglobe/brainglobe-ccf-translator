@@ -1,25 +1,18 @@
 """
-Generating the full metadata for developmental ages is too much to do by hand. 
-This will auto generate it assuming you only transform using deformation fields. 
+Generating the full metadata for developmental ages is too much to do by hand.
+This will auto generate it assuming you only transform using deformation fields.
 """
 
 import numpy as np
 import pandas as pd
 import nrrd
+from brainglobe_atlasapi.bg_atlas import BrainGlobeAtlas
 
-space_name = "demba_dev_mouse"
-
-
-import nibabel as nib
-
-img = nib.load(
-    r"/home/harryc/github/brainglobe_ccf_translator_local/demo_data/DeMBA_P56_double.nii.gz"
-)
-demba_dev_mouse_size_micron = np.array(img.shape) * 20
-img, header = nrrd.read(
-    r"/home/harryc/github/brainglobe_ccf_translator_local/demo_data//annotation_10.nrrd"
-)
-allen_size_micron = np.array(img.shape) * 10
+space_name = "demba_allen_seg_dev_mouse"
+atlas = BrainGlobeAtlas(f"{space_name}_p56_20um")
+demba_dev_mouse_size_micron = np.array(atlas.shape) * 20
+atlas = BrainGlobeAtlas(f"allen_mouse_10um")
+allen_size_micron = np.array(atlas.shape) * 10
 key_ages = np.array([4, 7, 14, 21, 28, 56])
 dim_flip = [False, False, False]
 padding_micron = [[0, 0], [0, 0], [0, 0]]
@@ -210,10 +203,10 @@ Add conversion to Allen Space
 file_name = False
 source_space = "demba_dev_mouse"
 target_space = "allen_mouse"
-dim_order = [2, 1, 0]
+dim_order = [0, 1, 2]
 dim_flip = [False, False, False]
 age = 56
-padding_micron = np.array([[0, 900], [0, 0], [0, 0]])
+padding_micron = np.array([[0, 0], [0, 0], [0, 900]])
 
 
 metadata_template = update_metadata(
