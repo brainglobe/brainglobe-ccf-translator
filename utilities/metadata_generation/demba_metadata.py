@@ -5,18 +5,14 @@ This will auto generate it assuming you only transform using deformation fields.
 
 import numpy as np
 import pandas as pd
-import nrrd
-from brainglobe_atlasapi.bg_atlas import BrainGlobeAtlas
-
-space_name = "demba_allen_seg_dev_mouse"
-atlas = BrainGlobeAtlas(f"{space_name}_p56_20um")
-demba_dev_mouse_size_micron = np.array(atlas.shape) * 20
-atlas = BrainGlobeAtlas(f"allen_mouse_10um")
-allen_size_micron = np.array(atlas.shape) * 10
+VERSION = "1.1"
+space_name = "demba_dev_mouse"
+demba_dev_mouse_size_micron = np.array([14100,  8000, 11400])
+allen_size_micron = np.array([13200,  8000, 11400])
 key_ages = np.array([4, 7, 14, 21, 28, 56])
 dim_flip = [False, False, False]
 padding_micron = [[0, 0], [0, 0], [0, 0]]
-file_name_template = "{}_pull_{}.nii.gz"
+file_name_template = "{}_pull_{}_v{}.nii.gz"
 
 metadata_template = {
     "file_name": [],
@@ -101,7 +97,7 @@ for age in range(4, 57):
     key_age = age in key_ages
     if age in key_ages[1:]:
         target_key = np.max(key_ages[key_ages < age])
-        file_name = file_name_template.format(age, age - 1)
+        file_name = file_name_template.format(age, age - 1, VERSION)
         for target_age in range(target_key, age + 1):
             if target_age == age:
                 continue
@@ -132,7 +128,7 @@ for age in range(4, 57):
             update_count += 1
     if age in key_ages[:-1]:
         target_key = np.min(key_ages[key_ages > age])
-        file_name = file_name_template.format(age, age + 1)
+        file_name = file_name_template.format(age, age + 1, VERSION)
 
         for target_age in range(age, target_key + 1):
             if target_age == age:
@@ -165,7 +161,7 @@ for age in range(4, 57):
 
     if not key_age:
         source_key = np.min(key_ages[key_ages > age])
-        file_name = file_name_template.format(age, age - 1)
+        file_name = file_name_template.format(age, age - 1, VERSION)
         target_key = np.max(key_ages[key_ages < age])
         for target_age in range(target_key, source_key + 1):
             if target_age == age:
@@ -206,7 +202,7 @@ target_space = "allen_mouse"
 dim_order = [0, 1, 2]
 dim_flip = [False, False, False]
 age = 56
-padding_micron = np.array([[0, 0], [0, 0], [0, 900]])
+padding_micron = np.array([[0, 900], [0, 0], [0, 0]])
 
 
 metadata_template = update_metadata(
@@ -269,8 +265,7 @@ metadata_template = update_metadata(
     metadata_template=metadata_template,
 )
 
-
 pd.DataFrame(metadata_template).to_csv(
-    "/home/harryc/github/brainglobe_ccf_translator/brainglobe_ccf_translator/metadata/translation_metadata.csv",
+    "/home/harryc/github/brainglobe-ccf-translator/brainglobe_ccf_translator/metadata/translation_metadata.csv",
     index=False,
 )

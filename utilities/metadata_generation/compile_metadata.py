@@ -4,12 +4,13 @@
 
 # Define the paths to the metadata files
 demba_metadata_path = "demba_metadata.py"
-gubra_metadata_path = "gubra_metadata.py"
+gubra_metadata_path = "perens_metadata.py"
 princeton_metadata_path = "princeton_metadata.py"
 
 
 # Function to execute a Python file
 def execute_file(file_path):
+    print(f"compiling {file_path}")
     with open(file_path, "r") as file:
         exec(file.read())
 

@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 
 VERSION = "1.1"
-metadata_path = Path("/home/harryc/github/brainglobe_ccf_translator/brainglobe_ccf_translator/metadata/translation_metadata.csv")
+metadata_path = Path("/home/harryc/github/brainglobe-ccf-translator/brainglobe_ccf_translator/metadata/translation_metadata.csv")
 out_path = Path("~/.brainglobe/").expanduser()
 def_out_dir = out_path / "deformation_fields"
 
@@ -22,8 +22,13 @@ def create_metadata_dict(
     padding_micron="[[0, 0], [0, 0], [0, 0]]",
     dim_flip="[False, False, False]",
     vector=1,
-    out_dir = ""
+    out_dir = "",
+    VERSION = ""
 ):
+    import nibabel as nib
+    import numpy as np
+    import pandas as pd
+
     filename = f"{target_space}_pull_{source_space}_v{VERSION}.nii.gz"
     img = nib.load(f"{out_dir}/{target_space}/{filename}")
     X_physical_size_micron,Y_physical_size_micron,Z_physical_size_micron,_ = np.array(img.shape) * transformation_resolution_micron
@@ -61,7 +66,8 @@ new_metadata = pd.DataFrame([
         transformation_resolution_micron=25,
         source_age_pnd=56,
         target_age_pnd=56,
-        out_dir=def_out_dir
+        out_dir=def_out_dir,
+        VERSION = VERSION
         ),
     create_metadata_dict(
         source_space = "allen_mouse",
@@ -69,7 +75,9 @@ new_metadata = pd.DataFrame([
         transformation_resolution_micron=25,
         source_age_pnd=56,
         target_age_pnd=56,
-        out_dir=def_out_dir
+        out_dir=def_out_dir,
+        VERSION = VERSION
+
         ),
     create_metadata_dict(
         source_space = "perens_stereotaxic_mri_mouse",
@@ -77,7 +85,9 @@ new_metadata = pd.DataFrame([
         transformation_resolution_micron=25,
         source_age_pnd=56,
         target_age_pnd=56,
-        out_dir=def_out_dir
+        out_dir=def_out_dir,
+        VERSION = VERSION
+
         ),
     create_metadata_dict(
         source_space = "allen_mouse",
@@ -85,7 +95,8 @@ new_metadata = pd.DataFrame([
         transformation_resolution_micron=25,
         source_age_pnd=56,
         target_age_pnd=56,
-        out_dir=def_out_dir
+        out_dir=def_out_dir,
+        VERSION = VERSION
         ),
     ])
 
