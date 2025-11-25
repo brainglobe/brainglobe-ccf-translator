@@ -13,7 +13,6 @@ import nibabel as nib
 import numpy as np
 from pathlib import Path
 import sys
-import pandas as pd
 from brainglobe_atlasapi.bg_atlas import BrainGlobeAtlas
 
 VERSION = "1.1"
@@ -154,52 +153,6 @@ def invert_and_save(
     _ensure_parent(output_path)
     nib.save(nib.Nifti1Image(invert_arr, img.affine, img.header), str(output_path))
 
-def create_metadata_dict(
-    source_space,
-    target_space,
-    source_age_pnd,
-    target_age_pnd,
-    transformation_resolution_micron,
-    affine="[[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0],[0.0, 0.0, 0.0, 1.0]]",
-    dim_order="[0, 1, 2]",
-    key_age=True,
-    source_key_age=False,
-    target_key_age=False,
-    padding_micron="[[0, 0], [0, 0], [0, 0]]",
-    dim_flip="[False, False, False]",
-    vector=1,
-    out_dir = ""
-):
-    filename = f"{target_space}_pull_{source_space}_v{VERSION}.nii.gz"
-    img = nib.load(f"{out_dir}/{target_space}/{filename}")
-    X_physical_size_micron,Y_physical_size_micron,Z_physical_size_micron,_ = np.array(img.shape) * transformation_resolution_micron
-
-    filename = f"{source_space}_pull_{target_space}_v{VERSION}.nii.gz"
-    img = nib.load(f"{out_dir}/{source_space}/{filename}")
-    target_X_physical_size_micron,target_Y_physical_size_micron,target_Z_physical_size_micron,_ = np.array(img.shape) * transformation_resolution_micron
-    return {
-        "filename": filename,
-        "source_space": source_space,
-        "target_space": target_space,
-        "affine": affine,
-        "dim_order": dim_order,
-        "key_age": key_age,
-        "source_age_pnd": source_age_pnd,
-        "target_age_pnd": target_age_pnd,
-        "source_key_age": source_key_age,
-        "target_key_age": target_key_age,
-        "padding_micron": padding_micron,
-        "transformation_resolution_micron": transformation_resolution_micron,
-        "X_physical_size_micron":X_physical_size_micron,
-        "Y_physical_size_micron":Y_physical_size_micron,
-        "Z_physical_size_micron":Z_physical_size_micron,
-        "target_X_physical_size_micron":target_X_physical_size_micron,
-        "target_Y_physical_size_micron":target_Y_physical_size_micron,
-        "target_Z_physical_size_micron":target_Z_physical_size_micron,
-        "dim_flip": dim_flip,
-        "vector": vector,
-    }
-
 root_path = Path("/home/harryc/github/gubra/Multimodal_mouse_brain_atlas_files")
 out_path = Path("~/.brainglobe/").expanduser()
 mri_dir = root_path / "MRI_space_oriented"
@@ -271,45 +224,6 @@ invert_and_save(
     crop_input=[[0,0],[0,0],[0,0]],
     crop_output=[[0,0],[0,0],[0,0]],
     )
-
-
-
-
-
-pd.DataFrame([
-    create_metadata_dict(
-        source_space = "perens_multimodal_lsfm",
-        target_space = "allen_mouse",
-        transformation_resolution_micron=25,
-        source_age_pnd=56,
-        target_age_pnd=56,
-        out_dir=def_out_dir
-        ),
-    create_metadata_dict(
-        source_space = "allen_mouse",
-        target_space = "perens_multimodal_lsfm",
-        transformation_resolution_micron=25,
-        source_age_pnd=56,
-        target_age_pnd=56,
-        out_dir=def_out_dir
-        ),
-    create_metadata_dict(
-        source_space = "perens_stereotaxic_mri_mouse",
-        target_space = "allen_mouse",
-        transformation_resolution_micron=25,
-        source_age_pnd=56,
-        target_age_pnd=56,
-        out_dir=def_out_dir
-        ),
-    create_metadata_dict(
-        source_space = "allen_mouse",
-        target_space = "perens_stereotaxic_mri_mouse",
-        transformation_resolution_micron=25,
-        source_age_pnd=56,
-        target_age_pnd=56,
-        out_dir=def_out_dir
-        ),
-    ]).to_csv(f"{root_path}/translation_metadata.csv", index=False)
 
 
 
