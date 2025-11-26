@@ -8,16 +8,19 @@ base_path = r"/home/harryc/github/brainglobe-ccf-translator/brainglobe_ccf_trans
 
 
 def generate_mermaid(metadata):
-    edges = []
+    edges = set()
     for i, m in metadata.iterrows():
         s = m["source_space"] + "_P" + str(int(m["source_age_pnd"]))
         t = m["target_space"] + "_P" + str(int(m["target_age_pnd"]))
         # Sanitize node names for Mermaid (replace special chars)
         s = s.replace("-", "_").replace(" ", "_")
         t = t.replace("-", "_").replace(" ", "_")
-        edges.append(f"    {s} --> {t}")
+        # Sort to ensure A---B and B---A are treated as the same edge
+        edge = tuple(sorted([s, t]))
+        edges.add(edge)
 
-    mermaid = "```mermaid\ngraph TD\n" + "\n".join(sorted(set(edges))) + "\n```"
+    edge_lines = [f"    {a} --- {b}" for a, b in sorted(edges)]
+    mermaid = "```mermaid\ngraph TD\n" + "\n".join(edge_lines) + "\n```"
     return mermaid
 
 
@@ -36,10 +39,9 @@ metadata = metadata.loc[
 ]
 demba = metadata[metadata["source_space"].str.contains("demba")]
 other = metadata[~metadata["source_space"].str.contains("demba")]
-demba = demba[demba["source_age_pnd"].isin(key_ages)]
-demba = demba[demba["target_age_pnd"].isin(key_ages)]
-metadata = pd.concat([demba, other])
+demba = demba[demba["source_age_pnd"].isin(key_ages) & demba["target_age_pnd"].isin(key_ages)]
 
+metadata = pd.concat([demba, other])
 mermaid_output = generate_mermaid(metadata)
 print(mermaid_output)
 
