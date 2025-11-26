@@ -404,6 +404,7 @@ import brainglobe_ccf_translator
 from nibabel.orientations import axcodes2ornt, ornt_transform, apply_orientation
 import numpy as np
 import nibabel as nib
+import matplotlib.pyplot as plt
 
 voxel_size_micron = 25
 space_name = r"perens_stereotaxic_mri_mouse"
