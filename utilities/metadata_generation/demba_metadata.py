@@ -266,6 +266,6 @@ metadata_template = update_metadata(
 )
 
 pd.DataFrame(metadata_template).to_csv(
-    "/home/harryc/github/brainglobe-ccf-translator/brainglobe_ccf_translator/metadata/translation_metadata.csv",
+    "../../brainglobe_ccf_translator/metadata/translation_metadata.csv",
     index=False,
 )

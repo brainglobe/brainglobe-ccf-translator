@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 
 VERSION = "1.1"
-metadata_path = Path("/home/harryc/github/brainglobe-ccf-translator/brainglobe_ccf_translator/metadata/translation_metadata.csv")
+metadata_path = r"../../brainglobe_ccf_translator/metadata/translation_metadata.csv"
 out_path = Path("~/.brainglobe/").expanduser()
 def_out_dir = out_path / "deformation_fields"
 
