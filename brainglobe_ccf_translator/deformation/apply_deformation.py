@@ -272,6 +272,9 @@ def load_and_combine_deformation(
             original_input_shape=(1, *old_shape),
             new_input_shape=(1, *deform_arr.shape[1:]),
         )
+    print("new_voxel_size", translation_metadata["transformation_resolution_micron"][0])
+    print("final_voxel_size", final_voxel_size)
+
     return deform_arr, final_voxel_size, target_shape, old_voxel_size
 
 

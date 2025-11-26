@@ -22,11 +22,11 @@ points = np.array([(286,250,267),
                     (100,200,100)])
 
 
-ccft_pts = ccft.PointSet(points, space="allen_mouse", voxel_size_micron=20, age_PND=28)
+ccft_pts = ccft.PointSet(points, space="allen_mouse", voxel_size_micron=20, age_PND=56)
 # the API is the same for points
-ccft_pts.transform(target_age=56)
-
-# To check the current age of any ccft object run
-print(ccft_vol.current_age)  # -> P56
-# To check the original age of any object run
-print(ccft_vol.original_age)  # -> P31
+ccft_pts.transform(target_space = "demba_dev_mouse", target_age=28)
+#the values can be accessed like so
+print("the values before transformation are:")
+print(points)
+print("the values after transformation are:")
+print(ccft_pts.values)

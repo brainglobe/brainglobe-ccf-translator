@@ -48,9 +48,8 @@ adult_vol = brainglobe_ccf_translator.Volume(
 # transform to demba space
 adult_vol.transform(target_space="demba_dev_mouse", target_age=source_age)
 demba_adult_template = adult_vol.values
-demba_young_template = nib.load(
-    rf"/home/harryc/github/brainglobe_ccf_translator_local/demo_data/demba_vols/DeMBA_P{target_age}.nii.gz"
-).get_fdata()
+demba_young_template = BrainGlobeAtlas(f'demba_allen_seg_dev_mouse_p{target_age}_20um').reference
+
 # rescale to 25µm
 rescaled_demba_young_template = zoom(
     demba_young_template, 20 / 25, order=1
