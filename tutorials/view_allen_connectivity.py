@@ -1,12 +1,11 @@
 """
-This script will show you how to take data from the allen connectivity API 
+This script will show you how to take data from the allen connectivity API
 and view it in a different space. In this case we will look at projection information
-transformed down to a P9 brain. 
+transformed down to a P9 brain.
 """
-
+from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache
 from brainglobe_atlasapi.bg_atlas import BrainGlobeAtlas
 import brainglobe_ccf_translator
-from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import nibabel as nib

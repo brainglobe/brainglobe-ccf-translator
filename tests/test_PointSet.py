@@ -1,7 +1,10 @@
-# import os
+## Useful for debugger
+# from pathlib import Path
 # import sys
+# PROJECT_ROOT = Path(__file__).resolve().parents[2]
+# if str(PROJECT_ROOT) not in sys.path:
+#     sys.path.insert(0, str(PROJECT_ROOT))
 
-# sys.path.append(os.path.abspath("/home/harryc/github/brainglobe_ccf_translator/"))
 import unittest
 import numpy as np
 import json
@@ -37,7 +40,7 @@ class TestPointset(unittest.TestCase):
 test_case_files = [
     "perens_stpt_mouse.json",
     "demba_dev_mouse_56.json",
-    "perens_lsfm_mouse.json",
+    "perens_multimodal_lsfm.json",
     "perens_mri_mouse.json",
     "demba_dev_mouse_32.json",
 ]

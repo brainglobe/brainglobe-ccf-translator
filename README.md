@@ -30,6 +30,11 @@ CCF translator can be installed by running
 ```
 pip install brainglobe-ccf-translator
 ```
+Or by cloning this repository and running 
+```
+pip install -e .
+```
+while in the root of the repository.
 ## Currently supported spaces
 the name in CCF translator usually copies the name of the atlas in the brainglobe atlasapi. 
 | Framework Name | name in api | supported age range

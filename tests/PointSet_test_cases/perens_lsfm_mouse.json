@@ -1,7 +1,7 @@
 {
     "points": [[1195, 268, 575]],
     "scale": 2.5,
-    "target": "perens_lsfm_mouse",
+    "target": "perens_multimodal_lsfm",
     "target_age": 56,
     "expected_values": [[464.81906322, 1116.69941131,  398.63036235]]
 }

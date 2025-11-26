@@ -3,9 +3,9 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 import os
+from pathlib import Path
 
-base_path = r"/home/harryc/github/brainglobe-ccf-translator/brainglobe_ccf_translator"
-
+base_path =  '../brainglobe_ccf_translator'
 
 def generate_mermaid(metadata):
     edges = set()

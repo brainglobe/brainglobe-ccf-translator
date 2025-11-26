@@ -153,7 +153,7 @@ def invert_and_save(
     _ensure_parent(output_path)
     nib.save(nib.Nifti1Image(invert_arr, img.affine, img.header), str(output_path))
 
-root_path = Path("/home/harryc/github/gubra/Multimodal_mouse_brain_atlas_files")
+root_path = Path("~/brainglobe_workingdir/perens_stereotaxic_mri_mouse/Multimodal_mouse_brain_atlas_files")
 out_path = Path("~/.brainglobe/").expanduser()
 mri_dir = root_path / "MRI_space_oriented"
 ccfv3_oriented_dir = root_path / "AIBS_CCFv3_space_oriented"

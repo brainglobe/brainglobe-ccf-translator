@@ -1,7 +1,3 @@
-import os
-import sys
-
-sys.path.append(os.path.abspath("/home/harryc/github/brainglobe_ccf_translator/"))
 import nibabel as nib
 import math
 import pandas as pd
@@ -14,7 +10,7 @@ from brainglobe_ccf_translator.deformation.apply_deformation import (
 import os
 import matplotlib.pyplot as plt
 
-root_path = r"/home/harryc/github/gubra/princeton/"
+root_path = r"~/brainglobe_workingdir/princeton_lightsheet_mouse"
 
 voxel_size_micron = 20
 
@@ -67,12 +63,12 @@ for i in range(len(original_elastix_volume_paths)):
     elastix_arr = np.transpose(elastix_arr, [0, 2, 1, 3])
     elastix_arr = elastix_arr[[1, 0, 2]]
 
-    save_path = f"/home/harryc/github/brainglobe_ccf_translator/brainglobe_ccf_translator/metadata/deformation_fields/{source}/"
+    save_path = f"~/.brainglobe/deformation_fields/deformation_fields/{source}/"
     if not os.path.isdir(save_path):
         os.mkdir(save_path)
     save_volume(elastix_arr, f"{save_path}/{source}_pull_{target}.nii.gz")
     inverted_arr = invert_deformation(elastix_arr, new_input_size[[1, 0, 2]])
-    save_path = f"/home/harryc/github/brainglobe_ccf_translator/brainglobe_ccf_translator/metadata/deformation_fields/{target}/"
+    save_path = f"~/.brainglobe/deformation_fields/deformation_fields/{target}/"
     if not os.path.isdir(save_path):
         os.mkdir(save_path)
     save_volume(inverted_arr, f"{save_path}/{target}_pull_{source}.nii.gz")

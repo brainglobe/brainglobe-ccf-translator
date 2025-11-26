@@ -21,7 +21,7 @@ ccft_vol = brainglobe_ccf_translator.Volume(
 # ccft_vol.transform(target_age, "allen_mouse")
 # ccft_vol.save(rf"demo_data/allen_mouse_from_princeton.nii.gz")
 
-ccft_vol.transform(target_age, "perens_lsfm_mouse")
+ccft_vol.transform(target_age, "perens_multimodal_lsfm")
 ccft_vol.save(rf"demo_data/perens_lsfm_from_princeton.nii.gz")
 import os
 

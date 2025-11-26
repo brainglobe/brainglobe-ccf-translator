@@ -1,13 +1,9 @@
-import os
-
-# os.chdir("..")
 import brainglobe_ccf_translator as ccft
-import nibabel as nib
 import numpy as np
+from brainglobe_atlasapi import BrainGlobeAtlas
 
-# Load the image
-image = nib.load("demo_data/DeMBA_P28.nii.gz")
-volume = image.get_fdata()
+
+volume = BrainGlobeAtlas('demba_allen_seg_dev_mouse_p28_20um').reference
 # Create a ccft object
 # this can be done for either volumes or points
 # for volumes we would run the following
@@ -17,12 +13,15 @@ ccft_vol = ccft.Volume(
 # we can then translate either the points or volumes into a new target age or space.
 # ccft will try to find a path from the current space into the target one
 ccft_vol.transform(target_age=40, target_space="demba_dev_mouse")
-ccft_vol.save("demo_data/transform_to_40.nii.gz")
+ccft_vol.save("../demo_data/transform_to_40.nii.gz")
 
 
 # alternatively for points we could do this
-with open("my_points.txt") as f:
-    points = np.array(f.readlines())
+points = points = np.array([(286,250,267),
+                            (414,247,452),
+                            (100,200,100)])
+
+
 ccft_pts = ccft.PointSet(points, space="CCFv3", voxel_size_micron=20, age_PND=28)
 # the API is the same for points
 ccft_pts.transform(target_age=56)

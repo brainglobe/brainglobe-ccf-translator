@@ -1,6 +1,9 @@
-# import os
+## Useful for debugger
+# from pathlib import Path
 # import sys
-# sys.path.append(os.path.abspath("/home/harryc/github/brainglobe_ccf_translator/"))
+# PROJECT_ROOT = Path(__file__).resolve().parents[2]
+# if str(PROJECT_ROOT) not in sys.path:
+#     sys.path.insert(0, str(PROJECT_ROOT))
 
 import unittest
 import numpy as np
@@ -48,7 +51,7 @@ class TestVolume(unittest.TestCase):
 
 # List of test case filenames
 test_case_files = [
-    "allen_to_perens_lsfm_mouse.json",
+    "allen_to_perens_multimodal_lsfm.json",
     "allen_to_demba_P5.json",
     "allen_to_demba_P56.json",
 ]
