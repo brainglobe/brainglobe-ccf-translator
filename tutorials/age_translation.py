@@ -17,12 +17,12 @@ ccft_vol.save("../demo_data/transform_to_40.nii.gz")
 
 
 # alternatively for points we could do this
-points = points = np.array([(286,250,267),
-                            (414,247,452),
-                            (100,200,100)])
+points = np.array([(286,250,267),
+                    (414,247,452),
+                    (100,200,100)])
 
 
-ccft_pts = ccft.PointSet(points, space="CCFv3", voxel_size_micron=20, age_PND=28)
+ccft_pts = ccft.PointSet(points, space="allen_mouse", voxel_size_micron=20, age_PND=28)
 # the API is the same for points
 ccft_pts.transform(target_age=56)
 
