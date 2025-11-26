@@ -1,44 +1,24 @@
 import json
 import networkx as nx
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 import os
-import pygraphviz as pgv
 
-base_path = r"/home/harryc/github/brainglobe_ccf_translator/brainglobe_ccf_translator"
+base_path = r"/home/harryc/github/brainglobe-ccf-translator/brainglobe_ccf_translator"
 
 
-def calculate_route(source, target, metadata):
-    G = nx.DiGraph()
+def generate_mermaid(metadata):
+    edges = []
     for i, m in metadata.iterrows():
-        s = m["source_space"] + "_P" + str(m["source_age_pnd"])
-        t = m["target_space"] + "_P" + str(m["target_age_pnd"])
-        G.add_edge(s, t)
+        s = m["source_space"] + "_P" + str(int(m["source_age_pnd"]))
+        t = m["target_space"] + "_P" + str(int(m["target_age_pnd"]))
+        # Sanitize node names for Mermaid (replace special chars)
+        s = s.replace("-", "_").replace(" ", "_")
+        t = t.replace("-", "_").replace(" ", "_")
+        edges.append(f"    {s} --> {t}")
 
-    # Visualize the graph
-    visualize_graph(G)
-
-
-def visualize_graph(G):
-    plt.figure(figsize=(14, 10))  # Increase figure size
-    pos = nx.nx_agraph.graphviz_layout(
-        G, prog="dot"
-    )  # Use the dot layout for the entire graph
-    nx.draw(
-        G,
-        pos,
-        with_labels=True,
-        node_size=1000,
-        node_color="skyblue",
-        font_size=12,
-        font_weight="bold",
-        arrows=True,
-    )
-    plt.savefig(
-        "graph.png", format="png", transparent=False
-    )  # Save as PNG with transparent background
-    plt.show()
+    mermaid = "```mermaid\ngraph TD\n" + "\n".join(sorted(set(edges))) + "\n```"
+    return mermaid
 
 
 key_ages = [56, 28, 21, 14, 7, 4]
@@ -59,6 +39,13 @@ other = metadata[~metadata["source_space"].str.contains("demba")]
 demba = demba[demba["source_age_pnd"].isin(key_ages)]
 demba = demba[demba["target_age_pnd"].isin(key_ages)]
 metadata = pd.concat([demba, other])
-source = "source_node"
-target = "target_node"
-calculate_route(source, target, metadata)
+
+mermaid_output = generate_mermaid(metadata)
+print(mermaid_output)
+
+# Optionally write to README
+readme_path = os.path.join(os.path.dirname(__file__), "README.md")
+with open(readme_path, "w") as f:
+    f.write("# Translation Graph\n\n")
+    f.write("This diagram shows the available translation paths between coordinate spaces.\n\n")
+    f.write(mermaid_output)
