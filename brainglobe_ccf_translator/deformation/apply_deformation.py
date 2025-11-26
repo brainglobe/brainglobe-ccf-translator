@@ -69,9 +69,9 @@ def resize_transform(arr, scale):
         z_new_indices, y_new_indices, x_new_indices, indexing="ij"
     )
     new_shape = np.array(arr.shape)
-    new_shape[1] = new_shape[1] * scale[1]
-    new_shape[2] = new_shape[2] * scale[2]
-    new_shape[3] = new_shape[3] * scale[3]
+    new_shape[1] = int(new_shape[1] * scale[1])
+    new_shape[2] = int(new_shape[2] * scale[2])
+    new_shape[3] = int(new_shape[3] * scale[3])
     new_array = np.zeros(new_shape)
     for i in range(3):
         new_array[i] = map_coordinates(arr[i], new_indices, order=1)
@@ -82,7 +82,7 @@ def resize_transform(arr, scale):
 
 
 def resize_transformation(deform_arr, array_size):
-    if (np.array(deform_arr.shape)[1:] != np.array(array_size)).all():
+    if (np.array(deform_arr.shape)[1:] != np.array(array_size)).any():
         scale = (1, *(np.array(array_size) / np.array(deform_arr.shape)[1:]))
         deform_arr = resize_transform(deform_arr, scale)
     return deform_arr
@@ -111,9 +111,18 @@ def download_deformation_field(url, path):
 
 
 def calculate_offset(original_input_shape, output_shape):
-    x = np.linspace(0, original_input_shape[1], output_shape[1], endpoint=False)
-    y = np.linspace(0, original_input_shape[2], output_shape[2], endpoint=False)
-    z = np.linspace(0, original_input_shape[3], output_shape[3], endpoint=False)
+    original_input_shape = np.asarray(original_input_shape, dtype=float)
+    output_shape = np.asarray(output_shape, dtype=int)
+
+    def _axis_lin(length, samples):
+        if samples <= 1:
+            return np.zeros(samples, dtype=float)
+        span = max(length - 1.0, 0.0)
+        return np.linspace(0.0, span, samples)
+
+    x = _axis_lin(original_input_shape[1], output_shape[1])
+    y = _axis_lin(original_input_shape[2], output_shape[2])
+    z = _axis_lin(original_input_shape[3], output_shape[3])
     X, Y, Z = np.meshgrid(x, y, z, indexing="ij")
     original_coordinates = np.stack([X, Y, Z])
     target_coordinates = np.indices(output_shape[1:])
@@ -202,78 +211,25 @@ def load_and_combine_deformation(
 ):
     if deform_arr is None:
         deform_arr = open_transformation(deform_path) * vector
-        target_shape = np.array(
-            (
-                translation_metadata["target_X_physical_size_micron"],
-                translation_metadata["target_Y_physical_size_micron"],
-                translation_metadata["target_Z_physical_size_micron"],
-            )
-        )
         old_voxel_size = float(
             translation_metadata["transformation_resolution_micron"][0]
         )
         final_voxel_size = old_voxel_size
-        target_shape = target_shape / final_voxel_size
-        target_shape = target_shape.flatten()
-        dim_order = list(
-            map(int, translation_metadata["dim_order"][0][1:-1].split(", "))
-        )
-        target_shape = target_shape[dim_order]
-        if (deform_arr.shape[1:] != target_shape).any():
-            deform_arr = resize_input(
-                deform_arr,
-                original_input_shape=(1, *target_shape),
-                new_input_shape=(1, *deform_arr.shape[1:]),
-            )
+        target_shape = np.array(deform_arr.shape[1:])
     else:
-        old_shape = np.array(
-            (
-                translation_metadata["target_X_physical_size_micron"],
-                translation_metadata["target_Y_physical_size_micron"],
-                translation_metadata["target_Z_physical_size_micron"],
-            )
-        )
         new_voxel_size = float(
             translation_metadata["transformation_resolution_micron"][0]
         )
-        dim_order = list(
-            map(int, translation_metadata["dim_order"][0][1:-1].split(", "))
-        )
         deform_b = open_transformation(deform_path) * vector
-        temp_shape = old_shape / new_voxel_size
-        temp_shape = temp_shape.flatten()
-        temp_shape = temp_shape[dim_order]
-        deform_b = resize_input(
-            deform_b,
-            original_input_shape=(1, *(temp_shape)),
-            new_input_shape=(1, *deform_b.shape[1:]),
-        )
+
         if new_voxel_size != old_voxel_size:
             deform_b = resize_transformation(
                 deform_b,
                 (np.array(deform_b.shape[1:]) * (new_voxel_size / old_voxel_size)),
             )
-        old_shape = old_shape / final_voxel_size
-        old_shape = old_shape.flatten()
-        old_shape = old_shape[dim_order]
-        deform_b = resize_input(
-            deform_b,
-            original_input_shape=(1, *deform_b.shape[1:]),
-            new_input_shape=(1, *deform_arr.shape[1:]),
-        )
-        deform_arr = resize_input(
-            deform_arr,
-            original_input_shape=(1, *deform_arr.shape[1:]),
-            new_input_shape=(1, *old_shape),
-        )
+
         deform_arr = combine_deformations(deform_arr, deform_b)
-        deform_arr = resize_input(
-            deform_arr,
-            original_input_shape=(1, *old_shape),
-            new_input_shape=(1, *deform_arr.shape[1:]),
-        )
-    print("new_voxel_size", translation_metadata["transformation_resolution_micron"][0])
-    print("final_voxel_size", final_voxel_size)
+        target_shape = np.array(deform_arr.shape[1:])
 
     return deform_arr, final_voxel_size, target_shape, old_voxel_size
 

@@ -10,8 +10,8 @@ from typing import Any
 
 """
 At present the order of transformations is:
-transpose 
-flip 
+transpose
+flip
 transform
 (if transform doesnt exist we pad, if it does we don't since it is handled by the transform)
 
