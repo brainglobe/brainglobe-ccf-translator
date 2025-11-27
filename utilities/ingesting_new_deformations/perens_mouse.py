@@ -179,29 +179,29 @@ ccfv3_original_shape = zero_origin_image(
     ccfv3_original_dir / "ccfv3_orig_temp.nii.gz",
     ccfv3_original_dir / "ccfv3_orig_new_header.nii.gz",
 )
-
-process_deformation_field(
-    deformation_dir / "ccfv3_orig_2_mri_deffield.nii.gz",
-    def_out_dir / "perens_stereotaxic_mri_mouse" / f"perens_stereotaxic_mri_mouse_pull_allen_mouse_v{VERSION}.nii.gz",
-    ccfv3_original_shape,
-    resize_to_source=True,
-    crop_input= [[0,0],[70,70],[0,0]],
-    new_order = [1, 2, 0],
-    flips=[False, True, False]
-
-    )
-
-
 atlas = BrainGlobeAtlas(f"allen_mouse_25um")
 
-invert_and_save(
-    def_out_dir / "perens_stereotaxic_mri_mouse" / f"perens_stereotaxic_mri_mouse_pull_allen_mouse_v{VERSION}.nii.gz",
-    ccfv3_template,
-    def_out_dir /  "allen_mouse"  / f"allen_mouse_pull_perens_stereotaxic_mri_mouse_v{VERSION}.nii.gz",
-    atlas.shape,
-    crop_input=[[0,0],[0,0],[0,0]],
-    crop_output=[[0,0],[0,0],[0,0]],
-    )
+# process_deformation_field(
+#     deformation_dir / "ccfv3_orig_2_mri_deffield.nii.gz",
+#     def_out_dir / "perens_stereotaxic_mri_mouse" / f"perens_stereotaxic_mri_mouse_pull_allen_mouse_v{VERSION}.nii.gz",
+#     ccfv3_original_shape,
+#     resize_to_source=True,
+#     crop_input= [[0,0],[70,70],[0,0]],
+#     new_order = [1, 2, 0],
+#     flips=[False, True, False]
+
+#     )
+
+
+
+# invert_and_save(
+#     def_out_dir / "perens_stereotaxic_mri_mouse" / f"perens_stereotaxic_mri_mouse_pull_allen_mouse_v{VERSION}.nii.gz",
+#     ccfv3_template,
+#     def_out_dir /  "allen_mouse"  / f"allen_mouse_pull_perens_stereotaxic_mri_mouse_v{VERSION}.nii.gz",
+#     atlas.shape,
+#     crop_input=[[0,0],[0,0],[0,0]],
+#     crop_output=[[0,0],[0,0],[0,0]],
+#     )
 
 
 
@@ -213,7 +213,8 @@ process_deformation_field(
     crop_input= [[0,0],[70,70],[0,0]],
     mask_fn=_lsfm_mask,
     new_order = [1, 2, 0],
-    flips=[False, True, False]
+    flips=[False, True, False],
+    fill_missing=True
 )
 invert_and_save(
     def_out_dir /"perens_multimodal_lsfm" /f"perens_multimodal_lsfm_pull_allen_mouse_v{VERSION}.nii.gz",
