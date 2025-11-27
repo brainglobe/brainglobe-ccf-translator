@@ -234,7 +234,6 @@ def load_and_combine_deformation(
         target_shape = np.array(deform_arr.shape[1:])
         # Adjust target_shape for accumulated padding/cropping
         if pad_sum is not None:
-            print(pad_sum)
             padding_adjustment = np.sum(pad_sum, axis=1)
             target_shape = target_shape - padding_adjustment
 

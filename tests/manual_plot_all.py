@@ -42,8 +42,8 @@ def plot_overlay(transformed_data, target_data, trans_res, target_res, title, ax
 def main():
     configs = [
                 {
-            "name": "Demba P4",
-            "bg_name": "demba_allen_seg_dev_mouse_p4_20um",
+            "name": "Demba P28",
+            "bg_name": "demba_allen_seg_dev_mouse_p28_20um",
             "space": "demba_dev_mouse",
             "age": 28,
             "res": 20,
@@ -55,6 +55,7 @@ def main():
             "age": 56,
             "res": 25,
         },
+
         {
             "name": "Allen P56",
             "bg_name": "allen_mouse_25um",
@@ -85,6 +86,14 @@ def main():
             "space": "perens_stereotaxic_mri_mouse",
             "age": 56,
             "res": 25,
+        },
+
+         {
+            "name": "Demba P4",
+            "bg_name": "demba_allen_seg_dev_mouse_p4_20um",
+            "space": "demba_dev_mouse",
+            "age": 4,
+            "res": 20,
         },
     ]
 
