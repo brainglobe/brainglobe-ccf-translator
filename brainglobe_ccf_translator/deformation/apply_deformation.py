@@ -218,9 +218,6 @@ def load_and_combine_deformation(
         final_voxel_size = old_voxel_size
         target_shape = np.array(deform_arr.shape[1:])
         # Adjust target_shape for accumulated padding/cropping
-        if pad_sum is not None:
-            padding_adjustment = np.sum(pad_sum, axis=1)
-            target_shape = target_shape - padding_adjustment
     else:
         new_voxel_size = float(
             translation_metadata["transformation_resolution_micron"][0]
@@ -237,6 +234,7 @@ def load_and_combine_deformation(
         target_shape = np.array(deform_arr.shape[1:])
         # Adjust target_shape for accumulated padding/cropping
         if pad_sum is not None:
+            print(pad_sum)
             padding_adjustment = np.sum(pad_sum, axis=1)
             target_shape = target_shape - padding_adjustment
 
