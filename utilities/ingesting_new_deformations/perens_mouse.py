@@ -109,6 +109,10 @@ def process_deformation_field(
 ) -> None:
     img = nib.load(str(input_path))
     arr = img.get_fdata()
+    if mask_fn:
+        mask = mask_fn(arr)
+        arr[mask, :] = np.nan
+
     diff = (np.array(img.shape[:3]) - np.array(source_shape)) / 2.0
     arr[:, :, :, :, 0] -= img.affine[0, 0] * diff[0]
     arr[:, :, :, :, 1] -= img.affine[1, 1] * diff[1]
@@ -118,12 +122,7 @@ def process_deformation_field(
     arr[:,:,:,:,0] -= crop_input[0][0]
     arr[:,:,:,:,1] -= crop_input[1][0]
     arr[:,:,:,:,2] -= crop_input[2][0]
-    if mask_fn:
-        mask = mask_fn(arr)
-        arr[mask, :] = np.nan
-        if mask_label:
-            print(mask_label)
-            print(np.mean(mask))
+
     arr = np.squeeze(arr, axis=3)
     if resize_to_source:
         arr = _resize_vector_field(arr, source_shape, fill_missing)

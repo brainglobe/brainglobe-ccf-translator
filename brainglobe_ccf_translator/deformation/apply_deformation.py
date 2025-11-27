@@ -208,6 +208,7 @@ def load_and_combine_deformation(
     old_voxel_size,
     final_voxel_size,
     target_shape,
+    pad_sum=None,
 ):
     if deform_arr is None:
         deform_arr = open_transformation(deform_path) * vector
@@ -216,6 +217,10 @@ def load_and_combine_deformation(
         )
         final_voxel_size = old_voxel_size
         target_shape = np.array(deform_arr.shape[1:])
+        # Adjust target_shape for accumulated padding/cropping
+        if pad_sum is not None:
+            padding_adjustment = np.sum(pad_sum, axis=1)
+            target_shape = target_shape - padding_adjustment
     else:
         new_voxel_size = float(
             translation_metadata["transformation_resolution_micron"][0]
@@ -230,6 +235,10 @@ def load_and_combine_deformation(
 
         deform_arr = combine_deformations(deform_arr, deform_b)
         target_shape = np.array(deform_arr.shape[1:])
+        # Adjust target_shape for accumulated padding/cropping
+        if pad_sum is not None:
+            padding_adjustment = np.sum(pad_sum, axis=1)
+            target_shape = target_shape - padding_adjustment
 
     return deform_arr, final_voxel_size, target_shape, old_voxel_size
 
@@ -301,6 +310,7 @@ def combine_route(route, original_voxel_size, base_path, metadata):
                     old_voxel_size,
                     final_voxel_size,
                     target_shape,
+                    pad_sum=pad_sum,
                 )
             )
 
