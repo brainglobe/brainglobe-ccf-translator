@@ -1,7 +1,19 @@
 {
-    "points": [[1195, 268, 575]],
+    "points": [
+        [
+            1195,
+            268,
+            575
+        ]
+    ],
     "scale": 2.5,
-    "target": "perens_mri_mouse",
+    "target": "perens_stereotaxic_mri_mouse",
     "target_age": 56,
-    "expected_values": [[576.4635812, 1322.22430175, 456.23996417]]
+    "expected_values": [
+        [
+            1322.1565532684326,
+            286.281786441803,
+            576.4687146246433
+        ]
+    ]
 }

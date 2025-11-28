@@ -38,11 +38,10 @@ class TestPointset(unittest.TestCase):
 
 # List of test case filenames
 test_case_files = [
-    "perens_stpt_mouse.json",
-    "demba_dev_mouse_56.json",
-    "perens_multimodal_lsfm.json",
-    "perens_mri_mouse.json",
     "demba_dev_mouse_32.json",
+    "demba_dev_mouse_56.json",
+    "perens_mri_mouse.json",
+    "perens_multimodal_lsfm.json",
 ]
 
 # Dynamically create test methods for each test case file
