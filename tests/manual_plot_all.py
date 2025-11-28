@@ -1,11 +1,14 @@
 """
 To ensure everything is working, this script will plot all combinations of volumes
 (For Demba it will just plot P56 and P4 so as to not create a huge number)
+
+Outputs images to a directory that can be uploaded with a pull request.
 """
 import matplotlib.pyplot as plt
 import numpy as np
 from brainglobe_atlasapi import BrainGlobeAtlas
 import brainglobe_ccf_translator as ccft
+from pathlib import Path
 
 
 def plot_mid_slice(volume_data, title, ax):
@@ -33,21 +36,48 @@ def plot_overlay(transformed_data, target_data, trans_res, target_res, title, ax
     trans_extent = [0, trans_slice.shape[1] * trans_res, trans_slice.shape[0] * trans_res, 0]
     target_extent = [0, target_slice.shape[1] * target_res, target_slice.shape[0] * target_res, 0]
 
-    ax.imshow(target_norm, cmap='Blues', extent=target_extent, alpha=0.7)
-    ax.imshow(trans_norm, cmap='Reds', extent=trans_extent, alpha=0.5)
+    ax.imshow(target_norm, cmap='gray', extent=target_extent, alpha=1)
+    ax.imshow(trans_norm, cmap='gray', extent=trans_extent, alpha=0.5)
     ax.set_title(title)
     ax.axis("off")
 
 
 def main():
+    output_dir = Path(__file__).parent / "overlay_manual_test_output"
+    output_dir.mkdir(exist_ok=True)
+
     configs = [
-                {
+        {
+            "name": "Allen P56",
+            "bg_name": "allen_mouse_25um",
+            "space": "allen_mouse",
+            "age": 56,
+            "res": 25,
+        },
+
+                   {
+            "name": "Demba P56",
+            "bg_name": "demba_allen_seg_dev_mouse_p56_20um",
+            "space": "demba_dev_mouse",
+            "age": 56,
+            "res": 20,
+        },
+                           {
             "name": "Demba P28",
             "bg_name": "demba_allen_seg_dev_mouse_p28_20um",
             "space": "demba_dev_mouse",
             "age": 28,
             "res": 20,
         },
+
+                      {
+            "name": "Demba P4",
+            "bg_name": "demba_allen_seg_dev_mouse_p4_20um",
+            "space": "demba_dev_mouse",
+            "age": 4,
+            "res": 20,
+        },
+
                  {
             "name": "Perens LSFM P56",
             "bg_name": "perens_multimodal_lsfm_25um",
@@ -56,25 +86,11 @@ def main():
             "res": 25,
         },
 
-        {
-            "name": "Allen P56",
-            "bg_name": "allen_mouse_25um",
-            "space": "allen_mouse",
-            "age": 56,
-            "res": 25,
-        },
+
            {
             "name": "Princeton P56",
             "bg_name": "princeton_mouse_20um",
             "space": "princeton_mouse",
-            "age": 56,
-            "res": 20,
-        },
-
-        {
-            "name": "Demba P56",
-            "bg_name": "demba_allen_seg_dev_mouse_p56_20um",
-            "space": "demba_dev_mouse",
             "age": 56,
             "res": 20,
         },
@@ -88,13 +104,7 @@ def main():
             "res": 25,
         },
 
-         {
-            "name": "Demba P4",
-            "bg_name": "demba_allen_seg_dev_mouse_p4_20um",
-            "space": "demba_dev_mouse",
-            "age": 4,
-            "res": 20,
-        },
+
     ]
 
     # Pre-load atlases to save time and check availability
@@ -165,17 +175,25 @@ def main():
                     target_atlas.reference,
                     ccft_vol.voxel_size_micron,
                     target_cfg["res"],
-                    "Overlay (Red=Transformed, Blue=Target)",
+                    "Overlay",
                     axes[3],
                 )
 
                 plt.suptitle(f"{source_cfg['name']} to {target_cfg['name']}")
-                plt.show()
+
+                # Save to file instead of showing
+                filename = f"{source_cfg['name']}_to_{target_cfg['name']}.png".replace(" ", "_")
+                output_path = output_dir / filename
+                plt.savefig(output_path, dpi=150, bbox_inches='tight')
+                plt.close(fig)
+                print(f"  Saved: {output_path}")
 
             except Exception as e:
                 print(
                     f"Failed transformation {source_cfg['name']} -> {target_cfg['name']}: {e}"
                 )
+
+    print(f"\nAll outputs saved to: {output_dir}")
 
 
 if __name__ == "__main__":

@@ -95,9 +95,10 @@ class VolumeSeries:
                 right_factor = (left_pos - target_pos) / (left_pos - right_pos)
                 left_factor = 1 - right_factor
 
-                left_volume_temp.values *= left_factor
-                right_volume_temp.values *= right_factor
-                new_values = left_volume_temp.values + right_volume_temp.values
+                new_values = (
+                    left_volume_temp.values * left_factor +
+                    right_volume_temp.values * right_factor
+                )
 
                 target_volume = Volume(
                     values=new_values,

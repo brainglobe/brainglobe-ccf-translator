@@ -1,13 +1,21 @@
 """
 Manual validation script for PointSet transformations.
 Plots points in 3 planes (coronal, sagittal, horizontal) in both source and target volumes.
+
+Outputs images to a directory that can be uploaded with a pull request.
+Set RECALCULATE = True to recompute point positions instead of using saved expected values.
 """
 import matplotlib.pyplot as plt
 import numpy as np
 import json
 import os
+from pathlib import Path
 from brainglobe_atlasapi import BrainGlobeAtlas
 import brainglobe_ccf_translator as ccft
+
+
+# Set to True to recalculate point positions, False to use saved expected values from tht tests
+RECALCULATE = True
 
 
 # Mapping from space names to BrainGlobe atlas names
@@ -21,7 +29,6 @@ SPACE_TO_ATLAS = {
         32: "demba_allen_seg_dev_mouse_p28_20um",  # Use closest available
         56: "demba_allen_seg_dev_mouse_p56_20um",
     },
-    "perens_stpt_mouse": "perens_stpt_mouse_25um",
     "perens_multimodal_lsfm": "perens_multimodal_lsfm_25um",
     "perens_mri_mouse": "perens_stereotaxic_mri_mouse_25um",
     "perens_stereotaxic_mri_mouse": "perens_stereotaxic_mri_mouse_25um",
@@ -79,7 +86,7 @@ def plot_point_in_volume(ax, volume, point, plane, title, color='red', marker_si
     ax.set_ylabel(ylabel)
 
 
-def validate_test_case(test_case_path):
+def validate_test_case(test_case_path, output_dir, recalculate=False):
     """Load and validate a single test case."""
     with open(test_case_path, 'r') as f:
         test_case = json.load(f)
@@ -88,20 +95,31 @@ def validate_test_case(test_case_path):
     scale = test_case["scale"]
     target_space = test_case["target"]
     target_age = test_case["target_age"]
-    expected_values = np.array(test_case["expected_values"])
 
     # Source is always allen_mouse P56 based on test setup
     source_space = "allen_mouse"
     source_age = 56
 
+    if recalculate:
+        # Recalculate expected values using ccft
+        print("  Recalculating point positions...")
+        input_points = np.array(points) / scale
+        pset = ccft.PointSet(input_points, source_space, voxel_size_micron=25, age_PND=source_age)
+        pset.transform(target_age=target_age, target_space=target_space)
+        expected_values = (pset.values * scale).tolist()
+    else:
+        expected_values = test_case["expected_values"]
+
+    expected_values = np.array(expected_values)
+
     # Load atlases
     source_atlas_name = get_atlas_name(source_space, source_age)
     target_atlas_name = get_atlas_name(target_space, target_age)
 
-    print(f"Loading source atlas: {source_atlas_name}")
+    print(f"  Loading source atlas: {source_atlas_name}")
     source_atlas = BrainGlobeAtlas(source_atlas_name)
 
-    print(f"Loading target atlas: {target_atlas_name}")
+    print(f"  Loading target atlas: {target_atlas_name}")
     target_atlas = BrainGlobeAtlas(target_atlas_name)
 
     # Convert points to voxel coordinates for each atlas
@@ -141,27 +159,38 @@ def validate_test_case(test_case_path):
                 color='red'
             )
 
+        mode_str = "recalculated" if recalculate else "from test case"
         fig.suptitle(
-            f"Point {i+1}: {src_point} -> {exp_point}\n"
-            f"Test case: {os.path.basename(test_case_path)}",
+            f"Point {i+1}: {src_point} -> {exp_point.tolist()}\n"
+            f"Test case: {os.path.basename(test_case_path)} ({mode_str})",
             fontsize=12
         )
         plt.tight_layout()
-        plt.show()
+
+        # Save to file
+        filename = f"{Path(test_case_path).stem}_point{i+1}.png"
+        output_path = output_dir / filename
+        plt.savefig(output_path, dpi=150, bbox_inches='tight')
+        plt.close(fig)
+        print(f"  Saved: {output_path}")
 
 
 def main():
+    output_dir = Path(__file__).parent / "points_manual_test_output"
+    output_dir.mkdir(exist_ok=True)
+
     test_cases_dir = os.path.join(
         os.path.dirname(__file__), "PointSet_test_cases"
     )
 
     test_case_files = [
-        "perens_stpt_mouse.json",
         "demba_dev_mouse_56.json",
         "perens_multimodal_lsfm.json",
         "perens_mri_mouse.json",
         "demba_dev_mouse_32.json",
     ]
+
+    print(f"Mode: {'recalculating positions' if RECALCULATE else 'using saved expected values'}")
 
     for filename in test_case_files:
         filepath = os.path.join(test_cases_dir, filename)
@@ -170,11 +199,13 @@ def main():
             print(f"Validating: {filename}")
             print('='*60)
             try:
-                validate_test_case(filepath)
+                validate_test_case(filepath, output_dir, recalculate=RECALCULATE)
             except Exception as e:
                 print(f"Error validating {filename}: {e}")
         else:
             print(f"Test case not found: {filepath}")
+
+    print(f"\nAll outputs saved to: {output_dir}")
 
 
 if __name__ == "__main__":
