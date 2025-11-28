@@ -50,7 +50,9 @@ class VolumeSeries:
         )
 
     def filter_metadata(self):
-        mask = np.abs(self.metadata["vector"]) == 1
+        """Filter metadata to only include entries with vector magnitude of 1."""
+        vector_numeric = pd.to_numeric(self.metadata["vector"], errors="coerce")
+        mask = np.abs(vector_numeric) == 1
         return self.metadata[mask]
 
     def interpolate_series(self):
