@@ -7,13 +7,13 @@
         ]
     ],
     "scale": 2.5,
-    "target": "demba_dev_mouse",
+    "target": "perens_multimodal_lsfm",
     "target_age": 56,
     "expected_values": [
         [
-            1195.0,
-            268.0,
-            575.0
+            1120.5459594726562,
+            270.5146127814678,
+            465.9502983093262
         ]
     ]
 }

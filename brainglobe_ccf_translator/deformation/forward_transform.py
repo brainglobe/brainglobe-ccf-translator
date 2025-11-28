@@ -22,7 +22,7 @@ def interpolate_volume(volume, mask):
     interpolator = NearestNDInterpolator(points[interp_mask], values[interp_mask])
     # Interpolate the volume
     out_mask = nan_pos & mask
-    values[out_mask] = interpolator(points[out_mask], k=40)
+    values[out_mask] = interpolator(points[out_mask], k=5)
     # Reshape the interpolated volume to the original shape
     interpolated_volume = values.reshape(shape)
     return interpolated_volume
