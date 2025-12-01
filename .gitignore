@@ -4,6 +4,8 @@ tutorials/mouse_connectivity
 demo_data
 create_transformation_for_ages/deformations_from_elastix
 create_transformation_for_ages/
+.vscode/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 brainglobe_ccf_translator/__pycache__/
@@ -12,7 +14,6 @@ brainglobe_ccf_translator/__pycache__/
 
 # C extensions
 *.so
-
 # Distribution / packaging
 .Python
 build/

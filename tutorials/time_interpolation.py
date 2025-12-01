@@ -6,13 +6,13 @@ from brainglobe_atlasapi import BrainGlobeAtlas
 # ccft is also able to interpolate time series data to create temporally continuous volumes.
 my_ages = [
     4,
-    7,
-    31,
-    56]
+    6,
+    9
+    ]
 ccft_vols = []
 for age in my_ages:
     vol = BrainGlobeAtlas(f'demba_allen_seg_dev_mouse_p{age}_20um').reference
-    ccft_vol = ccft.Volume(data=vol, space="demba_dev_mouse", voxel_size=20, age_PND=age)
+    ccft_vol = ccft.Volume(values=vol, space="demba_dev_mouse", voxel_size_micron=20, age_PND=age)
     ccft_vols.append(ccft_vol)
 # Once you have a list of ccft volumes a time series can then be created
 ccft_ts = ccft.VolumeSeries(ccft_vols)
