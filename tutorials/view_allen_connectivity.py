@@ -2,6 +2,8 @@
 This script will show you how to take data from the allen connectivity API
 and view it in a different space. In this case we will look at projection information
 transformed down to a P9 brain.
+
+To run this script you will need the allensdk which is installable via pip
 """
 from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache
 from brainglobe_atlasapi.bg_atlas import BrainGlobeAtlas
