@@ -65,8 +65,8 @@ def get_slice(volume, idx, axis):
         return volume[:, :, idx]
 
 slice_axis = 2  # 0=coronal, 1=horizontal, 2=sagittal
-slice_idx = -140
-young_slice_idx = -150
+slice_idx = 140
+young_slice_idx = 188
 
 # Calculate extents based on voxel sizes (in microns)
 adult_voxel_size = 25
@@ -75,7 +75,7 @@ young_voxel_size = 20
 # Get 2D slices along the chosen axis
 adult_slice = get_slice(demba_adult_template, slice_idx, slice_axis)
 adult_proj_slice = get_slice(P56_projection, slice_idx, slice_axis)
-young_slice = get_slice(demba_young_template, -young_slice_idx, slice_axis)
+young_slice = get_slice(demba_young_template, young_slice_idx, slice_axis)
 young_proj_slice = get_slice(young_projection, slice_idx, slice_axis)
 
 # Calculate physical extents [left, right, bottom, top]
