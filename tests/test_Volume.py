@@ -51,7 +51,7 @@ class TestVolume(unittest.TestCase):
 
 # List of test case filenames
 test_case_files = [
-    "allen_to_perens_multimodal_lsfm.json",
+    "princeton_to_perens_multimodal_lsfm.json",
     "allen_to_demba_P5.json",
     "allen_to_demba_P56.json",
 ]

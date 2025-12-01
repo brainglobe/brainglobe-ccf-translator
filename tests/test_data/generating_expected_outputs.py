@@ -120,6 +120,7 @@ volume_p8 = brainglobe_ccf_translator.Volume(
 
 series = brainglobe_ccf_translator.VolumeSeries(
     [
+        volume_p8,
         volume_p7,
         volume_p4,
     ]
