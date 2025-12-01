@@ -153,7 +153,7 @@ def extract_metadata(metadata, source_metadata, target_metadata, start, stop):
     return translation_metadata.to_dict(orient="list")
 
 
-def handle_padding(deform_arr, temp_padding, original_voxel_size):
+def handle_padding(deform_arr, temp_padding, original_voxel_size, target_shape):
     padding = np.array(json.loads(temp_padding))
     x_pad = padding[0] / original_voxel_size
     y_pad = padding[1] / original_voxel_size
@@ -161,13 +161,12 @@ def handle_padding(deform_arr, temp_padding, original_voxel_size):
     temp_padding = np.array([x_pad, y_pad, z_pad])
     deform_padding = np.concatenate(([[0, 0]], temp_padding), axis=0)
     if deform_arr is not None:
-        original_shape = deform_arr.shape
         deform_arr = pad_neg(deform_arr, deform_padding, mode="constant")
         for i in range(len(temp_padding)):
             deform_arr[i] += temp_padding[i][0]
-        new_shape = deform_arr.shape
-        deform_arr = resize_input(deform_arr, original_shape, new_shape)
-    return deform_arr, temp_padding
+        # Update target_shape to match new deformation field shape
+        target_shape = np.array(deform_arr.shape[1:])
+    return deform_arr, temp_padding, target_shape
 
 
 def handle_dim_order(
@@ -258,10 +257,11 @@ def combine_route(route, original_voxel_size, base_path, metadata):
         )
 
         if translation_metadata["padding_micron"][0] != "[[0, 0], [0, 0], [0, 0]]":
-            deform_arr, temp_padding = handle_padding(
+            deform_arr, temp_padding, target_shape = handle_padding(
                 deform_arr,
                 translation_metadata["padding_micron"][0],
                 original_voxel_size,
+                target_shape,
             )
             pad_sum += temp_padding
 
@@ -305,9 +305,11 @@ def combine_route(route, original_voxel_size, base_path, metadata):
             )
 
     if deform_arr is not None:
-        deform_arr = resize_input(
-            deform_arr,
-            original_input_shape=(1, *deform_arr.shape[1:]),
-            new_input_shape=(1, *target_shape),
-        )
+        current_shape = np.array(deform_arr.shape[1:])
+        if not np.array_equal(current_shape, target_shape):
+            deform_arr = resize_input(
+                deform_arr,
+                original_input_shape=(1, *deform_arr.shape[1:]),
+                new_input_shape=(1, *target_shape),
+            )
     return deform_arr, pad_sum, flip_sum, dim_order_sum, final_voxel_size

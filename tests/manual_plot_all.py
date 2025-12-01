@@ -47,6 +47,14 @@ def main():
     output_dir.mkdir(exist_ok=True)
 
     configs = [
+                                  {
+            "name": "Demba P28",
+            "bg_name": "demba_allen_seg_dev_mouse_p28_20um",
+            "space": "demba_dev_mouse",
+            "age": 28,
+            "res": 20,
+        },
+
         {
             "name": "Allen P56",
             "bg_name": "allen_mouse_25um",
@@ -62,12 +70,12 @@ def main():
             "age": 56,
             "res": 20,
         },
-                           {
-            "name": "Demba P28",
-            "bg_name": "demba_allen_seg_dev_mouse_p28_20um",
-            "space": "demba_dev_mouse",
-            "age": 28,
-            "res": 20,
+       {
+            "name": "Perens MRI P56",
+            "bg_name": "perens_stereotaxic_mri_mouse_25um",
+            "space": "perens_stereotaxic_mri_mouse",
+            "age": 56,
+            "res": 25,
         },
 
                       {
@@ -96,13 +104,7 @@ def main():
         },
 
 
-        {
-            "name": "Perens MRI P56",
-            "bg_name": "perens_stereotaxic_mri_mouse_25um",
-            "space": "perens_stereotaxic_mri_mouse",
-            "age": 56,
-            "res": 25,
-        },
+
 
 
     ]
