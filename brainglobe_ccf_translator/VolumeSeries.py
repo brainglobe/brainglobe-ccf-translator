@@ -108,13 +108,12 @@ class VolumeSeries:
                     segmentation_file=left_volume_temp.segmentation_file,
                 )
                 self.Volumes.append(target_volume)
-                print(f"appended P{target_age}")
-                print(len(self.Volumes))
+
 
     def save(self, output_dir):
         if not output_dir:
             raise ValueError("Output directory cannot be an empty string")
         output_path = Path(output_dir)
         for V in self.Volumes:
-            filename = f"{V.space}_P{V.age_PND}_{'segmentation_' if V.segmentation_file else ''}{V.voxel_size_micron}micron.nii.gz"
-            V.save(output_path / filename)
+            filename = f"{output_path}{V.space}_P{V.age_PND}_{'segmentation_' if V.segmentation_file else ''}{V.voxel_size_micron}micron.nii.gz"
+            V.save(filename)

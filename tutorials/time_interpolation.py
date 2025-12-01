@@ -22,5 +22,5 @@ print([i.age_PND for i in ccft_ts.Volumes])  # -> 4, 6, 9
 ccft_ts.interpolate_series()
 #you can check which ages are present after the interpolation
 print([i.age_PND for i in ccft_ts.Volumes])  # -> 4, 5, 6, 7, 8, 9
-#To save this to a single 4D file for viewing you can go
+#To save these series to volumes for viewing go
 ccft_ts.save("../demo_data/ages_4_to_9")

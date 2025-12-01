@@ -1,6 +1,7 @@
 brainglobe_ccf_translator/metadata/deformation_fields
 brainglobe_ccf_translator/metadata/deformation_fields_old
 tutorials/mouse_connectivity
+mouse_connectivity
 demo_data
 create_transformation_for_ages/deformations_from_elastix
 create_transformation_for_ages/
