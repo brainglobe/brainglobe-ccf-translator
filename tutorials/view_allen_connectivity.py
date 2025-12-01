@@ -11,7 +11,6 @@ import brainglobe_ccf_translator
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import nibabel as nib
-from scipy.ndimage import zoom
 
 # tell the cache class what resolution (in microns) of data you want to download
 mcc = MouseConnectivityCache(resolution=25)
@@ -52,14 +51,23 @@ adult_vol.transform(target_space="demba_dev_mouse", target_age=source_age)
 demba_adult_template = adult_vol.values
 demba_young_template = BrainGlobeAtlas(f'demba_allen_seg_dev_mouse_p{target_age}_20um').reference
 
-# rescale to 25µm
-rescaled_demba_young_template = zoom(
-    demba_young_template, 20 / 25, order=1
-)  # order=1 for bilinear interpolation
+#and that's it. to plot your data see below
 
 
 slice = 140
 young_slice = 150
+
+# Calculate extents based on voxel sizes (in microns)
+adult_voxel_size = 25
+young_voxel_size = 20
+
+# Get image dimensions for the slices
+adult_shape = demba_adult_template[:,slice].shape
+young_shape = demba_young_template[:,young_slice].shape
+
+# Calculate physical extents [left, right, bottom, top]
+adult_extent = [0, adult_shape[1] * adult_voxel_size, adult_shape[0] * adult_voxel_size, 0]
+young_extent = [0, young_shape[1] * young_voxel_size, young_shape[0] * young_voxel_size, 0]
 
 # Create a figure with two subplots
 fig, axes = plt.subplots(1, 2, figsize=(12, 6))
@@ -68,14 +76,14 @@ fig, axes = plt.subplots(1, 2, figsize=(12, 6))
 fig.subplots_adjust(wspace=0.5)  # Increase the width space between the subplots
 
 # Plot the adult images
-axes[0].imshow(demba_adult_template[slice], cmap="gray")
-axes[0].imshow(P56_projection[slice], alpha=0.7)
+axes[0].imshow(demba_adult_template[slice], cmap="gray", extent=adult_extent)
+axes[0].imshow(P56_projection[slice], alpha=0.7, extent=adult_extent)
 axes[0].set_title(f"Post natal day {source_age}")
 axes[0].axis("off")  # Remove axes and ticks
 
 # Plot the young images
-axes[1].imshow(rescaled_demba_young_template[young_slice], cmap="gray")
-axes[1].imshow(young_projection[young_slice], alpha=0.7)
+axes[1].imshow(demba_young_template[young_slice], cmap="gray", extent=young_extent)
+axes[1].imshow(young_projection[young_slice], alpha=0.7, extent=young_extent)
 axes[1].set_title(f"Post natal day {target_age}")
 axes[1].axis("off")  # Remove axes and ticks
 
@@ -94,7 +102,7 @@ arrow = patches.FancyArrowPatch(
 fig.add_artist(arrow)  # Add the arrow to the figure
 
 # Save the figure as an image file
-fig.savefig("media/allen_connectivity_transform.png", dpi=300, bbox_inches="tight")
+fig.savefig("../media/allen_connectivity_transform.png", dpi=300, bbox_inches="tight")
 
 # Show the plot
 plt.show()

@@ -17,24 +17,10 @@ for age in my_ages:
 # Once you have a list of ccft volumes a time series can then be created
 ccft_ts = ccft.VolumeSeries(ccft_vols)
 # You can check which ages are present with the following
-print(ccft_ts.data_ages)  # -> P4, P7, P31, P56
+print([i.age_PND for i in ccft_ts.Volumes])  # -> 4, 6, 9
 # We can then interpolate the missing data using the following line
-ccft_ts.interpolate_ages(ages_to_interpolate="all")
-# If we wanted to only interpolate specific ages we could pass a list of these to ages_to_interpolate.
-# We now have a 4D volume which includes every age.
-# To retrieve this volume as an array we can do the following
-ccft_ts_arr = ccft_ts.array()
-# The shape of this array is T, X, Y, Z
-print(ccft_ts_arr.shape)
-# We can use nibabel to save this volume for viewing in ITKsnap
-out_image = nib.Nifti1Image(ccft_ts_arr, np.eye(4))
-nib.save(out_image, "4D_file.nii.gz")
-# If we would like the arrays transformed to the same space for analysis we can do this
-# Note there is no need to first run interpolate ages.
-# This can be run as soon as a time series is created.
-ccft_translated = ccft_ts.translate_series(target_age=56, ignore_interpolated=True)
-# Above we ignored the interpolated volumes.
-# This is the default behaviour but can be changed by switching the value to False
-# This returns a list of translated volumes
-# If we want to see these as a list of arrays we can do the following
-CCF_translated_arrays = [i.array() for i in ccft_translated]
+ccft_ts.interpolate_series()
+#you can check which ages are present after the interpolation
+print([i.age_PND for i in ccft_ts.Volumes])  # -> 4, 5, 6, 7, 8, 9
+#To save this to a single 4D file for viewing you can go
+ccft_ts.save("../demo_data/ages_4_to_9")
