@@ -90,9 +90,7 @@ class Volume:
                 original_input_shape = np.array(original_input_shape)[
                     dim_order_sum
                 ]
-                new_input_shape = np.array(array.shape) * (
-                    final_voxel_size / self.voxel_size_micron
-                )
+
                 deform_arr = apply_deformation.resize_transform(
                     deform_arr,
                     (1, *([final_voxel_size / self.voxel_size_micron] * 3)),
