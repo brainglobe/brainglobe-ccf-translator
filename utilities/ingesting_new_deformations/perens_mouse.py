@@ -16,11 +16,6 @@ import nibabel as nib
 import numpy as np
 from brainglobe_atlasapi.bg_atlas import BrainGlobeAtlas
 
-VERSION = "1.1"
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
-
 from brainglobe_ccf_translator.deformation.apply_deformation import (
     resize_input,
 )
@@ -28,6 +23,12 @@ from brainglobe_ccf_translator.deformation.forward_transform import (
     interpolate_volume,
     invert_deformation,
 )
+
+VERSION = "1.1"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 
 
 def _reset_offsets(img: nib.Nifti1Image) -> None:

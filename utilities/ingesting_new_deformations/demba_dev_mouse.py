@@ -7,6 +7,10 @@ from pathlib import Path
 import nibabel as nib
 import numpy as np
 
+from brainglobe_ccf_translator.deformation.forward_transform import (
+    invert_deformation,
+)
+
 # Here we have a recreation of the intermediate volumes
 # We start from the files which came out of elastix
 # These can be found in the EBRAINS datasets ie;
@@ -16,9 +20,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from brainglobe_ccf_translator.deformation.forward_transform import (
-    invert_deformation,
-)
+
 
 VERSION = "1.1"
 
