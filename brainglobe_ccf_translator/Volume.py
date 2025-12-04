@@ -19,7 +19,6 @@ from . import config
 from .deformation import apply_deformation, route_calculation
 
 
-
 class Volume:
     def __init__(
         self,
