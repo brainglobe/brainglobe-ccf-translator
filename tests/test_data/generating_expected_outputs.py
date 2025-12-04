@@ -136,5 +136,3 @@ for volume in series.Volumes:
         ),
         reference=volume.values,
     )
-
-

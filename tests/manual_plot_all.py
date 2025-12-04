@@ -4,6 +4,7 @@ To ensure everything is working, this script will plot all combinations of volum
 
 Outputs images to a directory that can be uploaded with a pull request.
 """
+
 import matplotlib.pyplot as plt
 import numpy as np
 from brainglobe_atlasapi import BrainGlobeAtlas
@@ -29,15 +30,29 @@ def plot_overlay(transformed_data, target_data, trans_res, target_res, title, ax
     trans_slice = transformed_data[mid_idx_trans, :, :]
     target_slice = target_data[mid_idx_target, :, :]
 
-    trans_norm = (trans_slice - trans_slice.min()) / (trans_slice.max() - trans_slice.min() + 1e-8)
-    target_norm = (target_slice - target_slice.min()) / (target_slice.max() - target_slice.min() + 1e-8)
+    trans_norm = (trans_slice - trans_slice.min()) / (
+        trans_slice.max() - trans_slice.min() + 1e-8
+    )
+    target_norm = (target_slice - target_slice.min()) / (
+        target_slice.max() - target_slice.min() + 1e-8
+    )
 
     # Extent: [left, right, bottom, top] in physical units (microns)
-    trans_extent = [0, trans_slice.shape[1] * trans_res, trans_slice.shape[0] * trans_res, 0]
-    target_extent = [0, target_slice.shape[1] * target_res, target_slice.shape[0] * target_res, 0]
+    trans_extent = [
+        0,
+        trans_slice.shape[1] * trans_res,
+        trans_slice.shape[0] * trans_res,
+        0,
+    ]
+    target_extent = [
+        0,
+        target_slice.shape[1] * target_res,
+        target_slice.shape[0] * target_res,
+        0,
+    ]
 
-    ax.imshow(target_norm, cmap='gray', extent=target_extent, alpha=1)
-    ax.imshow(trans_norm, cmap='gray', extent=trans_extent, alpha=0.5)
+    ax.imshow(target_norm, cmap="gray", extent=target_extent, alpha=1)
+    ax.imshow(trans_norm, cmap="gray", extent=trans_extent, alpha=0.5)
     ax.set_title(title)
     ax.axis("off")
 
@@ -47,14 +62,13 @@ def main():
     output_dir.mkdir(exist_ok=True)
 
     configs = [
-                                  {
+        {
             "name": "Demba P28",
             "bg_name": "demba_allen_seg_dev_mouse_p28_20um",
             "space": "demba_dev_mouse",
             "age": 28,
             "res": 20,
         },
-
         {
             "name": "Allen P56",
             "bg_name": "allen_mouse_25um",
@@ -62,51 +76,41 @@ def main():
             "age": 56,
             "res": 25,
         },
-
-                   {
+        {
             "name": "Demba P56",
             "bg_name": "demba_allen_seg_dev_mouse_p56_20um",
             "space": "demba_dev_mouse",
             "age": 56,
             "res": 20,
         },
-       {
+        {
             "name": "Perens MRI P56",
             "bg_name": "perens_stereotaxic_mri_mouse_25um",
             "space": "perens_stereotaxic_mri_mouse",
             "age": 56,
             "res": 25,
         },
-
-                      {
+        {
             "name": "Demba P4",
             "bg_name": "demba_allen_seg_dev_mouse_p4_20um",
             "space": "demba_dev_mouse",
             "age": 4,
             "res": 20,
         },
-
-                 {
+        {
             "name": "Perens LSFM P56",
             "bg_name": "perens_multimodal_lsfm_25um",
             "space": "perens_multimodal_lsfm",
             "age": 56,
             "res": 25,
         },
-
-
-           {
+        {
             "name": "Princeton P56",
             "bg_name": "princeton_mouse_20um",
             "space": "princeton_mouse",
             "age": 56,
             "res": 20,
         },
-
-
-
-
-
     ]
 
     # Pre-load atlases to save time and check availability
@@ -184,9 +188,11 @@ def main():
                 plt.suptitle(f"{source_cfg['name']} to {target_cfg['name']}")
 
                 # Save to file instead of showing
-                filename = f"{source_cfg['name']}_to_{target_cfg['name']}.png".replace(" ", "_")
+                filename = f"{source_cfg['name']}_to_{target_cfg['name']}.png".replace(
+                    " ", "_"
+                )
                 output_path = output_dir / filename
-                plt.savefig(output_path, dpi=150, bbox_inches='tight')
+                plt.savefig(output_path, dpi=150, bbox_inches="tight")
                 plt.close(fig)
                 print(f"  Saved: {output_path}")
 

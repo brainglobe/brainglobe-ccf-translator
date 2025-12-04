@@ -29,7 +29,12 @@ def generate_test_data(atlas_name, zoom_factor, output_name, include_annotation=
 atlas_configs = [
     ("allen_mouse_100um", 0.5, "allen_mouse_200um", True),
     ("princeton_mouse_20um", 0.1, "princeton_mouse_200um", True),
-    ("perens_stereotaxic_mri_mouse_25um", 0.125, "perens_stereotaxic_mri_mouse_200um", False),
+    (
+        "perens_stereotaxic_mri_mouse_25um",
+        0.125,
+        "perens_stereotaxic_mri_mouse_200um",
+        False,
+    ),
     ("demba_allen_seg_dev_mouse_p5_20um", 0.1, "demba_P5_mouse_200um", True),
     ("demba_allen_seg_dev_mouse_p4_20um", 0.1, "demba_P4_mouse_200um", True),
     ("demba_allen_seg_dev_mouse_p7_20um", 0.1, "demba_P7_mouse_200um", True),
@@ -41,6 +46,3 @@ atlas_configs = [
 
 for atlas_name, zoom_factor, output_name, include_annotation in atlas_configs:
     generate_test_data(atlas_name, zoom_factor, output_name, include_annotation)
-
-
-

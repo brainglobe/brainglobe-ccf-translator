@@ -2,6 +2,7 @@ import os
 import json
 import numpy as np
 from brainglobe_ccf_translator import PointSet
+
 """
 If you want to validate that this output is correct run "manual_plot_all_pointset_outputs.py"
 in the directory above.

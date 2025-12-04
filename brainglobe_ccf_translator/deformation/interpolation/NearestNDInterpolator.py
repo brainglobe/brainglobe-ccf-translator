@@ -4,6 +4,7 @@ import numpy as np
 
 import numpy as np
 
+
 def _ndim_coords_from_arrays(points, ndim=None):
     """
     Convert a tuple of coordinate arrays to a (..., ndim)-shaped array.
@@ -55,6 +56,7 @@ def _ndim_coords_from_arrays(points, ndim=None):
 
     # Already multi-dimensional
     return points
+
 
 class NearestNDInterpolator(NDInterpolatorBase):
     """NearestNDInterpolator(x, y).

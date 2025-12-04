@@ -5,10 +5,11 @@ This will auto generate it assuming you only transform using deformation fields.
 
 import numpy as np
 import pandas as pd
+
 VERSION = "1.1"
 space_name = "demba_dev_mouse"
-demba_dev_mouse_size_micron = np.array([14100,  8000, 11400])
-allen_size_micron = np.array([13200,  8000, 11400])
+demba_dev_mouse_size_micron = np.array([14100, 8000, 11400])
+allen_size_micron = np.array([13200, 8000, 11400])
 key_ages = np.array([4, 7, 14, 21, 28, 56])
 dim_flip = [False, False, False]
 padding_micron = [[0, 0], [0, 0], [0, 0]]

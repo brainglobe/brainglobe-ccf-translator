@@ -21,14 +21,13 @@ from brainglobe_ccf_translator.deformation.forward_transform import invert_defor
 VERSION = "1.1"
 
 
-
 deformation_urls = {
     4: "https://data-proxy.ebrains.eu/api/v1/buckets/d-278f396c-53b6-4d90-9b3f-568d3f23e407/script_with_metadata/deformationField.nii.gz?inline=true",
     7: "https://data-proxy.ebrains.eu/api/v1/buckets/d-d45dc547-64eb-4314-8f73-c6e3d5ab8de0/script_with_metadata/deformationField.nii.gz?inline=true",
     14: "https://data-proxy.ebrains.eu/api/v1/buckets/d-fbd8a406-a114-4c26-a77d-59dc93476682/script_with_metadata/deformationField.nii.gz?inline=true",
     21: "https://data-proxy.ebrains.eu/api/v1/buckets/d-4a0b3a87-4fe4-4a9f-a07e-e35e54681ff8/script_with_metadata/deformationField.nii.gz?inline=true",
-    28: "https://data-proxy.ebrains.eu/api/v1/buckets/d-c8395a2f-a6ae-40d0-ad0d-a87e8b9b610b/script_with_metadata/deformationField.nii.gz?inline=true"
-    }
+    28: "https://data-proxy.ebrains.eu/api/v1/buckets/d-c8395a2f-a6ae-40d0-ad0d-a87e8b9b610b/script_with_metadata/deformationField.nii.gz?inline=true",
+}
 
 key_ages = [56, 28, 21, 14, 7, 4]
 space_name = "demba_dev_mouse"
@@ -39,6 +38,7 @@ if not os.path.exists(save_path):
     os.makedirs(save_path, exist_ok=True)
 if not os.path.exists(working_path):
     os.makedirs(working_path, exist_ok=True)
+
 
 def open_deformation_field(deformation):
     """this function opens the elastix deformation
@@ -71,7 +71,9 @@ for i in range(len(key_ages) - 1):
     # using ccft terminology we would say that the elastix deform is in
     # the 28 space pulling values in from 56 (for the p28 volume that is)
     url = deformation_urls[age]
-    original_elastix_volume_path = os.path.join(working_path, f"downloaded_deformation_{age}.nii.gz")
+    original_elastix_volume_path = os.path.join(
+        working_path, f"downloaded_deformation_{age}.nii.gz"
+    )
 
     if not os.path.exists(original_elastix_volume_path):
         print(f"Downloading deformation for age {age}...")
@@ -79,7 +81,7 @@ for i in range(len(key_ages) - 1):
 
     elastix_img = nib.load(original_elastix_volume_path)
     elastix_arr = open_deformation_field(elastix_img).astype(np.float32)
-    elastix_arr = elastix_arr[[2,1,0]]
+    elastix_arr = elastix_arr[[2, 1, 0]]
     elastix_arr = np.transpose(elastix_arr, (0, 3, 2, 1))
     magnitude = key_ages[i] - age
     # here we make it a single day transform so in our example 28 pulling values from 29
@@ -91,6 +93,6 @@ for i in range(len(key_ages) - 1):
         temp_arr = invert_deformation(temp_arr)
         temp_arr /= day
         temp_age = age + day
-        save_volume(temp_arr, f"{save_path}/{temp_age}_pull_{temp_age-1}_v{VERSION}.nii.gz")
-
-
+        save_volume(
+            temp_arr, f"{save_path}/{temp_age}_pull_{temp_age-1}_v{VERSION}.nii.gz"
+        )

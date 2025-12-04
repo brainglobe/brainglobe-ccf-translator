@@ -5,6 +5,7 @@ transformed down to a P9 brain.
 
 To run this script you will need the allensdk which is installable via pip
 """
+
 from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache
 from brainglobe_atlasapi.bg_atlas import BrainGlobeAtlas
 import brainglobe_ccf_translator
@@ -49,10 +50,13 @@ adult_vol = brainglobe_ccf_translator.Volume(
 # transform to demba space
 adult_vol.transform(target_space="demba_dev_mouse", target_age=source_age)
 demba_adult_template = adult_vol.values
-demba_young_template = BrainGlobeAtlas(f'demba_allen_seg_dev_mouse_p{target_age}_20um').reference
+demba_young_template = BrainGlobeAtlas(
+    f"demba_allen_seg_dev_mouse_p{target_age}_20um"
+).reference
 
-ccft_vol.save('../demo_data/p9_tracing.nii.gz')
-#and that's it. to plot your data see below
+ccft_vol.save("../demo_data/p9_tracing.nii.gz")
+# and that's it. to plot your data see below
+
 
 def get_slice(volume, idx, axis):
     """Get a 2D slice from a 3D volume along the specified axis."""
@@ -62,6 +66,7 @@ def get_slice(volume, idx, axis):
         return volume[:, idx, :]
     else:
         return volume[:, :, idx]
+
 
 slice_axis = 2  # 0=coronal, 1=horizontal, 2=sagittal
 slice_idx = 140
@@ -74,13 +79,32 @@ young_voxel_size = 20
 # Get 2D slices along the chosen axis
 adult_slice = np.rot90(get_slice(demba_adult_template, slice_idx, slice_axis), k=-1)
 adult_proj_slice = np.rot90(get_slice(P56_projection, slice_idx, slice_axis), k=-1)
-#scale slice index as the images are different resolutions
-young_slice = np.rot90(get_slice(demba_young_template, int(young_slice_idx * (adult_voxel_size / young_voxel_size)), slice_axis), k=-1)
-young_proj_slice = np.rot90(get_slice(young_projection, young_slice_idx, slice_axis), k=-1)
+# scale slice index as the images are different resolutions
+young_slice = np.rot90(
+    get_slice(
+        demba_young_template,
+        int(young_slice_idx * (adult_voxel_size / young_voxel_size)),
+        slice_axis,
+    ),
+    k=-1,
+)
+young_proj_slice = np.rot90(
+    get_slice(young_projection, young_slice_idx, slice_axis), k=-1
+)
 
 # Calculate physical extents [left, right, bottom, top]
-adult_extent = [0, adult_slice.shape[1] * adult_voxel_size, adult_slice.shape[0] * adult_voxel_size, 0]
-young_extent = [0, young_slice.shape[1] * young_voxel_size, young_slice.shape[0] * young_voxel_size, 0]
+adult_extent = [
+    0,
+    adult_slice.shape[1] * adult_voxel_size,
+    adult_slice.shape[0] * adult_voxel_size,
+    0,
+]
+young_extent = [
+    0,
+    young_slice.shape[1] * young_voxel_size,
+    young_slice.shape[0] * young_voxel_size,
+    0,
+]
 
 # Create a figure with two subplots
 fig, axes = plt.subplots(1, 2, figsize=(16, 6))

@@ -96,8 +96,8 @@ class VolumeSeries:
                 left_factor = 1 - right_factor
 
                 new_values = (
-                    left_volume_temp.values * left_factor +
-                    right_volume_temp.values * right_factor
+                    left_volume_temp.values * left_factor
+                    + right_volume_temp.values * right_factor
                 )
 
                 target_volume = Volume(
@@ -108,7 +108,6 @@ class VolumeSeries:
                     segmentation_file=left_volume_temp.segmentation_file,
                 )
                 self.Volumes.append(target_volume)
-
 
     def save(self, output_dir):
         if not output_dir:
