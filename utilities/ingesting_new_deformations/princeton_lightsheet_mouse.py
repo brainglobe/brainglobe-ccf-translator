@@ -50,6 +50,11 @@ target_spaces = ["allen_mouse"]
 original_elastix_volume_paths = [
     f"{root_path}/output_directory/deformationField.nii.gz"
 ]
+current_input_size = np.array([320, 528, 456])
+new_input_size = current_input_size * (25 / 20)
+new_input_size = np.round(new_input_size).astype(int)
+
+
 
 for i in range(len(original_elastix_volume_paths)):
     original_elastix_volume_path = original_elastix_volume_paths[i]
