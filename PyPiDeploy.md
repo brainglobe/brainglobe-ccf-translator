@@ -13,7 +13,7 @@ The package is automatically published to PyPI when you push a version tag:
 ## Manual Deployment
 
 ```bash
-pip install build twine 
+pip install build twine
 python -m build
 twine upload dist/*
 ```

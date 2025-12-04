@@ -1,14 +1,14 @@
+"""
+If you want to validate that this output is correct run "manual_plot_all_pointset_outputs.py"
+in the directory above.
+"""
+
 import json
 import os
 
 import numpy as np
 
 from brainglobe_ccf_translator import PointSet
-
-"""
-If you want to validate that this output is correct run "manual_plot_all_pointset_outputs.py"
-in the directory above.
-"""
 
 test_data_dir = os.path.dirname(__file__)
 pointset_test_cases_dir = os.path.join(

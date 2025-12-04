@@ -16,7 +16,7 @@ from brainglobe_atlasapi import BrainGlobeAtlas
 
 import brainglobe_ccf_translator as ccft
 
-# Set to True to recalculate point positions, False to use saved expected values from tht tests
+# Set to True to recalculate point positions, False to use saved expected values from the tests
 RECALCULATE = True
 
 

@@ -2,7 +2,7 @@
 name = "brainglobe_ccf_translator"
 description = "a package to translate data between common coordinate frameworks"
 readme = "README.md"
-license = "MIT"
+license = { text = "MIT" }
 authors = [
     { name = "Harry Carey", email = "harry.carey@medisin.uio.no" }
 ]
@@ -128,6 +128,15 @@ commands =
 [tool.codespell]
 skip = '.git'
 check-hidden = true
+ignore-words-list = "doesnt,infinte,tht"
+
 
 [tool.black]
 line-length = 79
+
+[tool.mypy]
+ignore_missing_imports = true
+exclude = [
+    "^utilities/",
+    "utilities/.*",
+]
