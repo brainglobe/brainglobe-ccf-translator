@@ -16,7 +16,9 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from brainglobe_ccf_translator.deformation.forward_transform import invert_deformation
+from brainglobe_ccf_translator.deformation.forward_transform import (
+    invert_deformation,
+)
 
 VERSION = "1.1"
 
@@ -32,7 +34,9 @@ deformation_urls = {
 key_ages = [56, 28, 21, 14, 7, 4]
 space_name = "demba_dev_mouse"
 voxel_size_micron = 20
-save_path = os.path.expanduser(f"~/.brainglobe/deformation_fields/{space_name}")
+save_path = os.path.expanduser(
+    f"~/.brainglobe/deformation_fields/{space_name}"
+)
 working_path = os.path.expanduser(f"~/brainglobe_workingdir/{space_name}/")
 if not os.path.exists(save_path):
     os.makedirs(save_path, exist_ok=True)
@@ -53,7 +57,9 @@ def open_deformation_field(deformation):
     deformation_arr_scaled = np.squeeze(deformation_arr, 3)
     deformation_arr_scaled = np.transpose(deformation_arr_scaled, (3, 0, 1, 2))
     dim_scale_reshaped = dim_scale.reshape(-1, 1, 1, 1)
-    deformation_arr_scaled_multiplied = deformation_arr_scaled * dim_scale_reshaped
+    deformation_arr_scaled_multiplied = (
+        deformation_arr_scaled * dim_scale_reshaped
+    )
     return deformation_arr_scaled_multiplied
 
 
@@ -86,7 +92,9 @@ for i in range(len(key_ages) - 1):
     magnitude = key_ages[i] - age
     # here we make it a single day transform so in our example 28 pulling values from 29
     elastix_arr /= magnitude
-    save_volume(elastix_arr, f"{save_path}/{age}_pull_{age+1}_v{VERSION}.nii.gz")
+    save_volume(
+        elastix_arr, f"{save_path}/{age}_pull_{age+1}_v{VERSION}.nii.gz"
+    )
     for day in range(1, magnitude + 1):
         temp_arr = elastix_arr.copy()
         temp_arr *= day
@@ -94,5 +102,6 @@ for i in range(len(key_ages) - 1):
         temp_arr /= day
         temp_age = age + day
         save_volume(
-            temp_arr, f"{save_path}/{temp_age}_pull_{temp_age-1}_v{VERSION}.nii.gz"
+            temp_arr,
+            f"{save_path}/{temp_age}_pull_{temp_age-1}_v{VERSION}.nii.gz",
         )

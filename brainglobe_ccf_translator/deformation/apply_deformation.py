@@ -41,7 +41,9 @@ def apply_transform(data, deformation, order, apply_to_coords=False):
             )
     else:
         out_data = np.empty(deformation[0].shape)
-        out_data = scipy.ndimage.map_coordinates(data, deformation_coords, order=order)
+        out_data = scipy.ndimage.map_coordinates(
+            data, deformation_coords, order=order
+        )
     return out_data
 
 
@@ -153,7 +155,9 @@ def extract_metadata(metadata, source_metadata, target_metadata, start, stop):
     return translation_metadata.to_dict(orient="list")
 
 
-def handle_padding(deform_arr, temp_padding, original_voxel_size, target_shape):
+def handle_padding(
+    deform_arr, temp_padding, original_voxel_size, target_shape
+):
     padding = np.array(json.loads(temp_padding))
     x_pad = padding[0] / original_voxel_size
     y_pad = padding[1] / original_voxel_size
@@ -224,7 +228,10 @@ def load_and_combine_deformation(
         if new_voxel_size != old_voxel_size:
             deform_b = resize_transformation(
                 deform_b,
-                (np.array(deform_b.shape[1:]) * (new_voxel_size / old_voxel_size)),
+                (
+                    np.array(deform_b.shape[1:])
+                    * (new_voxel_size / old_voxel_size)
+                ),
             )
 
         deform_arr = combine_deformations(deform_arr, deform_b)
@@ -242,10 +249,14 @@ def combine_route(route, original_voxel_size, base_path, metadata):
     flip_sum = [False, False, False]
     dim_order_sum = np.array([0, 1, 2])
     source_metadata = (
-        metadata["source_space"] + "_P" + metadata["source_age_pnd"].astype(str)
+        metadata["source_space"]
+        + "_P"
+        + metadata["source_age_pnd"].astype(str)
     )
     target_metadata = (
-        metadata["target_space"] + "_P" + metadata["target_age_pnd"].astype(str)
+        metadata["target_space"]
+        + "_P"
+        + metadata["target_age_pnd"].astype(str)
     )
     temp_padding = None
 
@@ -256,7 +267,10 @@ def combine_route(route, original_voxel_size, base_path, metadata):
             metadata, source_metadata, target_metadata, start, stop
         )
 
-        if translation_metadata["padding_micron"][0] != "[[0, 0], [0, 0], [0, 0]]":
+        if (
+            translation_metadata["padding_micron"][0]
+            != "[[0, 0], [0, 0], [0, 0]]"
+        ):
             deform_arr, temp_padding, target_shape = handle_padding(
                 deform_arr,
                 translation_metadata["padding_micron"][0],
@@ -279,7 +293,10 @@ def combine_route(route, original_voxel_size, base_path, metadata):
 
         if translation_metadata["dim_flip"][0] != "[False, False, False]":
             deform_arr, pad_sum, flip_sum = handle_dim_flip(
-                deform_arr, translation_metadata["dim_flip"][0], pad_sum, flip_sum
+                deform_arr,
+                translation_metadata["dim_flip"][0],
+                pad_sum,
+                flip_sum,
             )
 
         if translation_metadata["file_name"][0] != "False":

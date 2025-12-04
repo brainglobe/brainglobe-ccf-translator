@@ -20,7 +20,9 @@ ccft_vol.save("../demo_data/transform_to_40.nii.gz")
 points = np.array([(286, 250, 267), (414, 247, 452), (100, 200, 100)])
 
 
-ccft_pts = ccft.PointSet(points, space="allen_mouse", voxel_size_micron=20, age_PND=56)
+ccft_pts = ccft.PointSet(
+    points, space="allen_mouse", voxel_size_micron=20, age_PND=56
+)
 # the API is the same for points
 ccft_pts.transform(target_space="demba_dev_mouse", target_age=28)
 # the values can be accessed like so

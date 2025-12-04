@@ -22,7 +22,9 @@ def plot_mid_slice(volume_data, title, ax):
     ax.axis("off")
 
 
-def plot_overlay(transformed_data, target_data, trans_res, target_res, title, ax):
+def plot_overlay(
+    transformed_data, target_data, trans_res, target_res, title, ax
+):
     """Plot two images overlaid with different colors, aligned by corner origin"""
     mid_idx_trans = transformed_data.shape[0] // 2
     mid_idx_target = target_data.shape[0] // 2
@@ -148,7 +150,8 @@ def main():
 
                 # Transform
                 ccft_vol.transform(
-                    target_age=target_cfg["age"], target_space=target_cfg["space"]
+                    target_age=target_cfg["age"],
+                    target_space=target_cfg["space"],
                 )
 
                 # Load target for comparison
@@ -160,12 +163,16 @@ def main():
 
                 # Source
                 plot_mid_slice(
-                    source_atlas.reference, f"Source: {source_cfg['name']}", axes[0]
+                    source_atlas.reference,
+                    f"Source: {source_cfg['name']}",
+                    axes[0],
                 )
 
                 # Transformed
                 plot_mid_slice(
-                    ccft_vol.values, f"Transformed to {target_cfg['name']}", axes[1]
+                    ccft_vol.values,
+                    f"Transformed to {target_cfg['name']}",
+                    axes[1],
                 )
 
                 # Target (Ground Truth)

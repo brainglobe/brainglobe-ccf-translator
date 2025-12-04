@@ -77,8 +77,12 @@ adult_voxel_size = 25
 young_voxel_size = 20
 
 # Get 2D slices along the chosen axis
-adult_slice = np.rot90(get_slice(demba_adult_template, slice_idx, slice_axis), k=-1)
-adult_proj_slice = np.rot90(get_slice(P56_projection, slice_idx, slice_axis), k=-1)
+adult_slice = np.rot90(
+    get_slice(demba_adult_template, slice_idx, slice_axis), k=-1
+)
+adult_proj_slice = np.rot90(
+    get_slice(P56_projection, slice_idx, slice_axis), k=-1
+)
 # scale slice index as the images are different resolutions
 young_slice = np.rot90(
     get_slice(
@@ -139,7 +143,9 @@ arrow = patches.FancyArrowPatch(
 fig.add_artist(arrow)
 
 # Save the figure as an image file
-fig.savefig("../media/allen_connectivity_transform.png", dpi=300, bbox_inches="tight")
+fig.savefig(
+    "../media/allen_connectivity_transform.png", dpi=300, bbox_inches="tight"
+)
 
 # Show the plot
 plt.show()

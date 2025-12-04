@@ -39,7 +39,9 @@ def _ensure_parent(path: Path) -> None:
     Path(path).parent.mkdir(parents=True, exist_ok=True)
 
 
-def zero_origin_image(input_path: Path, output_path: Path) -> tuple[int, int, int]:
+def zero_origin_image(
+    input_path: Path, output_path: Path
+) -> tuple[int, int, int]:
     img = nib.load(str(input_path))
     data = np.asanyarray(img.dataobj)
     _reset_offsets(img)
@@ -163,7 +165,9 @@ def invert_and_save(
     invert_arr[:, :, :, 1] -= crop_input[1][0]
     invert_arr[:, :, :, 2] -= crop_input[2][0]
     _ensure_parent(output_path)
-    nib.save(nib.Nifti1Image(invert_arr, img.affine, img.header), str(output_path))
+    nib.save(
+        nib.Nifti1Image(invert_arr, img.affine, img.header), str(output_path)
+    )
 
 
 root_path = Path(
@@ -178,7 +182,9 @@ allen_mouse_dir = out_path / "deformation_fields" / "allen_mouse"
 def_out_dir = out_path / "deformation_fields"
 
 
-zero_origin_image(mri_dir / "mri_temp.nii.gz", mri_dir / "mri_new_header.nii.gz")
+zero_origin_image(
+    mri_dir / "mri_temp.nii.gz", mri_dir / "mri_new_header.nii.gz"
+)
 ccfv3_shape = zero_origin_image(
     ccfv3_oriented_dir / "ccfv3_temp.nii.gz",
     ccfv3_oriented_dir / "ccfv3_new_header.nii.gz",

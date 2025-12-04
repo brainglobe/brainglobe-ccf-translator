@@ -19,7 +19,9 @@ def interpolate_volume(volume, mask):
         return volume
     interp_mask = ~nan_pos & mask
     # Create the interpolator
-    interpolator = NearestNDInterpolator(points[interp_mask], values[interp_mask])
+    interpolator = NearestNDInterpolator(
+        points[interp_mask], values[interp_mask]
+    )
     # Interpolate the volume
     out_mask = nan_pos & mask
     values[out_mask] = interpolator(points[out_mask], k=5)
@@ -30,7 +32,9 @@ def interpolate_volume(volume, mask):
 
 def invert_transformation_volume(forward_arr):
     coords = np.mgrid[
-        0 : forward_arr.shape[1], 0 : forward_arr.shape[2], 0 : forward_arr.shape[3]
+        0 : forward_arr.shape[1],
+        0 : forward_arr.shape[2],
+        0 : forward_arr.shape[3],
     ]
     output = np.zeros(forward_arr.shape)
     output[:] = np.nan
@@ -67,5 +71,7 @@ def invert_deformation(deformation_arr_transpose, output_shape=None):
     edge_mask = mask & ~binary_dilation(~mask)
     eroded_img = binary_erosion(edge_mask, structure=np.ones((3, 3, 3)))
     for i in range(3):
-        reversed_deform[i] = interpolate_volume(reversed_deform[i], mask=~eroded_img)
+        reversed_deform[i] = interpolate_volume(
+            reversed_deform[i], mask=~eroded_img
+        )
     return reversed_deform

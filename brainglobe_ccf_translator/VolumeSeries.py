@@ -45,20 +45,28 @@ class VolumeSeries:
 
     def find_volume_by_age_and_space(self, age, space):
         return next(
-            (vol for vol in self.Volumes if vol.age_PND == age and vol.space == space),
+            (
+                vol
+                for vol in self.Volumes
+                if vol.age_PND == age and vol.space == space
+            ),
             None,
         )
 
     def filter_metadata(self):
         """Filter metadata to only include entries with vector magnitude of 1."""
-        vector_numeric = pd.to_numeric(self.metadata["vector"], errors="coerce")
+        vector_numeric = pd.to_numeric(
+            self.metadata["vector"], errors="coerce"
+        )
         mask = np.abs(vector_numeric) == 1
         return self.metadata[mask]
 
     def interpolate_series(self):
         route = self.calculate_hamiltonian()
         existing_route = [
-            i for i in route if i in [f"{i.space}_P{i.age_PND}" for i in self.Volumes]
+            i
+            for i in route
+            if i in [f"{i.space}_P{i.age_PND}" for i in self.Volumes]
         ]
         if not route:
             print("No valid route was found. Exiting.")
@@ -72,8 +80,12 @@ class VolumeSeries:
             start_age, start_space = self.split_volume_name(start)
             end_age, end_space = self.split_volume_name(end)
 
-            left_volume = self.find_volume_by_age_and_space(start_age, start_space)
-            right_volume = self.find_volume_by_age_and_space(end_age, end_space)
+            left_volume = self.find_volume_by_age_and_space(
+                start_age, start_space
+            )
+            right_volume = self.find_volume_by_age_and_space(
+                end_age, end_space
+            )
 
             if left_volume is None or right_volume is None:
                 print(f"Volume not found for start {start} or end {end}")

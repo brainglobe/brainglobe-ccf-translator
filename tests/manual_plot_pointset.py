@@ -47,7 +47,9 @@ def get_atlas_name(space, age):
     return atlas_info
 
 
-def plot_point_in_volume(ax, volume, point, plane, title, color="red", marker_size=100):
+def plot_point_in_volume(
+    ax, volume, point, plane, title, color="red", marker_size=100
+):
     """
     Plot a single plane with a point marked.
 
@@ -83,7 +85,14 @@ def plot_point_in_volume(ax, volume, point, plane, title, color="red", marker_si
         raise ValueError(f"Unknown plane: {plane}")
 
     ax.imshow(slice_img, cmap="gray")
-    ax.scatter([marker_x], [marker_y], c=color, s=marker_size, marker="x", linewidths=2)
+    ax.scatter(
+        [marker_x],
+        [marker_y],
+        c=color,
+        s=marker_size,
+        marker="x",
+        linewidths=2,
+    )
     ax.set_title(
         f"{title}\n{plane.capitalize()} (idx={[ap, dv, lr][['coronal', 'sagittal', 'horizontal'].index(plane)]})"
     )
@@ -110,7 +119,10 @@ def validate_test_case(test_case_path, output_dir, recalculate=False):
         print("  Recalculating point positions...")
         input_points = np.array(points) / scale
         pset = ccft.PointSet(
-            input_points, source_space, voxel_size_micron=25, age_PND=source_age
+            input_points,
+            source_space,
+            voxel_size_micron=25,
+            age_PND=source_age,
         )
         pset.transform(target_age=target_age, target_space=target_space)
         expected_values = (pset.values * scale).tolist()
@@ -186,7 +198,9 @@ def main():
     output_dir = Path(__file__).parent / "points_manual_test_output"
     output_dir.mkdir(exist_ok=True)
 
-    test_cases_dir = os.path.join(os.path.dirname(__file__), "PointSet_test_cases")
+    test_cases_dir = os.path.join(
+        os.path.dirname(__file__), "PointSet_test_cases"
+    )
 
     test_case_files = [
         "demba_dev_mouse_56.json",
@@ -206,7 +220,9 @@ def main():
             print(f"Validating: {filename}")
             print("=" * 60)
             try:
-                validate_test_case(filepath, output_dir, recalculate=RECALCULATE)
+                validate_test_case(
+                    filepath, output_dir, recalculate=RECALCULATE
+                )
             except Exception as e:
                 print(f"Error validating {filename}: {e}")
         else:

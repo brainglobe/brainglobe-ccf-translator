@@ -22,7 +22,9 @@ class PointSet:
         try:
             metadata = pd.read_csv(metadata_path)
         except FileNotFoundError:
-            raise FileNotFoundError(f"Metadata file not found at {metadata_path}")
+            raise FileNotFoundError(
+                f"Metadata file not found at {metadata_path}"
+            )
         except pd.errors.ParserError:
             raise ValueError(f"Error parsing metadata file at {metadata_path}")
 
@@ -41,7 +43,10 @@ class PointSet:
         route = route_calculation.calculate_route(target, source, G)
         deform_arr, pad_sum, flip_sum, dim_order_sum, final_voxel_size = (
             apply_deformation.combine_route(
-                route, self.voxel_size_micron, self.deformation_dir, self.metadata
+                route,
+                self.voxel_size_micron,
+                self.deformation_dir,
+                self.metadata,
             )
         )
         previous = "_".join(route[1].split("_")[:-1])

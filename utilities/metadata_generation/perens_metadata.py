@@ -4,7 +4,9 @@ from pathlib import Path
 import pandas as pd
 
 VERSION = "1.1"
-metadata_path = r"../../brainglobe_ccf_translator/metadata/translation_metadata.csv"
+metadata_path = (
+    r"../../brainglobe_ccf_translator/metadata/translation_metadata.csv"
+)
 out_path = Path("~/.brainglobe/").expanduser()
 def_out_dir = out_path / "deformation_fields"
 
@@ -32,7 +34,12 @@ def create_metadata_dict(
 
     filename = f"{target_space}_pull_{source_space}_v{VERSION}.nii.gz"
     img = nib.load(f"{out_dir}/{target_space}/{filename}")
-    X_physical_size_micron, Y_physical_size_micron, Z_physical_size_micron, _ = (
+    (
+        X_physical_size_micron,
+        Y_physical_size_micron,
+        Z_physical_size_micron,
+        _,
+    ) = (
         np.array(img.shape) * transformation_resolution_micron
     )
 

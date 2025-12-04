@@ -35,7 +35,9 @@ def _ndim_coords_from_arrays(points, ndim=None):
         # ensure shapes match
         for j in range(1, n):
             if p[j].shape != p[0].shape:
-                raise ValueError("coordinate arrays do not have the same shape")
+                raise ValueError(
+                    "coordinate arrays do not have the same shape"
+                )
 
         # create output array (..., ndim)
         out = np.empty(p[0].shape + (n,), dtype=float)
@@ -143,7 +145,12 @@ class NearestNDInterpolator(NDInterpolatorBase):
 
     def __init__(self, x, y, rescale=False, tree_options=None):
         NDInterpolatorBase.__init__(
-            self, x, y, rescale=rescale, need_contiguous=False, need_values=False
+            self,
+            x,
+            y,
+            rescale=rescale,
+            need_contiguous=False,
+            need_values=False,
         )
         if tree_options is None:
             tree_options = dict()
@@ -209,7 +216,9 @@ class NearestNDInterpolator(NDInterpolatorBase):
             interp_shape = flattened_shape[:-1]
 
         if np.issubdtype(self.values.dtype, np.complexfloating):
-            interp_values = np.full(interp_shape, np.nan, dtype=self.values.dtype)
+            interp_values = np.full(
+                interp_shape, np.nan, dtype=self.values.dtype
+            )
         else:
             interp_values = np.full(interp_shape, np.nan)
 

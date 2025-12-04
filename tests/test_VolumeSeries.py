@@ -54,10 +54,13 @@ class TestVolumeSeries(unittest.TestCase):
         # Compare the expected outputs
         for v in volume_series.Volumes:
             expected_volume_path = os.path.join(
-                expected_output_dir, f"demba_dev_mouse_P{v.age_PND}_interpolated.npz"
+                expected_output_dir,
+                f"demba_dev_mouse_P{v.age_PND}_interpolated.npz",
             )
             expected_volume_data = np.load(expected_volume_path)["reference"]
-            np.testing.assert_array_almost_equal(v.values, expected_volume_data)
+            np.testing.assert_array_almost_equal(
+                v.values, expected_volume_data
+            )
 
 
 # List of test case filenames
@@ -69,7 +72,9 @@ for test_case_file in test_case_files:
     def test_method(self, test_case_file=test_case_file):
         self.run_test_case(test_case_file)
 
-    setattr(TestVolumeSeries, f'test_{test_case_file.split(".")[0]}', test_method)
+    setattr(
+        TestVolumeSeries, f'test_{test_case_file.split(".")[0]}', test_method
+    )
 
 if __name__ == "__main__":
     unittest.main()
