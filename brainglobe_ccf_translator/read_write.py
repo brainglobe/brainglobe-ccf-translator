@@ -1,6 +1,8 @@
-import numpy as np
-import nibabel as nib
 import ast
+
+import nibabel as nib
+import numpy as np
+
 import brainglobe_ccf_translator.Volume as Volume
 
 

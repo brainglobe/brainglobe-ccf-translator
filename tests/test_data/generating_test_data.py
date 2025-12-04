@@ -1,7 +1,8 @@
+from pathlib import Path
+
 import numpy as np
 from brainglobe_atlasapi.bg_atlas import BrainGlobeAtlas
 from scipy.ndimage import zoom
-from pathlib import Path
 
 test_data_dir = Path(__file__).parent
 

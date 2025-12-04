@@ -1,7 +1,7 @@
-import brainglobe_ccf_translator as ccft
 import numpy as np
 from brainglobe_atlasapi import BrainGlobeAtlas
 
+import brainglobe_ccf_translator as ccft
 
 volume = BrainGlobeAtlas("demba_allen_seg_dev_mouse_p28_20um").reference
 # Create a ccft object

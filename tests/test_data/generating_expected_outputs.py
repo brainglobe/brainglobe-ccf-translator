@@ -1,7 +1,8 @@
 import os
-import brainglobe_ccf_translator
+
 import numpy as np
 
+import brainglobe_ccf_translator
 
 test_data_dir = os.path.dirname(__file__)
 

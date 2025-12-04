@@ -1,16 +1,16 @@
-from .deformation.route_calculation import (
-    find_hamiltonian_path,
-    calculate_route,
-    find_path_through_nodes,
-    create_G,
-)
-import os
-import pandas as pd
-import nibabel as nib
 import copy
-import numpy as np
-from .Volume import Volume
+import os
 from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+from .deformation.route_calculation import (
+    calculate_route,
+    create_G,
+    find_path_through_nodes,
+)
+from .Volume import Volume
 
 
 class VolumeSeries:

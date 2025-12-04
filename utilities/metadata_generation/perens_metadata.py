@@ -1,6 +1,7 @@
+from pathlib import Path
+
 import nibabel as nib
 import numpy as np
-from pathlib import Path
 import pandas as pd
 
 VERSION = "1.1"
@@ -28,9 +29,6 @@ def create_metadata_dict(
     out_dir="",
     VERSION="",
 ):
-    import nibabel as nib
-    import numpy as np
-    import pandas as pd
 
     filename = f"{target_space}_pull_{source_space}_v{VERSION}.nii.gz"
     img = nib.load(f"{out_dir}/{target_space}/{filename}")

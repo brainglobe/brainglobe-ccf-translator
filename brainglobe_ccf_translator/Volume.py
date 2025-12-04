@@ -1,12 +1,12 @@
-import numpy as np
-from .deformation import apply_deformation, route_calculation
-from . import config
-import pandas as pd
-import json
 import os
-import nibabel as nib
 from typing import Any
 
+import nibabel as nib
+import numpy as np
+import pandas as pd
+
+from . import config
+from .deformation import apply_deformation, route_calculation
 
 """
 At present the order of transformations is:

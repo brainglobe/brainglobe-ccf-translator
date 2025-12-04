@@ -1,6 +1,8 @@
-import os
 import json
+import os
+
 import numpy as np
+
 from brainglobe_ccf_translator import PointSet
 
 """

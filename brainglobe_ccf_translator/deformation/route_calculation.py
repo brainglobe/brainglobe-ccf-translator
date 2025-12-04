@@ -1,8 +1,6 @@
-import json
 import networkx as nx
-import numpy as np
-from networkx.algorithms.approximation import steiner_tree
 from networkx.algorithms import approximation as approx
+from networkx.algorithms.approximation import steiner_tree
 
 
 def calculate_route(source, target, G):

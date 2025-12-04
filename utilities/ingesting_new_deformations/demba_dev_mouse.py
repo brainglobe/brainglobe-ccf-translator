@@ -1,11 +1,11 @@
-import numpy as np
-from glob import glob
-import nibabel as nib
-import os
 import math
-from pathlib import Path
+import os
 import sys
 import urllib
+from pathlib import Path
+
+import nibabel as nib
+import numpy as np
 
 # Here we have a recreation of the intermediate volumes
 # We start from the files which came out of elastix

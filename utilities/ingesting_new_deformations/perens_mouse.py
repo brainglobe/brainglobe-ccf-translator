@@ -9,10 +9,11 @@ This script assumes you have downloaded the Gubra atlas files available from:
 https://www.neuropedia.dk/wp-content/uploads/Multimodal_mouse_brain_atlas_files_v2.7z
 """
 
+import sys
+from pathlib import Path
+
 import nibabel as nib
 import numpy as np
-from pathlib import Path
-import sys
 from brainglobe_atlasapi.bg_atlas import BrainGlobeAtlas
 
 VERSION = "1.1"
@@ -20,12 +21,12 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from brainglobe_ccf_translator.deformation.forward_transform import (
-    invert_deformation,
-    interpolate_volume,
-)
 from brainglobe_ccf_translator.deformation.apply_deformation import (
     resize_input,
+)
+from brainglobe_ccf_translator.deformation.forward_transform import (
+    interpolate_volume,
+    invert_deformation,
 )
 
 
@@ -197,7 +198,7 @@ ccfv3_original_shape = zero_origin_image(
     ccfv3_original_dir / "ccfv3_orig_temp.nii.gz",
     ccfv3_original_dir / "ccfv3_orig_new_header.nii.gz",
 )
-atlas = BrainGlobeAtlas(f"allen_mouse_25um")
+atlas = BrainGlobeAtlas("allen_mouse_25um")
 
 process_deformation_field(
     deformation_dir / "ccfv3_orig_2_mri_deffield.nii.gz",

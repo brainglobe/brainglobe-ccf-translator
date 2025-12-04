@@ -1,4 +1,5 @@
 import numpy as np
+
 import brainglobe_ccf_translator
 
 multi_point = np.array([(286, 250, 267), (414, 247, 452)])

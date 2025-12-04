@@ -6,12 +6,13 @@ transformed down to a P9 brain.
 To run this script you will need the allensdk which is installable via pip
 """
 
+import matplotlib.patches as patches
+import matplotlib.pyplot as plt
+import numpy as np
 from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache
 from brainglobe_atlasapi.bg_atlas import BrainGlobeAtlas
+
 import brainglobe_ccf_translator
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-import numpy as np
 
 # tell the cache class what resolution (in microns) of data you want to download
 mcc = MouseConnectivityCache(resolution=25)

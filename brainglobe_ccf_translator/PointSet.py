@@ -1,8 +1,10 @@
-from .deformation import apply_deformation, route_calculation
-import pandas as pd
 import os
+
 import numpy as np
+import pandas as pd
+
 from . import config
+from .deformation import apply_deformation, route_calculation
 
 base_path = os.path.dirname(__file__)
 

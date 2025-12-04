@@ -97,6 +97,9 @@ lint.select = [
   #"SIM", # flake8 simplify
   #"C90", # McCabe complexity
 ]
+lint.ignore = [
+  "E501",  # line too long - let Black handle formatting
+]
 fix = true
 
 

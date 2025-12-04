@@ -5,10 +5,12 @@
 # if str(PROJECT_ROOT) not in sys.path:
 #     sys.path.insert(0, str(PROJECT_ROOT))
 
-import unittest
-import numpy as np
 import json
 import os
+import unittest
+
+import numpy as np
+
 from brainglobe_ccf_translator import Volume
 
 

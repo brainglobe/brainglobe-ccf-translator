@@ -1,8 +1,6 @@
+import numpy as np
 from scipy.interpolate.interpnd import NDInterpolatorBase
 from scipy.spatial import cKDTree
-import numpy as np
-
-import numpy as np
 
 
 def _ndim_coords_from_arrays(points, ndim=None):

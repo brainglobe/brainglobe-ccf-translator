@@ -1,7 +1,6 @@
-import brainglobe_ccf_translator as ccft
-import nibabel as nib
-import numpy as np
 from brainglobe_atlasapi import BrainGlobeAtlas
+
+import brainglobe_ccf_translator as ccft
 
 # ccft is also able to interpolate time series data to create temporally continuous volumes.
 my_ages = [4, 6, 9]

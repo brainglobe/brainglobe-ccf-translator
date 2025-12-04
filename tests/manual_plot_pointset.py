@@ -6,14 +6,15 @@ Outputs images to a directory that can be uploaded with a pull request.
 Set RECALCULATE = True to recompute point positions instead of using saved expected values.
 """
 
-import matplotlib.pyplot as plt
-import numpy as np
 import json
 import os
 from pathlib import Path
-from brainglobe_atlasapi import BrainGlobeAtlas
-import brainglobe_ccf_translator as ccft
 
+import matplotlib.pyplot as plt
+import numpy as np
+from brainglobe_atlasapi import BrainGlobeAtlas
+
+import brainglobe_ccf_translator as ccft
 
 # Set to True to recalculate point positions, False to use saved expected values from tht tests
 RECALCULATE = True

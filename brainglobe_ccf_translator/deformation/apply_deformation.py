@@ -1,10 +1,11 @@
-import numpy as np
-import nibabel as nib
-import scipy
 import json
 import os
-from scipy.ndimage import map_coordinates
+
+import nibabel as nib
+import numpy as np
 import requests
+import scipy
+from scipy.ndimage import map_coordinates
 
 
 def invert_dim_order(order):

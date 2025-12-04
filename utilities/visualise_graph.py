@@ -1,9 +1,6 @@
-import json
-import networkx as nx
-import numpy as np
-import pandas as pd
 import os
-from pathlib import Path
+
+import pandas as pd
 
 base_path = "../brainglobe_ccf_translator"
 

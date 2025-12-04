@@ -1,16 +1,14 @@
+import os
+
 import nibabel as nib
-import math
-import pandas as pd
 import numpy as np
+
+from brainglobe_ccf_translator.deformation.apply_deformation import (
+    resize_input,
+)
 from brainglobe_ccf_translator.deformation.forward_transform import (
     invert_deformation,
 )
-from brainglobe_ccf_translator.deformation.apply_deformation import (
-    resize_input,
-    apply_transform,
-)
-import os
-import matplotlib.pyplot as plt
 
 root_path = r"~/brainglobe_workingdir/princeton_lightsheet_mouse"
 

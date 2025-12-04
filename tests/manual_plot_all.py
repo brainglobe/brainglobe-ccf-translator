@@ -5,11 +5,12 @@ To ensure everything is working, this script will plot all combinations of volum
 Outputs images to a directory that can be uploaded with a pull request.
 """
 
-import matplotlib.pyplot as plt
-import numpy as np
-from brainglobe_atlasapi import BrainGlobeAtlas
-import brainglobe_ccf_translator as ccft
 from pathlib import Path
+
+import matplotlib.pyplot as plt
+from brainglobe_atlasapi import BrainGlobeAtlas
+
+import brainglobe_ccf_translator as ccft
 
 
 def plot_mid_slice(volume_data, title, ax):

@@ -1,8 +1,8 @@
 import numpy as np
-from .interpolation.NearestNDInterpolator import NearestNDInterpolator
-from .apply_deformation import create_deformation_coords
-import nibabel as nib
 from scipy.ndimage import binary_dilation, binary_erosion
+
+from .apply_deformation import create_deformation_coords
+from .interpolation.NearestNDInterpolator import NearestNDInterpolator
 
 
 def interpolate_volume(volume, mask):
