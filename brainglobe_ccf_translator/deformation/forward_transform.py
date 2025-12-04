@@ -15,12 +15,14 @@ def interpolate_volume(volume, mask):
     mask = mask.flatten()
     values = volume.flatten()
     nan_pos = np.isnan(values)
+    if np.sum(nan_pos) == 0:
+        return volume
     interp_mask = ~nan_pos & mask
     # Create the interpolator
     interpolator = NearestNDInterpolator(points[interp_mask], values[interp_mask])
     # Interpolate the volume
     out_mask = nan_pos & mask
-    values[out_mask] = interpolator(points[out_mask], k=40)
+    values[out_mask] = interpolator(points[out_mask], k=5)
     # Reshape the interpolated volume to the original shape
     interpolated_volume = values.reshape(shape)
     return interpolated_volume
@@ -42,7 +44,8 @@ def invert_transformation_volume(forward_arr):
     ]
     return output
 
-def invert_deformation(deformation_arr_transpose, output_shape = None):
+
+def invert_deformation(deformation_arr_transpose, output_shape=None):
     if output_shape is None:
         output_shape = deformation_arr_transpose.shape[1:]
     deformed_coords = create_deformation_coords(deformation_arr_transpose)

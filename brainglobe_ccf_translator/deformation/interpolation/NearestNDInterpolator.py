@@ -1,7 +1,60 @@
-from scipy.interpolate.interpnd import NDInterpolatorBase, _ndim_coords_from_arrays
+from scipy.interpolate.interpnd import NDInterpolatorBase
 from scipy.spatial import cKDTree
 import numpy as np
 
+import numpy as np
+
+def _ndim_coords_from_arrays(points, ndim=None):
+    """
+    Convert a tuple of coordinate arrays to a (..., ndim)-shaped array.
+    Pure-Python version of the SciPy private helper removed in newer versions.
+
+    Parameters
+    ----------
+    points : array-like or tuple of array-likes
+    ndim : int, optional
+        If `points` is 1D and ndim is given, reshape to (-1, ndim).
+
+    Returns
+    -------
+    points_arr : ndarray
+        Array of shape (..., ndim)
+    """
+
+    # Unwrap singleton tuple
+    if isinstance(points, tuple) and len(points) == 1:
+        points = points[0]
+
+    # Case 1: tuple of coordinate arrays
+    if isinstance(points, tuple):
+        # broadcast all coordinate arrays to same shape
+        p = np.broadcast_arrays(*points)
+        n = len(p)
+
+        # ensure shapes match
+        for j in range(1, n):
+            if p[j].shape != p[0].shape:
+                raise ValueError("coordinate arrays do not have the same shape")
+
+        # create output array (..., ndim)
+        out = np.empty(p[0].shape + (n,), dtype=float)
+        for j, item in enumerate(p):
+            out[..., j] = item
+
+        return out
+
+    # Case 2: points is a numpy array or array-like
+    points = np.asarray(points)
+
+    if points.ndim == 1:
+        # Caller wants a specific ndim
+        if ndim is None:
+            return points.reshape(-1, 1)
+        else:
+            return points.reshape(-1, ndim)
+
+    # Already multi-dimensional
+    return points
 
 class NearestNDInterpolator(NDInterpolatorBase):
     """NearestNDInterpolator(x, y).

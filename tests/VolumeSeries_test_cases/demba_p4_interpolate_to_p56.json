@@ -1,5 +1,5 @@
 {
-    "expected_output_dir":"tests/test_data/expected_outputs/interpolated_values",
+    "expected_output_dir":"tests/test_data/expected_outputs",
     "space":"demba_dev_mouse",
     "voxel_size_micron":200,
     "key_ages":[56, 28, 14, 4],

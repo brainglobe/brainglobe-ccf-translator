@@ -1,7 +1,3 @@
-import os
-
-os.chdir("..")
-
 import numpy as np
 import brainglobe_ccf_translator
 

@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
-
-metadata_path = r"/home/harryc/github/brainglobe_ccf_translator/brainglobe_ccf_translator/metadata/translation_metadata.csv"
+VERSION = "1.1"
+metadata_path = r"../../brainglobe_ccf_translator/metadata/translation_metadata.csv"
 
 metadata_template = {
     "file_name": [],
@@ -42,11 +42,11 @@ for i in range(len(target_spaces)):
     metadata_template["target_space"].append(target)
     metadata_template["affine"].append(np.eye(4).tolist())
     if source == "allen_mouse":
-        metadata_template["dim_order"].append([0,1,2])
+        metadata_template["dim_order"].append([0, 1, 2])
 
         metadata_template["dim_flip"].append([False, False, False])
     elif target == "allen_mouse":
-        metadata_template["dim_order"].append([0,1,2])
+        metadata_template["dim_order"].append([0, 1, 2])
         metadata_template["dim_flip"].append([False, False, False])
 
     metadata_template["key_age"].append(True)
@@ -57,7 +57,7 @@ for i in range(len(target_spaces)):
     metadata_template["source_key_age"].append(False)
     metadata_template["target_key_age"].append(False)
     metadata_template["transformation_resolution_micron"].append(20)
-    
+
     if target == "princeton_mouse":
         metadata_template["target_X_physical_size_micron"].append(12800)
         metadata_template["target_Y_physical_size_micron"].append(7040)

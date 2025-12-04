@@ -1,7 +1,19 @@
 {
-    "points": [[1195, 268, 575]],
+    "points": [
+        [
+            1195,
+            268,
+            575
+        ]
+    ],
     "scale": 2.5,
     "target": "demba_dev_mouse",
     "target_age": 56,
-    "expected_values": [[575,  268, 1195]]
+    "expected_values": [
+        [
+            1195.0,
+            268.0,
+            575.0
+        ]
+    ]
 }

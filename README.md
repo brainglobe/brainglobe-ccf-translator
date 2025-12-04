@@ -6,7 +6,22 @@ A longstanding problem in NeuroInformatics has been the inability to easily tran
 
 CCF translator can also interpolate between spaces and create a new intermediate space. This is primarily useful for development, where, for instance, the midpoint between day 5 and day 7 can be taken and used as a postnatal day 6 reference. It could also be useful for making references of disease progression.  
 
-![a graph of all the available spaces and how they are connected. the spaces are nodes with the space name written on top of them, the edges show which spaces are connected to which other spaces.](https://raw.githubusercontent.com/brainglobe/brainglobe-ccf-translator/main/media/graph.png)
+![a graph of all the available spaces and how they are connected. the spaces are nodes with the space name written on top of them, the edges show which spaces are connected to which other spaces.]
+
+```mermaid
+graph TD
+    allen_mouse_P56 --- demba_dev_mouse_P56
+    allen_mouse_P56 --- perens_multimodal_lsfm_P56
+    allen_mouse_P56 --- perens_stereotaxic_mri_mouse_P56
+    allen_mouse_P56 --- princeton_mouse_P56
+    demba_dev_mouse_P14 --- demba_dev_mouse_P21
+    demba_dev_mouse_P14 --- demba_dev_mouse_P7
+    demba_dev_mouse_P21 --- demba_dev_mouse_P28
+    demba_dev_mouse_P28 --- demba_dev_mouse_P56
+    demba_dev_mouse_P4 --- demba_dev_mouse_P7
+```
+
+
 ## Use Cases
 One way you can use CCF translator is to view data from one space, in another space. For instance the allen connectivity dataset shows projections from viral tracing studies in the adult brain. We can take any of these projection datasets and view them in the developing brain, for instance post natal day 9.
 ![an image which shows a viral tracing study overlaid on the allen adult ccfv3 template. it shows that same viral tracing data transformed and overlaid on a post natal day 9 template. between the two images is an arrow pointing from the adult to the post natal day 9 brain, above which is text saying CCF translator, implying that CCF translator was used to transform the data from adult to post natal day 9.](https://raw.githubusercontent.com/brainglobe/brainglobe-ccf-translator/main/media/allen_connectivity_transform.png)
@@ -15,16 +30,20 @@ CCF translator can be installed by running
 ```
 pip install brainglobe-ccf-translator
 ```
+Or by cloning this repository and running 
+```
+pip install -e .
+```
+while in the root of the repository.
 ## Currently supported spaces
-the name in CCF translator aims to copy the name of atlases in the brainglobe_atlasapi when possible. 
+the name in CCF translator usually copies the name of the atlas in the brainglobe atlasapi. 
 | Framework Name | name in api | supported age range
 | -------------- | ----------- | ----------- 
 | Allen mouse CCFv3 | allen_mouse | 56
 | Demba developmental mouse | demba_dev_mouse| 4-56
-| Gubra lightsheet mouse | perens_lsfm_mouse| 56
-| Gubra MRI mouse | perens_mri_mouse| 56
-| Gubra STPT mouse | perens_stpt_mouse| 56
-| Princeton lighsheet mouse | princeton_mouse| 56
+| Gubra lightsheet mouse | perens_multimodal_lsfm| 56
+| Gubra MRI mouse | perens_stereotaxic_mri_mouse| 56
+| Princeton lightsheet mouse | princeton_mouse| 56
 ## Usage
 **Transforming points**
 To take a coordinate in one volume and find the equivalent coordinate in a second volume is quite simple in CCF translator. 
@@ -42,7 +61,7 @@ print(f"new points are {pset.values}")
 new points are [[267 250 286] [452 247 414]]
  ```
 **Transforming volumes**
-
+All of our transforms assume you retrieved the atlas from the brianglobe-atlasapi. 
 To run the volume examples you will want to install brainglobe-atlasapi using the following
 ```
 pip install brainglobe-atlasapi
@@ -56,7 +75,7 @@ import brainglobe_ccf_translator
 
 voxel_size_micron = 10
 space_name = r"allen_mouse"
-atlas = BrainGlobeAtlas("{space_name}_{voxel_size_micron}um")
+atlas = BrainGlobeAtlas(f"{space_name}_{voxel_size_micron}um")
 source_age = 56
 target_age= 32
 

@@ -4,15 +4,15 @@ import ast
 import brainglobe_ccf_translator.Volume as Volume
 
 
-def save_volume(CCFT_vol, save_path):
+def save_volume(ccft_vol, save_path):
     vol_metadata = {
-        "space": CCFT_vol.space,
-        "age_PND": CCFT_vol.age_PND,
-        "segmentation_file": CCFT_vol.segmentation_file,
+        "space": ccft_vol.space,
+        "age_PND": ccft_vol.age_PND,
+        "segmentation_file": ccft_vol.segmentation_file,
     }
     affine = np.eye(4)
-    affine[:3, :3] *= CCFT_vol.voxel_size_micron
-    image = nib.Nifti1Image(CCFT_vol.values, affine=affine)
+    affine[:3, :3] *= ccft_vol.voxel_size_micron
+    image = nib.Nifti1Image(ccft_vol.values, affine=affine)
     image.header["descrip"] = vol_metadata
     image.header.set_xyzt_units(3)
     nib.save(image, save_path)
@@ -27,7 +27,7 @@ def read_volume(path):
         # Convert the string to a dictionary
         dictionary = ast.literal_eval(string_representation)
         data = np.asanyarray(img.dataobj)
-        CCFT_vol = Volume(
+        ccft_vol = Volume(
             data=data,
             space=dictionary["space"],
             voxel_size_micron=img.affine[0],
@@ -36,6 +36,6 @@ def read_volume(path):
         )
     except:
         raise (
-            "Failed to open volume. This function only works with volumes that were saved using CCFT translator."
+            "Failed to open volume. This function only works with volumes that were saved using ccft translator."
         )
-    return CCFT_vol
+    return ccft_vol

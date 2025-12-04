@@ -1,6 +1,3 @@
-import os
-
-# os.chdir("..")
 from brainglobe_atlasapi.bg_atlas import BrainGlobeAtlas
 import brainglobe_ccf_translator
 
@@ -11,39 +8,20 @@ atlas = BrainGlobeAtlas(f"{space_name}_{voxel_size_micron}um")
 source_age = 56
 target_age = 56
 
-CCFT_vol = brainglobe_ccf_translator.Volume(
+ccft_vol = brainglobe_ccf_translator.Volume(
     values=atlas.reference,
     space="princeton_mouse",
     voxel_size_micron=voxel_size_micron,
     segmentation_file=False,
     age_PND=source_age,
 )
-# CCFT_vol.transform(target_age, "allen_mouse")
-# CCFT_vol.save(rf"demo_data/allen_mouse_from_princeton.nii.gz")
 
-CCFT_vol.transform(target_age, "perens_lsfm_mouse")
-CCFT_vol.save(rf"demo_data/perens_lsfm_from_princeton.nii.gz")
-import os
-
-# os.chdir("..")
-from brainglobe_atlasapi.bg_atlas import BrainGlobeAtlas
-import brainglobe_ccf_translator
+ccft_vol.transform(target_age, "perens_multimodal_lsfm")
+ccft_vol.save(rf"../demo_data/perens_lsfm_from_princeton.nii.gz")
 
 
-voxel_size_micron = 25
-space_name = r"allen_mouse"
-atlas = BrainGlobeAtlas(f"{space_name}_{voxel_size_micron}um")
-source_age = 56
-target_age = 56
-
-CCFT_vol = brainglobe_ccf_translator.Volume(
-    values=atlas.reference,
-    space=space_name,
-    voxel_size_micron=voxel_size_micron,
-    segmentation_file=True,
-    age_PND=source_age,
-)
-# CCFT_vol.save(rf"demo_data/princeton_mouse_from_princeton.nii.gz")
-
-CCFT_vol.transform(target_age, "princeton_mouse")
-CCFT_vol.save(rf"demo_data/princeton_from_allen_mouse.nii.gz")
+"""
+You can then run subsequent transformations like the following.
+"""
+ccft_vol.transform(target_age, "allen_mouse")
+ccft_vol.save(rf"../demo_data/allen_from_princeton.nii.gz")
