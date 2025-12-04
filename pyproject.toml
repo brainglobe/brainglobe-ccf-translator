@@ -70,6 +70,17 @@ ignore = [
   "tests/",
   "tests/test_unit/",
   "tests/test_integration/",
+  "*.md",
+  "codemeta.json",
+  "demo_data/",
+  "demo_data/*",
+  "media/",
+  "media/*",
+  "tutorials/",
+  "tutorials/*",
+  "utilities/",
+  "utilities/*",
+  "utilities/**/*",
 ]
 
 [tool.ruff]
