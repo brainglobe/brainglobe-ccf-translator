@@ -1,3 +1,13 @@
+"""
+At present the order of transformations is:
+transpose
+flip
+transform
+(if transform doesnt exist we pad, if it does we don't since it is handled by the transform)
+
+So the transform should be in the shape of the output
+"""
+
 import os
 from typing import Any
 
@@ -8,15 +18,6 @@ import pandas as pd
 from . import config
 from .deformation import apply_deformation, route_calculation
 
-"""
-At present the order of transformations is:
-transpose
-flip
-transform
-(if transform doesnt exist we pad, if it does we don't since it is handled by the transform)
-
-So the transform should be in the shape of the output
-"""
 
 
 class Volume:
