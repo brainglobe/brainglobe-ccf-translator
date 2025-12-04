@@ -20,7 +20,6 @@ ccft_vol.transform(target_age, "perens_multimodal_lsfm")
 ccft_vol.save(r"../demo_data/perens_lsfm_from_princeton.nii.gz")
 
 
-
 # You can then run subsequent transformations like the following.
 
 ccft_vol.transform(target_age, "allen_mouse")
