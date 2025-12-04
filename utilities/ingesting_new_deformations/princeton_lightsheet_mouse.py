@@ -55,7 +55,6 @@ new_input_size = current_input_size * (25 / 20)
 new_input_size = np.round(new_input_size).astype(int)
 
 
-
 for i in range(len(original_elastix_volume_paths)):
     original_elastix_volume_path = original_elastix_volume_paths[i]
     source = source_spaces[i]

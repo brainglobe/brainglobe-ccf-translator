@@ -62,9 +62,9 @@ def invert_deformation(deformation_arr_transpose, output_shape=None):
     new_coords[2][new_coords[2] < 0] = 0
     reversed_deform = np.zeros((3, *output_shape))
     reversed_deform[:] = np.nan
-    reversed_deform[:, new_coords[0], new_coords[1], new_coords[2]] = (
-        -deformation_arr_transpose
-    )
+    reversed_deform[
+        :, new_coords[0], new_coords[1], new_coords[2]
+    ] = -deformation_arr_transpose
     # Assuming `img` is your image array
     mask = np.isnan(reversed_deform[0])
     # Create a mask for NaNs that are at the edge for efficiency

@@ -29,7 +29,6 @@ def create_metadata_dict(
     out_dir="",
     VERSION="",
 ):
-
     filename = f"{target_space}_pull_{source_space}_v{VERSION}.nii.gz"
     img = nib.load(f"{out_dir}/{target_space}/{filename}")
     (
@@ -37,9 +36,7 @@ def create_metadata_dict(
         Y_physical_size_micron,
         Z_physical_size_micron,
         _,
-    ) = (
-        np.array(img.shape) * transformation_resolution_micron
-    )
+    ) = np.array(img.shape) * transformation_resolution_micron
 
     filename = f"{source_space}_pull_{target_space}_v{VERSION}.nii.gz"
     img = nib.load(f"{out_dir}/{source_space}/{filename}")
@@ -48,9 +45,7 @@ def create_metadata_dict(
         target_Y_physical_size_micron,
         target_Z_physical_size_micron,
         _,
-    ) = (
-        np.array(img.shape) * transformation_resolution_micron
-    )
+    ) = np.array(img.shape) * transformation_resolution_micron
     return {
         "file_name": filename,
         "source_space": source_space,

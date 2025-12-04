@@ -54,7 +54,7 @@ for test_case_file in test_case_files:
     def test_method(self, test_case_file=test_case_file):
         self.run_test_case(test_case_file)
 
-    setattr(TestPointset, f'test_{test_case_file.split(".")[0]}', test_method)
+    setattr(TestPointset, f"test_{test_case_file.split('.')[0]}", test_method)
 
 if __name__ == "__main__":
     unittest.main()

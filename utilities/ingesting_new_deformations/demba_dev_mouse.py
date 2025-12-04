@@ -21,7 +21,6 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 
-
 VERSION = "1.1"
 
 
@@ -95,7 +94,7 @@ for i in range(len(key_ages) - 1):
     # here we make it a single day transform so in our example 28 pulling values from 29
     elastix_arr /= magnitude
     save_volume(
-        elastix_arr, f"{save_path}/{age}_pull_{age+1}_v{VERSION}.nii.gz"
+        elastix_arr, f"{save_path}/{age}_pull_{age + 1}_v{VERSION}.nii.gz"
     )
     for day in range(1, magnitude + 1):
         temp_arr = elastix_arr.copy()
@@ -105,5 +104,5 @@ for i in range(len(key_ages) - 1):
         temp_age = age + day
         save_volume(
             temp_arr,
-            f"{save_path}/{temp_age}_pull_{temp_age-1}_v{VERSION}.nii.gz",
+            f"{save_path}/{temp_age}_pull_{temp_age - 1}_v{VERSION}.nii.gz",
         )

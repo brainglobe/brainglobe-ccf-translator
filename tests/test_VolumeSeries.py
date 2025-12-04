@@ -74,7 +74,7 @@ for test_case_file in test_case_files:
         self.run_test_case(test_case_file)
 
     setattr(
-        TestVolumeSeries, f'test_{test_case_file.split(".")[0]}', test_method
+        TestVolumeSeries, f"test_{test_case_file.split('.')[0]}", test_method
     )
 
 if __name__ == "__main__":

@@ -181,14 +181,14 @@ def validate_test_case(test_case_path, output_dir, recalculate=False):
 
         mode_str = "recalculated" if recalculate else "from test case"
         fig.suptitle(
-            f"Point {i+1}: {src_point} -> {exp_point.tolist()}\n"
+            f"Point {i + 1}: {src_point} -> {exp_point.tolist()}\n"
             f"Test case: {os.path.basename(test_case_path)} ({mode_str})",
             fontsize=12,
         )
         plt.tight_layout()
 
         # Save to file
-        filename = f"{Path(test_case_path).stem}_point{i+1}.png"
+        filename = f"{Path(test_case_path).stem}_point{i + 1}.png"
         output_path = output_dir / filename
         plt.savefig(output_path, dpi=150, bbox_inches="tight")
         plt.close(fig)
@@ -217,7 +217,7 @@ def main():
     for filename in test_case_files:
         filepath = os.path.join(test_cases_dir, filename)
         if os.path.exists(filepath):
-            print(f"\n{'='*60}")
+            print(f"\n{'=' * 60}")
             print(f"Validating: {filename}")
             print("=" * 60)
             try:

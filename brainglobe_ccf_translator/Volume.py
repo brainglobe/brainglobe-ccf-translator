@@ -83,7 +83,6 @@ class Volume:
             if flip_sum[i]:
                 array = np.flip(array, axis=i)
         if deform_arr is not None:
-
             # original_input_shape = np.array([456.0, 668.0, 320.0])
             if final_voxel_size != self.voxel_size_micron:
                 original_input_shape = np.shape(array)
