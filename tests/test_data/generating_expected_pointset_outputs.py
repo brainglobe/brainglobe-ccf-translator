@@ -12,7 +12,7 @@ from brainglobe_ccf_translator import PointSet
 
 test_data_dir = os.path.dirname(__file__)
 pointset_test_cases_dir = os.path.join(
-    os.path.dirname(test_data_dir), "../PointSet_test_cases"
+    os.path.dirname(test_data_dir), "PointSet_test_cases"
 )
 
 # Define test cases: input parameters (without expected_values)
