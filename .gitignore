@@ -6,7 +6,7 @@ demo_data
 create_transformation_for_ages/deformations_from_elastix
 create_transformation_for_ages/
 .vscode/
-
+testing.py
 # Byte-compiled / optimized / DLL files
 __pycache__/
 brainglobe_ccf_translator/__pycache__/
