@@ -84,6 +84,7 @@ ignore = [
 ]
 
 [tool.ruff]
+line-length = 79
 exclude = ["__init__.py", "build", ".eggs"]
 lint.select = [
   "E",   # pycodestyle errors
@@ -98,9 +99,6 @@ lint.select = [
 ]
 fix = true
 
-[tool.ruff.format]
-# Use the same line length as black
-line-length = 79
 
 [tool.tox]
 legacy_tox_ini = """
