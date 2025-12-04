@@ -89,7 +89,8 @@ lint.select = [
 fix = true
 
 [tool.ruff.format]
-docstring-code-format = true # Also format code in docstrings (e.g. examples)
+# Use the same line length as black
+line-length = 79
 
 [tool.tox]
 legacy_tox_ini = """
@@ -116,3 +117,6 @@ commands =
 [tool.codespell]
 skip = '.git'
 check-hidden = true
+
+[tool.black]
+line-length = 79
