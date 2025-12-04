@@ -2,13 +2,13 @@
 
 ## Automatic Deployment (Recommended)
 
-The package is automatically published to PyPI when you create a GitHub release:
+The package is automatically published to PyPI when you push a version tag:
 
-1. Go to the repository's Releases page
-2. Click "Create a new release"
-3. Create a tag (e.g., `v0.1.0`)
-4. Publish the release
-5. The GitHub Action will automatically build and upload to PyPI
+1. Update your version as needed
+2. Create and push a tag: `git tag v0.1.0 && git push --tags`
+3. The GitHub Action will run tests, build, and upload to PyPI
+
+**Note:** You need to add a `TWINE_API_KEY` secret to your repository with your PyPI API token.
 
 ## Manual Deployment
 
