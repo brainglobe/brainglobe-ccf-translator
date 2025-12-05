@@ -44,6 +44,13 @@ the name in CCF translator usually copies the name of the atlas in the brainglob
 | Gubra lightsheet mouse | perens_multimodal_lsfm| 56
 | Gubra MRI mouse | perens_stereotaxic_mri_mouse| 56
 | Princeton lightsheet mouse | princeton_mouse| 56
+
+We also support brainglobe atlas api names which are in existing coordinate frameworks. For instance you can specify osten_mouse and CCF translator will autoconvert this to allen_mouse.
+| atlas api name | converts to  | supported age range
+| -------------- | ----------- | -----------
+| osten_mouse | allen_mouse | 56
+| allen_mouse_bluebrain_barrels | allen_mouse| 56
+| kim_mouse | allen_mouse | 56
 ## Usage
 **Transforming points**
 To take a coordinate in one volume and find the equivalent coordinate in a second volume is quite simple in CCF translator.
