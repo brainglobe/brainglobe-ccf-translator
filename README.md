@@ -51,6 +51,8 @@ We also support brainglobe atlas api names which are in existing coordinate fram
 | osten_mouse | allen_mouse | 56
 | allen_mouse_bluebrain_barrels | allen_mouse| 56
 | kim_mouse | allen_mouse | 56
+| demba_allen_seg_dev_mouse | demba_dev_mouse | 4-56
+
 ## Usage
 **Transforming points**
 To take a coordinate in one volume and find the equivalent coordinate in a second volume is quite simple in CCF translator.
