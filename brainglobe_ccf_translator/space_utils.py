@@ -39,6 +39,12 @@ def normalise_space_name(space: str) -> str:
     return _alias_lookup().get(cleaned, cleaned)
 
 
+def normalize_space_name(space: str) -> str:
+    """US-spelling wrapper for :func:`normalise_space_name`."""
+
+    return normalise_space_name(space)
+
+
 def collect_known_spaces(metadata: pd.DataFrame) -> Set[str]:
     """Collect the set of known spaces from translation metadata."""
     if not {"source_space", "target_space"}.issubset(metadata.columns):
@@ -48,19 +54,36 @@ def collect_known_spaces(metadata: pd.DataFrame) -> Set[str]:
     return set(source_spaces) | set(target_spaces)
 
 
+def collect_known_spaces_with_synonyms(metadata: pd.DataFrame) -> Set[str]:
+    """Return known spaces augmented with their accepted synonyms."""
+
+    alias_lookup = _alias_lookup()
+    return collect_known_spaces(metadata) | set(alias_lookup.keys())
+
+
 def validate_space_name(space: str, metadata: pd.DataFrame) -> str:
     """Validate and canonicalise a space name.
 
     Raises a ValueError if the (normalised) name is unknown.
     """
     canonical_space = normalise_space_name(space)
+    alias_lookup = _alias_lookup()
     known_spaces = collect_known_spaces(metadata)
+    known_with_synonyms = collect_known_spaces_with_synonyms(metadata)
 
-    if canonical_space not in known_spaces:
-        suggestion = difflib.get_close_matches(canonical_space, sorted(known_spaces), n=1)
-        suggestion_msg = f" Did you mean '{suggestion[0]}'?" if suggestion else ""
-        raise ValueError(
-            f"Unknown space '{space}'.{suggestion_msg} Known spaces include: {sorted(known_spaces)}"
+    if canonical_space in known_spaces:
+        return canonical_space
+
+    # If the user typed an alias that normalises to something unknown, fall back to lookup.
+    if canonical_space in alias_lookup and alias_lookup[canonical_space] in known_spaces:
+        return alias_lookup[canonical_space]
+
+    suggestion = difflib.get_close_matches(
+        canonical_space, sorted(known_with_synonyms), n=1
+    )
+    suggestion_msg = f" Did you mean '{suggestion[0]}'?" if suggestion else ""
+    raise ValueError(
+        "Unknown space '{space}'.{suggestion_msg} Known spaces include: {known}".format(
+            space=space, known=sorted(known_with_synonyms), suggestion_msg=suggestion_msg
         )
-
-    return canonical_space
+    )

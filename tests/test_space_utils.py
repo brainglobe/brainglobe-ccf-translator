@@ -37,6 +37,14 @@ class TestSpaceUtils(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_space_name("unknown_mouse", self.metadata)
 
+    def test_near_miss_suggests_synonym(self):
+        with self.assertRaises(ValueError) as ctx:
+            validate_space_name("allen_mouse_fbluebrain_barrels", self.metadata)
+
+        msg = str(ctx.exception)
+        self.assertIn("allen_mouse_bluebrain_barrels", msg)
+        self.assertIn("Did you mean", msg)
+
 
 if __name__ == "__main__":
     unittest.main()
