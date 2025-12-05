@@ -127,7 +127,7 @@ commands =
 [tool.codespell]
 skip = '.git'
 check-hidden = true
-ignore-words-list = "doesnt,infinte,tht"
+ignore-words-list = "doesnt,infinte,tht,assertIn"
 
 
 [tool.black]
