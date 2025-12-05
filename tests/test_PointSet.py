@@ -46,7 +46,8 @@ class TestPointset(unittest.TestCase):
 
         pset = PointSet(points, "kim_mouse", voxel_size_micron=25, age_PND=56)
         pset.transform(
-            target_age=test_case["target_age"], target_space=test_case["target"]
+            target_age=test_case["target_age"],
+            target_space=test_case["target"],
         )
 
         np.testing.assert_array_almost_equal(

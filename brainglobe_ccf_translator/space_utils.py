@@ -48,9 +48,15 @@ def normalize_space_name(space: str) -> str:
 def collect_known_spaces(metadata: pd.DataFrame) -> Set[str]:
     """Collect the set of known spaces from translation metadata."""
     if not {"source_space", "target_space"}.issubset(metadata.columns):
-        raise ValueError("Metadata must contain 'source_space' and 'target_space' columns.")
-    source_spaces: Iterable[str] = metadata["source_space"].astype(str).str.lower()
-    target_spaces: Iterable[str] = metadata["target_space"].astype(str).str.lower()
+        raise ValueError(
+            "Metadata must contain 'source_space' and 'target_space' columns."
+        )
+    source_spaces: Iterable[str] = (
+        metadata["source_space"].astype(str).str.lower()
+    )
+    target_spaces: Iterable[str] = (
+        metadata["target_space"].astype(str).str.lower()
+    )
     return set(source_spaces) | set(target_spaces)
 
 
@@ -75,7 +81,10 @@ def validate_space_name(space: str, metadata: pd.DataFrame) -> str:
         return canonical_space
 
     # If the user typed an alias that normalises to something unknown, fall back to lookup.
-    if canonical_space in alias_lookup and alias_lookup[canonical_space] in known_spaces:
+    if (
+        canonical_space in alias_lookup
+        and alias_lookup[canonical_space] in known_spaces
+    ):
         return alias_lookup[canonical_space]
 
     suggestion = difflib.get_close_matches(
@@ -84,6 +93,8 @@ def validate_space_name(space: str, metadata: pd.DataFrame) -> str:
     suggestion_msg = f" Did you mean '{suggestion[0]}'?" if suggestion else ""
     raise ValueError(
         "Unknown space '{space}'.{suggestion_msg} Known spaces include: {known}".format(
-            space=space, known=sorted(known_with_synonyms), suggestion_msg=suggestion_msg
+            space=space,
+            known=sorted(known_with_synonyms),
+            suggestion_msg=suggestion_msg,
         )
     )

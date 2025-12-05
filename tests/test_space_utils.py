@@ -1,4 +1,3 @@
-import os
 import unittest
 from pathlib import Path
 
@@ -39,7 +38,9 @@ class TestSpaceUtils(unittest.TestCase):
 
     def test_near_miss_suggests_synonym(self):
         with self.assertRaises(ValueError) as ctx:
-            validate_space_name("allen_mouse_fbluebrain_barrels", self.metadata)
+            validate_space_name(
+                "allen_mouse_fbluebrain_barrels", self.metadata
+            )
 
         msg = str(ctx.exception)
         self.assertIn("allen_mouse_bluebrain_barrels", msg)
