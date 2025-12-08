@@ -44,6 +44,8 @@ the name in CCF translator usually copies the name of the atlas in the brainglob
 | Gubra lightsheet mouse | perens_multimodal_lsfm| 56
 | Gubra MRI mouse | perens_stereotaxic_mri_mouse| 56
 | Princeton lightsheet mouse | princeton_mouse| 56
+| Dorr MRI mouse | dorr_mouse_mri | 56
+
 
 We also support brainglobe atlas api names which are in existing coordinate frameworks. For instance you can specify osten_mouse and CCF translator will autoconvert this to allen_mouse.
 | atlas api name | converts to  | supported age range
