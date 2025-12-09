@@ -11,7 +11,7 @@ SPACE_SYNONYMS = {
     "kim_mouse": "allen_mouse",
     "allen_mouse_bluebrain_barrels": "allen_mouse",
     "osten_mouse": "allen_mouse",
-    "demba_allen_seg_dev_mouse":"demba_dev_mouse"
+    "demba_allen_seg_dev_mouse": "demba_dev_mouse",
 }
 
 
