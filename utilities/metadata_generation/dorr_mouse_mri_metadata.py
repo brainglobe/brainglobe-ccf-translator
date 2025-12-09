@@ -52,13 +52,14 @@ for i in range(len(target_spaces)):
     metadata_template["key_age"].append(True)
     metadata_template["padding_micron"].append([[0, 0], [0, 0], [0, 0]])
     metadata_template["vector"].append(1)
-    metadata_template["source_age_pnd"].append(56)
-    metadata_template["target_age_pnd"].append(56)
+
     metadata_template["source_key_age"].append(False)
     metadata_template["target_key_age"].append(False)
     metadata_template["transformation_resolution_micron"].append(25)
 
     if target == "perens_stereotaxic_mri_mouse":
+        metadata_template["source_age_pnd"].append(84)
+        metadata_template["target_age_pnd"].append(56)
         metadata_template["target_X_physical_size_micron"].append(perens_shape[0])
         metadata_template["target_Y_physical_size_micron"].append(perens_shape[1])
         metadata_template["target_Z_physical_size_micron"].append(perens_shape[1])
@@ -66,6 +67,8 @@ for i in range(len(target_spaces)):
         metadata_template["Y_physical_size_micron"].append(dorr_shape[1])
         metadata_template["Z_physical_size_micron"].append(dorr_shape[2])
     if target == "dorr_mouse_mri":
+        metadata_template["source_age_pnd"].append(56)
+        metadata_template["target_age_pnd"].append(84)
         metadata_template["target_X_physical_size_micron"].append(dorr_shape[0])
         metadata_template["target_Y_physical_size_micron"].append(dorr_shape[1])
         metadata_template["target_Z_physical_size_micron"].append(dorr_shape[2])

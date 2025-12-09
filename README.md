@@ -19,7 +19,7 @@ graph TD
     demba_dev_mouse_P21 --- demba_dev_mouse_P28
     demba_dev_mouse_P28 --- demba_dev_mouse_P56
     demba_dev_mouse_P4 --- demba_dev_mouse_P7
-    dorr_mouse_mri_P56 --- perens_stereotaxic_mri_mouse_P56
+    dorr_mouse_mri_P84 --- perens_stereotaxic_mri_mouse_P56
 ```
 
 ## Use Cases
@@ -44,7 +44,7 @@ the name in CCF translator usually copies the name of the atlas in the brainglob
 | Gubra lightsheet mouse | perens_multimodal_lsfm| 56
 | Gubra MRI mouse | perens_stereotaxic_mri_mouse| 56
 | Princeton lightsheet mouse | princeton_mouse| 56
-| Dorr MRI mouse | dorr_mouse_mri | 56
+| Dorr MRI mouse | dorr_mouse_mri | 84
 
 
 We also support brainglobe atlas api names which are in existing coordinate frameworks. For instance you can specify osten_mouse and CCF translator will autoconvert this to allen_mouse.
