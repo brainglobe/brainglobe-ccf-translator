@@ -6,7 +6,7 @@ A longstanding problem in NeuroInformatics has been the inability to easily tran
 
 CCF translator can also interpolate between spaces and create a new intermediate space. This is primarily useful for development, where, for instance, the midpoint between day 5 and day 7 can be taken and used as a postnatal day 6 reference. It could also be useful for making references of disease progression.
 
-**Diagram:**  
+**Diagram:**
 a graph of all the available spaces and how they are connected. the spaces are nodes with the space name written on top of them, the edges show which spaces are connected to which other spaces.
 ```mermaid
 graph TD
