@@ -19,8 +19,8 @@ graph TD
     demba_dev_mouse_P21 --- demba_dev_mouse_P28
     demba_dev_mouse_P28 --- demba_dev_mouse_P56
     demba_dev_mouse_P4 --- demba_dev_mouse_P7
+    dorr_mouse_mri_P56 --- perens_stereotaxic_mri_mouse_P56
 ```
-
 
 ## Use Cases
 One way you can use CCF translator is to view data from one space, in another space. For instance the allen connectivity dataset shows projections from viral tracing studies in the adult brain. We can take any of these projection datasets and view them in the developing brain, for instance post natal day 9.
