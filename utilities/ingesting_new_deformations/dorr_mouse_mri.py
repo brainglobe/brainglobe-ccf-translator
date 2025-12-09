@@ -4,16 +4,17 @@ We need to rescale the input to 25um as ccf translator expects inputs and
 outputs to be the same resolution.
 """
 
-VERSION = "1.0"
-import tifffile
 from pathlib import Path
-from brainglobe_atlasapi.bg_atlas import BrainGlobeAtlas
+
+import nibabel as nib
+import numpy as np
+import tifffile
+
 from brainglobe_ccf_translator.deformation.forward_transform import (
     invert_deformation,
 )
-import numpy as np
-import nibabel as nib
 
+VERSION = "1.0"
 voxel_size_micron = 25
 perens_shape = np.array((615, 297, 455))
 
@@ -41,7 +42,7 @@ deformation_paths = [
 deformation_arr = open_deformation_field(deformation_paths)
 
 file_name = Path(
-    f"~/.brainglobe/deformation_fields/dorr_mouse_mri/"
+    "~/.brainglobe/deformation_fields/dorr_mouse_mri/"
 ).expanduser()
 file_name.mkdir(parents=True, exist_ok=True)
 save_volume(
@@ -52,7 +53,7 @@ save_volume(
 invert_arr = invert_deformation(deformation_arr, output_shape=perens_shape)
 
 file_name = Path(
-    f"~/.brainglobe/deformation_fields/perens_stereotaxic_mri_mouse/"
+    "~/.brainglobe/deformation_fields/perens_stereotaxic_mri_mouse/"
 ).expanduser()
 
 save_volume(
