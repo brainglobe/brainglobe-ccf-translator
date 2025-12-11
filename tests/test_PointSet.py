@@ -63,13 +63,22 @@ test_case_files = [
     "perens_multimodal_lsfm.json",
 ]
 
-# Dynamically create test methods for each test case file
-for test_case_file in test_case_files:
 
-    def test_method(self, test_case_file=test_case_file):
+# Factory to avoid module-level pytest collection of the helper
+def _make_test(test_case_file):
+    def _test(self):
         self.run_test_case(test_case_file)
 
-    setattr(TestPointset, f"test_{test_case_file.split('.')[0]}", test_method)
+    return _test
+
+
+# Dynamically create test methods for each test case file
+for test_case_file in test_case_files:
+    setattr(
+        TestPointset,
+        f"test_{test_case_file.split('.')[0]}",
+        _make_test(test_case_file),
+    )
 
 if __name__ == "__main__":
     unittest.main()
