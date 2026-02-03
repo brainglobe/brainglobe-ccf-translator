@@ -6,18 +6,20 @@ outputs to be the same resolution.
 
 from pathlib import Path
 
+import brainglobe_atlasapi
 import nibabel as nib
 import numpy as np
 import tifffile
-import brainglobe_atlasapi
+
 from brainglobe_ccf_translator.deformation.forward_transform import (
     invert_deformation,
 )
 
-
 VERSION = "1.0"
 voxel_size_micron = 25
-perens = brainglobe_atlasapi.BrainGlobeAtlas('perens_stereotaxic_mri_mouse_25um')
+perens = brainglobe_atlasapi.BrainGlobeAtlas(
+    "perens_stereotaxic_mri_mouse_25um"
+)
 
 
 def open_deformation_field(deformation_paths):
@@ -51,7 +53,9 @@ save_volume(
     f"{file_name}/dorr_mouse_mri_pull_perens_stereotaxic_mri_mouse.nii.gz",
 )
 
-invert_arr = invert_deformation(deformation_arr, output_shape=np.array(perens.shape))
+invert_arr = invert_deformation(
+    deformation_arr, output_shape=np.array(perens.shape)
+)
 
 file_name = Path(
     "~/.brainglobe/deformation_fields/perens_stereotaxic_mri_mouse/"

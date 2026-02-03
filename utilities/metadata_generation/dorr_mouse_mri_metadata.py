@@ -1,13 +1,15 @@
+import brainglobe_atlasapi
 import numpy as np
 import pandas as pd
-import brainglobe_atlasapi
 
 VERSION = "1.0"
 metadata_path = (
     r"../../brainglobe_ccf_translator/metadata/translation_metadata.csv"
 )
-perens = brainglobe_atlasapi.BrainGlobeAtlas('perens_stereotaxic_mri_mouse_25um')
-dorr = brainglobe_atlasapi.BrainGlobeAtlas('dorr_mouse_mri_32um')
+perens = brainglobe_atlasapi.BrainGlobeAtlas(
+    "perens_stereotaxic_mri_mouse_25um"
+)
+dorr = brainglobe_atlasapi.BrainGlobeAtlas("dorr_mouse_mri_32um")
 perens_shape = np.array(perens.shape) * 25
 dorr_shape = ((np.array(dorr.shape) * 32) / 25).round()
 metadata_template = {
