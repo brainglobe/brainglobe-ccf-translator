@@ -1,13 +1,3 @@
-import numpy as np
-from .deformation import apply_deformation, route_calculation
-from . import config
-import pandas as pd
-import json
-import os
-import nibabel as nib
-from typing import Any
-
-
 """
 At present the order of transformations is:
 transpose
@@ -17,6 +7,17 @@ transform
 
 So the transform should be in the shape of the output
 """
+
+import os
+from typing import Any
+
+import nibabel as nib
+import numpy as np
+import pandas as pd
+
+from . import config
+from .deformation import apply_deformation, route_calculation
+from .space_utils import validate_space_name
 
 
 class Volume:
@@ -39,7 +40,6 @@ class Volume:
         segmentation_file (bool): Flag indicating if a segmentation file is used.
         """
         self.values = values
-        self.space = space
         self.voxel_size_micron = voxel_size_micron
         self.age_PND = age_PND
         self.segmentation_file = segmentation_file
@@ -53,15 +53,19 @@ class Volume:
         try:
             metadata = pd.read_csv(metadata_path)
         except FileNotFoundError:
-            raise FileNotFoundError(f"Metadata file not found at {metadata_path}")
+            raise FileNotFoundError(
+                f"Metadata file not found at {metadata_path}"
+            )
         except pd.errors.ParserError:
             raise ValueError(f"Error parsing metadata file at {metadata_path}")
 
         self.metadata = metadata
+        self.space = validate_space_name(space, self.metadata)
 
     def transform(self, target_age, target_space):
         array = self.values
         source = f"{self.space}_P{self.age_PND}"
+        target_space = validate_space_name(target_space, self.metadata)
         target = f"{target_space}_P{target_age}"
         if source == target:
             print("volume is already in that space")
@@ -70,7 +74,10 @@ class Volume:
         route = route_calculation.calculate_route(source, target, G)
         deform_arr, pad_sum, flip_sum, dim_order_sum, final_voxel_size = (
             apply_deformation.combine_route(
-                route, self.voxel_size_micron, self.deformation_dir, self.metadata
+                route,
+                self.voxel_size_micron,
+                self.deformation_dir,
+                self.metadata,
             )
         )
         array = np.transpose(array, dim_order_sum)
@@ -78,20 +85,21 @@ class Volume:
             if flip_sum[i]:
                 array = np.flip(array, axis=i)
         if deform_arr is not None:
-
             # original_input_shape = np.array([456.0, 668.0, 320.0])
             if final_voxel_size != self.voxel_size_micron:
                 original_input_shape = np.shape(array)
-                original_input_shape = np.array(original_input_shape)[dim_order_sum]
-                new_input_shape = np.array(array.shape) * (
-                    final_voxel_size / self.voxel_size_micron
-                )
+                original_input_shape = np.array(original_input_shape)[
+                    dim_order_sum
+                ]
+
                 deform_arr = apply_deformation.resize_transform(
                     deform_arr,
                     (1, *([final_voxel_size / self.voxel_size_micron] * 3)),
                 )
             order = 0 if self.segmentation_file else 1
-            array = apply_deformation.apply_transform(array, deform_arr, order=order)
+            array = apply_deformation.apply_transform(
+                array, deform_arr, order=order
+            )
         else:
             array = apply_deformation.pad_neg(array, pad_sum, mode="constant")
         self.values = array

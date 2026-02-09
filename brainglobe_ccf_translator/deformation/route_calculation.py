@@ -1,8 +1,6 @@
-import json
 import networkx as nx
-import numpy as np
-from networkx.algorithms.approximation import steiner_tree
 from networkx.algorithms import approximation as approx
+from networkx.algorithms.approximation import steiner_tree
 
 
 def calculate_route(source, target, G):
@@ -21,7 +19,7 @@ def create_G(metadata):
 
 def find_path_through_nodes(G, nodes):
     # Create a subgraph containing only the specified nodes
-    subgraph = steiner_tree(G, nodes)
+    subgraph = steiner_tree(G, nodes, method="mehlhorn")
     # Find the shortest route through the nodes using TSP solver
     tsp_path = approx.traveling_salesman_problem(subgraph, cycle=False)
     # Convert the TSP path to the full path in the original graph

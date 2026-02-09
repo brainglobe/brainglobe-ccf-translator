@@ -1,8 +1,11 @@
-from .deformation import apply_deformation, route_calculation
-import pandas as pd
 import os
+
 import numpy as np
+import pandas as pd
+
 from . import config
+from .deformation import apply_deformation, route_calculation
+from .space_utils import validate_space_name
 
 base_path = os.path.dirname(__file__)
 
@@ -10,7 +13,6 @@ base_path = os.path.dirname(__file__)
 class PointSet:
     def __init__(self, values, space, voxel_size_micron, age_PND):
         self.values = np.array(values).astype(float)
-        self.space = space
         self.voxel_size_micron = voxel_size_micron
         self.age_PND = age_PND
         # Setup brainglobe dir
@@ -22,17 +24,21 @@ class PointSet:
         try:
             metadata = pd.read_csv(metadata_path)
         except FileNotFoundError:
-            raise FileNotFoundError(f"Metadata file not found at {metadata_path}")
+            raise FileNotFoundError(
+                f"Metadata file not found at {metadata_path}"
+            )
         except pd.errors.ParserError:
             raise ValueError(f"Error parsing metadata file at {metadata_path}")
 
         self.metadata = metadata
+        self.space = validate_space_name(space, self.metadata)
 
     def transform(self, target_age=None, target_space=None):
         values = self.values
         if len(values.shape) == 1:
             values = values.reshape(1, -1)
         source = f"{self.space}_P{self.age_PND}"
+        target_space = validate_space_name(target_space, self.metadata)
         target = f"{target_space}_P{target_age}"
         row_template = "{}_physical_size_micron"
         source = f"{self.space}_P{self.age_PND}"
@@ -41,7 +47,10 @@ class PointSet:
         route = route_calculation.calculate_route(target, source, G)
         deform_arr, pad_sum, flip_sum, dim_order_sum, final_voxel_size = (
             apply_deformation.combine_route(
-                route, self.voxel_size_micron, self.deformation_dir, self.metadata
+                route,
+                self.voxel_size_micron,
+                self.deformation_dir,
+                self.metadata,
             )
         )
         previous = "_".join(route[1].split("_")[:-1])

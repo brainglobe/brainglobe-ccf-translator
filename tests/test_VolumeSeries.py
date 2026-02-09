@@ -4,12 +4,13 @@
 # PROJECT_ROOT = Path(__file__).resolve().parents[2]
 # if str(PROJECT_ROOT) not in sys.path:
 #     sys.path.insert(0, str(PROJECT_ROOT))
+import json
 import os
 import unittest
-import nibabel as nib
+
 import numpy as np
-import json
-from brainglobe_ccf_translator import VolumeSeries, Volume
+
+from brainglobe_ccf_translator import Volume, VolumeSeries
 
 
 class TestVolumeSeries(unittest.TestCase):
@@ -54,22 +55,34 @@ class TestVolumeSeries(unittest.TestCase):
         # Compare the expected outputs
         for v in volume_series.Volumes:
             expected_volume_path = os.path.join(
-                expected_output_dir, f"demba_dev_mouse_P{v.age_PND}_interpolated.npz"
+                expected_output_dir,
+                f"demba_dev_mouse_P{v.age_PND}_interpolated.npz",
             )
             expected_volume_data = np.load(expected_volume_path)["reference"]
-            np.testing.assert_array_almost_equal(v.values, expected_volume_data)
+            np.testing.assert_array_almost_equal(
+                v.values, expected_volume_data
+            )
 
 
 # List of test case filenames
 test_case_files = ["demba_p4_interpolate_to_p8.json"]
 
-# Dynamically create test methods for each test case file
-for test_case_file in test_case_files:
 
-    def test_method(self, test_case_file=test_case_file):
+# Factory to avoid module-level pytest collection of the helper
+def _make_test(test_case_file):
+    def _test(self):
         self.run_test_case(test_case_file)
 
-    setattr(TestVolumeSeries, f'test_{test_case_file.split(".")[0]}', test_method)
+    return _test
+
+
+# Dynamically create test methods for each test case file
+for test_case_file in test_case_files:
+    setattr(
+        TestVolumeSeries,
+        f"test_{test_case_file.split('.')[0]}",
+        _make_test(test_case_file),
+    )
 
 if __name__ == "__main__":
     unittest.main()
