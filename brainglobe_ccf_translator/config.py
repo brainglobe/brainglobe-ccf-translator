@@ -23,7 +23,6 @@ TEMPLATE_CONF_DICT = {
         "interm_download_dir": DEFAULT_PATH,
     }
 }
-
 DEFAULT_WORKDIR = Path.home() / "brainglobe_workingdir"
 
 
