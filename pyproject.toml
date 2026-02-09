@@ -2,7 +2,6 @@
 name = "brainglobe_ccf_translator"
 description = "a package to translate data between common coordinate frameworks"
 readme = "README.md"
-license = "MIT"
 authors = [
     { name = "Harry Carey", email = "harry.carey@medisin.uio.no" }
 ]
@@ -127,7 +126,7 @@ commands =
 [tool.codespell]
 skip = '.git'
 check-hidden = true
-ignore-words-list = "doesnt,infinte,tht"
+ignore-words-list = "doesnt,infinte,tht,assertIn"
 
 
 [tool.black]

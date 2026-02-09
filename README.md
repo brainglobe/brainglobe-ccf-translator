@@ -6,8 +6,8 @@ A longstanding problem in NeuroInformatics has been the inability to easily tran
 
 CCF translator can also interpolate between spaces and create a new intermediate space. This is primarily useful for development, where, for instance, the midpoint between day 5 and day 7 can be taken and used as a postnatal day 6 reference. It could also be useful for making references of disease progression.
 
-![a graph of all the available spaces and how they are connected. the spaces are nodes with the space name written on top of them, the edges show which spaces are connected to which other spaces.]
-
+**Diagram:**
+a graph of all the available spaces and how they are connected. the spaces are nodes with the space name written on top of them, the edges show which spaces are connected to which other spaces.
 ```mermaid
 graph TD
     allen_mouse_P56 --- demba_dev_mouse_P56
@@ -19,8 +19,8 @@ graph TD
     demba_dev_mouse_P21 --- demba_dev_mouse_P28
     demba_dev_mouse_P28 --- demba_dev_mouse_P56
     demba_dev_mouse_P4 --- demba_dev_mouse_P7
+    dorr_mouse_mri_P84 --- perens_stereotaxic_mri_mouse_P56
 ```
-
 
 ## Use Cases
 One way you can use CCF translator is to view data from one space, in another space. For instance the allen connectivity dataset shows projections from viral tracing studies in the adult brain. We can take any of these projection datasets and view them in the developing brain, for instance post natal day 9.
@@ -44,6 +44,17 @@ the name in CCF translator usually copies the name of the atlas in the brainglob
 | Gubra lightsheet mouse | perens_multimodal_lsfm| 56
 | Gubra MRI mouse | perens_stereotaxic_mri_mouse| 56
 | Princeton lightsheet mouse | princeton_mouse| 56
+| Dorr MRI mouse | dorr_mouse_mri | 84
+
+
+We also support brainglobe atlas api names which are in existing coordinate frameworks. For instance you can specify osten_mouse and CCF translator will autoconvert this to allen_mouse.
+| atlas api name | converts to  | supported age range
+| -------------- | ----------- | -----------
+| osten_mouse | allen_mouse | 56
+| allen_mouse_bluebrain_barrels | allen_mouse| 56
+| kim_mouse | allen_mouse | 56
+| demba_allen_seg_dev_mouse | demba_dev_mouse | 4-56
+
 ## Usage
 **Transforming points**
 To take a coordinate in one volume and find the equivalent coordinate in a second volume is quite simple in CCF translator.

@@ -67,14 +67,21 @@ class TestVolumeSeries(unittest.TestCase):
 # List of test case filenames
 test_case_files = ["demba_p4_interpolate_to_p8.json"]
 
-# Dynamically create test methods for each test case file
-for test_case_file in test_case_files:
 
-    def test_method(self, test_case_file=test_case_file):
+# Factory to avoid module-level pytest collection of the helper
+def _make_test(test_case_file):
+    def _test(self):
         self.run_test_case(test_case_file)
 
+    return _test
+
+
+# Dynamically create test methods for each test case file
+for test_case_file in test_case_files:
     setattr(
-        TestVolumeSeries, f"test_{test_case_file.split('.')[0]}", test_method
+        TestVolumeSeries,
+        f"test_{test_case_file.split('.')[0]}",
+        _make_test(test_case_file),
     )
 
 if __name__ == "__main__":

@@ -39,6 +39,21 @@ class TestPointset(unittest.TestCase):
             pset.values * test_case["scale"], expected_values
         )
 
+    def test_source_space_synonym(self):
+        test_case = self.load_test_case("demba_dev_mouse_56.json")
+        points = np.array(test_case["points"]) / test_case["scale"]
+        expected_values = np.array(test_case["expected_values"])
+
+        pset = PointSet(points, "kim_mouse", voxel_size_micron=25, age_PND=56)
+        pset.transform(
+            target_age=test_case["target_age"],
+            target_space=test_case["target"],
+        )
+
+        np.testing.assert_array_almost_equal(
+            pset.values * test_case["scale"], expected_values
+        )
+
 
 # List of test case filenames
 test_case_files = [
@@ -48,13 +63,22 @@ test_case_files = [
     "perens_multimodal_lsfm.json",
 ]
 
-# Dynamically create test methods for each test case file
-for test_case_file in test_case_files:
 
-    def test_method(self, test_case_file=test_case_file):
+# Factory to avoid module-level pytest collection of the helper
+def _make_test(test_case_file):
+    def _test(self):
         self.run_test_case(test_case_file)
 
-    setattr(TestPointset, f"test_{test_case_file.split('.')[0]}", test_method)
+    return _test
+
+
+# Dynamically create test methods for each test case file
+for test_case_file in test_case_files:
+    setattr(
+        TestPointset,
+        f"test_{test_case_file.split('.')[0]}",
+        _make_test(test_case_file),
+    )
 
 if __name__ == "__main__":
     unittest.main()

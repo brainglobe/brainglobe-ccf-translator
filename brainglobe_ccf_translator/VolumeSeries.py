@@ -10,6 +10,7 @@ from .deformation.route_calculation import (
     create_G,
     find_path_through_nodes,
 )
+from .space_utils import validate_space_name
 from .Volume import Volume
 
 
@@ -21,6 +22,8 @@ class VolumeSeries:
         )
         metadata = pd.read_csv(metadata_path)
         self.metadata = metadata
+        for vol in self.Volumes:
+            vol.space = validate_space_name(vol.space, self.metadata)
 
     def calculate_hamiltonian(self):
         terminals = {f"{i.space}_P{i.age_PND}" for i in self.Volumes}
