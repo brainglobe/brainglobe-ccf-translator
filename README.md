@@ -47,7 +47,7 @@ the name in CCF translator usually copies the name of the atlas in the brainglob
 | Dorr MRI mouse | dorr_mouse_mri | 84
 
 
-We also support brainglobe atlas api names which are in existing coordinate frameworks. For instance you can specify osten_mouse and CCF translator will autoconvert this to allen_mouse.
+We also support brainglobe atlas api names which are in existing coordinate frameworks. For instance you can specify kim_mouse and CCF translator will autoconvert this to allen_mouse.
 | atlas api name | converts to  | supported age range
 | -------------- | ----------- | -----------
 | osten_mouse | allen_mouse | 56
