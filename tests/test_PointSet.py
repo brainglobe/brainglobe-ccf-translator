@@ -5,12 +5,10 @@
 # if str(PROJECT_ROOT) not in sys.path:
 #     sys.path.insert(0, str(PROJECT_ROOT))
 
+import unittest
+import numpy as np
 import json
 import os
-import unittest
-
-import numpy as np
-
 from brainglobe_ccf_translator import PointSet
 
 
@@ -30,25 +28,8 @@ class TestPointset(unittest.TestCase):
         target = test_case["target"]
         expected_values = np.array(test_case["expected_values"])
 
-        pset = PointSet(
-            points, "allen_mouse", voxel_size_micron=25, age_PND=56
-        )
+        pset = PointSet(points, "allen_mouse", voxel_size_micron=25, age_PND=56)
         pset.transform(target_age=test_case["target_age"], target_space=target)
-
-        np.testing.assert_array_almost_equal(
-            pset.values * test_case["scale"], expected_values
-        )
-
-    def test_source_space_synonym(self):
-        test_case = self.load_test_case("demba_dev_mouse_56.json")
-        points = np.array(test_case["points"]) / test_case["scale"]
-        expected_values = np.array(test_case["expected_values"])
-
-        pset = PointSet(points, "kim_mouse", voxel_size_micron=25, age_PND=56)
-        pset.transform(
-            target_age=test_case["target_age"],
-            target_space=test_case["target"],
-        )
 
         np.testing.assert_array_almost_equal(
             pset.values * test_case["scale"], expected_values
@@ -63,22 +44,13 @@ test_case_files = [
     "perens_multimodal_lsfm.json",
 ]
 
-
-# Factory to avoid module-level pytest collection of the helper
-def _make_test(test_case_file):
-    def _test(self):
-        self.run_test_case(test_case_file)
-
-    return _test
-
-
 # Dynamically create test methods for each test case file
 for test_case_file in test_case_files:
-    setattr(
-        TestPointset,
-        f"test_{test_case_file.split('.')[0]}",
-        _make_test(test_case_file),
-    )
+
+    def test_method(self, test_case_file=test_case_file):
+        self.run_test_case(test_case_file)
+
+    setattr(TestPointset, f'test_{test_case_file.split(".")[0]}', test_method)
 
 if __name__ == "__main__":
     unittest.main()

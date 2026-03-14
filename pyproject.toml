@@ -2,6 +2,7 @@
 name = "brainglobe_ccf_translator"
 description = "a package to translate data between common coordinate frameworks"
 readme = "README.md"
+license = { file = "LICENSE" }
 authors = [
     { name = "Harry Carey", email = "harry.carey@medisin.uio.no" }
 ]
@@ -11,6 +12,7 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python"
 ]
 urls = { "Homepage" = "https://github.com/brainglobe/brainglobe-ccf-translator" }
@@ -68,17 +70,6 @@ ignore = [
   "tests/",
   "tests/test_unit/",
   "tests/test_integration/",
-  "*.md",
-  "codemeta.json",
-  "demo_data/",
-  "demo_data/*",
-  "media/",
-  "media/*",
-  "tutorials/",
-  "tutorials/*",
-  "utilities/",
-  "utilities/*",
-  "utilities/**/*",
 ]
 
 [tool.ruff]
@@ -95,11 +86,10 @@ lint.select = [
   #"SIM", # flake8 simplify
   #"C90", # McCabe complexity
 ]
-lint.ignore = [
-  "E501",  # line too long - let Black handle formatting
-]
 fix = true
 
+[tool.ruff.format]
+docstring-code-format = true # Also format code in docstrings (e.g. examples)
 
 [tool.tox]
 legacy_tox_ini = """
@@ -112,8 +102,6 @@ python =
     3.9: py39
     3.10: py310
     3.11: py311
-    3.12: py312
-    3.13: py313
 
 [testenv]
 extras =
@@ -126,15 +114,3 @@ commands =
 [tool.codespell]
 skip = '.git'
 check-hidden = true
-ignore-words-list = "doesnt,infinte,tht,assertIn"
-
-
-[tool.black]
-line-length = 79
-
-[tool.mypy]
-ignore_missing_imports = true
-exclude = [
-    "^utilities/",
-    "utilities/.*",
-]

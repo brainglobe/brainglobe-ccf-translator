@@ -1,10 +1,7 @@
 import numpy as np
 import pandas as pd
-
 VERSION = "1.1"
-metadata_path = (
-    r"../../brainglobe_ccf_translator/metadata/translation_metadata.csv"
-)
+metadata_path = r"../../brainglobe_ccf_translator/metadata/translation_metadata.csv"
 
 metadata_template = {
     "file_name": [],

@@ -1,15 +1,11 @@
-import math
+import numpy as np
+from glob import glob
+import nibabel as nib
 import os
+import math
+from pathlib import Path
 import sys
 import urllib
-from pathlib import Path
-
-import nibabel as nib
-import numpy as np
-
-from brainglobe_ccf_translator.deformation.forward_transform import (
-    invert_deformation,
-)
 
 # Here we have a recreation of the intermediate volumes
 # We start from the files which came out of elastix
@@ -20,8 +16,10 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from brainglobe_ccf_translator.deformation.forward_transform import invert_deformation
 
 VERSION = "1.1"
+
 
 
 deformation_urls = {
@@ -29,21 +27,18 @@ deformation_urls = {
     7: "https://data-proxy.ebrains.eu/api/v1/buckets/d-d45dc547-64eb-4314-8f73-c6e3d5ab8de0/script_with_metadata/deformationField.nii.gz?inline=true",
     14: "https://data-proxy.ebrains.eu/api/v1/buckets/d-fbd8a406-a114-4c26-a77d-59dc93476682/script_with_metadata/deformationField.nii.gz?inline=true",
     21: "https://data-proxy.ebrains.eu/api/v1/buckets/d-4a0b3a87-4fe4-4a9f-a07e-e35e54681ff8/script_with_metadata/deformationField.nii.gz?inline=true",
-    28: "https://data-proxy.ebrains.eu/api/v1/buckets/d-c8395a2f-a6ae-40d0-ad0d-a87e8b9b610b/script_with_metadata/deformationField.nii.gz?inline=true",
-}
+    28: "https://data-proxy.ebrains.eu/api/v1/buckets/d-c8395a2f-a6ae-40d0-ad0d-a87e8b9b610b/script_with_metadata/deformationField.nii.gz?inline=true"
+    }
 
 key_ages = [56, 28, 21, 14, 7, 4]
 space_name = "demba_dev_mouse"
 voxel_size_micron = 20
-save_path = os.path.expanduser(
-    f"~/.brainglobe/deformation_fields/{space_name}"
-)
+save_path = os.path.expanduser(f"~/.brainglobe/deformation_fields/{space_name}")
 working_path = os.path.expanduser(f"~/brainglobe_workingdir/{space_name}/")
 if not os.path.exists(save_path):
     os.makedirs(save_path, exist_ok=True)
 if not os.path.exists(working_path):
     os.makedirs(working_path, exist_ok=True)
-
 
 def open_deformation_field(deformation):
     """this function opens the elastix deformation
@@ -58,9 +53,7 @@ def open_deformation_field(deformation):
     deformation_arr_scaled = np.squeeze(deformation_arr, 3)
     deformation_arr_scaled = np.transpose(deformation_arr_scaled, (3, 0, 1, 2))
     dim_scale_reshaped = dim_scale.reshape(-1, 1, 1, 1)
-    deformation_arr_scaled_multiplied = (
-        deformation_arr_scaled * dim_scale_reshaped
-    )
+    deformation_arr_scaled_multiplied = deformation_arr_scaled * dim_scale_reshaped
     return deformation_arr_scaled_multiplied
 
 
@@ -78,9 +71,7 @@ for i in range(len(key_ages) - 1):
     # using ccft terminology we would say that the elastix deform is in
     # the 28 space pulling values in from 56 (for the p28 volume that is)
     url = deformation_urls[age]
-    original_elastix_volume_path = os.path.join(
-        working_path, f"downloaded_deformation_{age}.nii.gz"
-    )
+    original_elastix_volume_path = os.path.join(working_path, f"downloaded_deformation_{age}.nii.gz")
 
     if not os.path.exists(original_elastix_volume_path):
         print(f"Downloading deformation for age {age}...")
@@ -88,21 +79,18 @@ for i in range(len(key_ages) - 1):
 
     elastix_img = nib.load(original_elastix_volume_path)
     elastix_arr = open_deformation_field(elastix_img).astype(np.float32)
-    elastix_arr = elastix_arr[[2, 1, 0]]
+    elastix_arr = elastix_arr[[2,1,0]]
     elastix_arr = np.transpose(elastix_arr, (0, 3, 2, 1))
     magnitude = key_ages[i] - age
     # here we make it a single day transform so in our example 28 pulling values from 29
     elastix_arr /= magnitude
-    save_volume(
-        elastix_arr, f"{save_path}/{age}_pull_{age + 1}_v{VERSION}.nii.gz"
-    )
+    save_volume(elastix_arr, f"{save_path}/{age}_pull_{age+1}_v{VERSION}.nii.gz")
     for day in range(1, magnitude + 1):
         temp_arr = elastix_arr.copy()
         temp_arr *= day
         temp_arr = invert_deformation(temp_arr)
         temp_arr /= day
         temp_age = age + day
-        save_volume(
-            temp_arr,
-            f"{save_path}/{temp_age}_pull_{temp_age - 1}_v{VERSION}.nii.gz",
-        )
+        save_volume(temp_arr, f"{save_path}/{temp_age}_pull_{temp_age-1}_v{VERSION}.nii.gz")
+
+

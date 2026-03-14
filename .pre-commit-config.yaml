@@ -1,3 +1,5 @@
+
+
 # Configuring https://pre-commit.ci/
 ci:
     autoupdate_schedule: monthly
@@ -28,14 +30,12 @@ repos:
           - id: mypy
             additional_dependencies:
                 - types-setuptools
-                - types-requests
-            exclude: ^utilities/
     - repo: https://github.com/mgedmin/check-manifest
       rev: "0.50"
       hooks:
           - id: check-manifest
             args: [--no-build-isolation]
-            additional_dependencies: [setuptools-scm, wheel]
+            additional_dependencies: [setuptools-scm]
     - repo: https://github.com/codespell-project/codespell
       # Configuration for codespell is in pyproject.toml
       rev: v2.3.0
