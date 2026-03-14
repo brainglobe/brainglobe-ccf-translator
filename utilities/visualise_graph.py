@@ -1,9 +1,11 @@
-import os
-
+import json
+import networkx as nx
+import numpy as np
 import pandas as pd
+import os
+from pathlib import Path
 
-base_path = "../brainglobe_ccf_translator"
-
+base_path =  '../brainglobe_ccf_translator'
 
 def generate_mermaid(metadata):
     edges = set()
@@ -37,10 +39,7 @@ metadata = metadata.loc[
 ]
 demba = metadata[metadata["source_space"].str.contains("demba")]
 other = metadata[~metadata["source_space"].str.contains("demba")]
-demba = demba[
-    demba["source_age_pnd"].isin(key_ages)
-    & demba["target_age_pnd"].isin(key_ages)
-]
+demba = demba[demba["source_age_pnd"].isin(key_ages) & demba["target_age_pnd"].isin(key_ages)]
 
 metadata = pd.concat([demba, other])
 mermaid_output = generate_mermaid(metadata)
@@ -50,7 +49,5 @@ print(mermaid_output)
 readme_path = os.path.join(os.path.dirname(__file__), "README.md")
 with open(readme_path, "w") as f:
     f.write("# Translation Graph\n\n")
-    f.write(
-        "This diagram shows the available translation paths between coordinate spaces.\n\n"
-    )
+    f.write("This diagram shows the available translation paths between coordinate spaces.\n\n")
     f.write(mermaid_output)

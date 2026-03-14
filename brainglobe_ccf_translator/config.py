@@ -10,6 +10,8 @@ import configparser
 import os
 from pathlib import Path
 
+import click
+
 CONFIG_FILENAME = "bg_config.conf"
 CONFIG_DEFAULT_DIR = Path.home() / ".config" / "brainglobe"
 CONFIG_DIR = Path(os.environ.get("BRAINGLOBE_CONFIG_DIR", CONFIG_DEFAULT_DIR))
@@ -23,6 +25,7 @@ TEMPLATE_CONF_DICT = {
         "interm_download_dir": DEFAULT_PATH,
     }
 }
+
 DEFAULT_WORKDIR = Path.home() / "brainglobe_workingdir"
 
 
@@ -123,16 +126,16 @@ def cli_modify_config(key=0, value=0, show=False):
     if not show:
         if key[-3:] == "dir":
             path = Path(value)
-            print(path.parent.exists())
+            click.echo(path.parent.exists())
             if not path.parent.exists():
-                print(
+                click.echo(
                     f"{value} is not a valid path. Path must be "
                     "a valid path string, and its parent must exist!"
                 )
                 return
         write_config_value(key, value)
 
-    print(_print_config())
+    click.echo(_print_config())
 
 
 def setup_deformation_dir():
