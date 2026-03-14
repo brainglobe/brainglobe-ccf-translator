@@ -5,16 +5,18 @@ Plots points in 3 planes (coronal, sagittal, horizontal) in both source and targ
 Outputs images to a directory that can be uploaded with a pull request.
 Set RECALCULATE = True to recompute point positions instead of using saved expected values.
 """
-import matplotlib.pyplot as plt
-import numpy as np
+
 import json
 import os
 from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
 from brainglobe_atlasapi import BrainGlobeAtlas
+
 import brainglobe_ccf_translator as ccft
 
-
-# Set to True to recalculate point positions, False to use saved expected values from tht tests
+# Set to True to recalculate point positions, False to use saved expected values from the tests
 RECALCULATE = True
 
 
@@ -40,11 +42,15 @@ def get_atlas_name(space, age):
     """Get BrainGlobe atlas name from space and age."""
     atlas_info = SPACE_TO_ATLAS.get(space)
     if isinstance(atlas_info, dict):
-        return atlas_info.get(age, atlas_info.get(56))  # Default to P56 if age not found
+        return atlas_info.get(
+            age, atlas_info.get(56)
+        )  # Default to P56 if age not found
     return atlas_info
 
 
-def plot_point_in_volume(ax, volume, point, plane, title, color='red', marker_size=100):
+def plot_point_in_volume(
+    ax, volume, point, plane, title, color="red", marker_size=100
+):
     """
     Plot a single plane with a point marked.
 
@@ -64,31 +70,40 @@ def plot_point_in_volume(ax, volume, point, plane, title, color='red', marker_si
     dv = np.clip(dv, 0, volume.shape[1] - 1)
     lr = np.clip(lr, 0, volume.shape[2] - 1)
 
-    if plane == 'coronal':
+    if plane == "coronal":
         slice_img = volume[ap, :, :]
         marker_x, marker_y = lr, dv
-        xlabel, ylabel = 'LR', 'DV'
-    elif plane == 'sagittal':
+        xlabel, ylabel = "LR", "DV"
+    elif plane == "sagittal":
         slice_img = volume[:, :, lr]
         marker_x, marker_y = dv, ap
-        xlabel, ylabel = 'DV', 'AP'
-    elif plane == 'horizontal':
+        xlabel, ylabel = "DV", "AP"
+    elif plane == "horizontal":
         slice_img = volume[:, dv, :]
         marker_x, marker_y = lr, ap
-        xlabel, ylabel = 'LR', 'AP'
+        xlabel, ylabel = "LR", "AP"
     else:
         raise ValueError(f"Unknown plane: {plane}")
 
-    ax.imshow(slice_img, cmap='gray')
-    ax.scatter([marker_x], [marker_y], c=color, s=marker_size, marker='x', linewidths=2)
-    ax.set_title(f"{title}\n{plane.capitalize()} (idx={[ap, dv, lr][['coronal', 'sagittal', 'horizontal'].index(plane)]})")
+    ax.imshow(slice_img, cmap="gray")
+    ax.scatter(
+        [marker_x],
+        [marker_y],
+        c=color,
+        s=marker_size,
+        marker="x",
+        linewidths=2,
+    )
+    ax.set_title(
+        f"{title}\n{plane.capitalize()} (idx={[ap, dv, lr][['coronal', 'sagittal', 'horizontal'].index(plane)]})"
+    )
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
 
 
 def validate_test_case(test_case_path, output_dir, recalculate=False):
     """Load and validate a single test case."""
-    with open(test_case_path, 'r') as f:
+    with open(test_case_path, "r") as f:
         test_case = json.load(f)
 
     points = np.array(test_case["points"])
@@ -104,7 +119,12 @@ def validate_test_case(test_case_path, output_dir, recalculate=False):
         # Recalculate expected values using ccft
         print("  Recalculating point positions...")
         input_points = np.array(points) / scale
-        pset = ccft.PointSet(input_points, source_space, voxel_size_micron=25, age_PND=source_age)
+        pset = ccft.PointSet(
+            input_points,
+            source_space,
+            voxel_size_micron=25,
+            age_PND=source_age,
+        )
         pset.transform(target_age=target_age, target_space=target_space)
         expected_values = (pset.values * scale).tolist()
     else:
@@ -135,7 +155,7 @@ def validate_test_case(test_case_path, output_dir, recalculate=False):
         # Create figure with 2 rows (source/target) x 3 columns (planes)
         fig, axes = plt.subplots(2, 3, figsize=(15, 10))
 
-        planes = ['coronal', 'sagittal', 'horizontal']
+        planes = ["coronal", "sagittal", "horizontal"]
 
         # Plot source
         for j, plane in enumerate(planes):
@@ -145,7 +165,7 @@ def validate_test_case(test_case_path, output_dir, recalculate=False):
                 src_voxel,
                 plane,
                 f"Source: {source_space} P{source_age}",
-                color='lime'
+                color="lime",
             )
 
         # Plot target (expected)
@@ -156,21 +176,21 @@ def validate_test_case(test_case_path, output_dir, recalculate=False):
                 exp_voxel,
                 plane,
                 f"Target: {target_space} P{target_age}",
-                color='red'
+                color="red",
             )
 
         mode_str = "recalculated" if recalculate else "from test case"
         fig.suptitle(
-            f"Point {i+1}: {src_point} -> {exp_point.tolist()}\n"
+            f"Point {i + 1}: {src_point} -> {exp_point.tolist()}\n"
             f"Test case: {os.path.basename(test_case_path)} ({mode_str})",
-            fontsize=12
+            fontsize=12,
         )
         plt.tight_layout()
 
         # Save to file
-        filename = f"{Path(test_case_path).stem}_point{i+1}.png"
+        filename = f"{Path(test_case_path).stem}_point{i + 1}.png"
         output_path = output_dir / filename
-        plt.savefig(output_path, dpi=150, bbox_inches='tight')
+        plt.savefig(output_path, dpi=150, bbox_inches="tight")
         plt.close(fig)
         print(f"  Saved: {output_path}")
 
@@ -190,16 +210,20 @@ def main():
         "demba_dev_mouse_32.json",
     ]
 
-    print(f"Mode: {'recalculating positions' if RECALCULATE else 'using saved expected values'}")
+    print(
+        f"Mode: {'recalculating positions' if RECALCULATE else 'using saved expected values'}"
+    )
 
     for filename in test_case_files:
         filepath = os.path.join(test_cases_dir, filename)
         if os.path.exists(filepath):
-            print(f"\n{'='*60}")
+            print(f"\n{'=' * 60}")
             print(f"Validating: {filename}")
-            print('='*60)
+            print("=" * 60)
             try:
-                validate_test_case(filepath, output_dir, recalculate=RECALCULATE)
+                validate_test_case(
+                    filepath, output_dir, recalculate=RECALCULATE
+                )
             except Exception as e:
                 print(f"Error validating {filename}: {e}")
         else:

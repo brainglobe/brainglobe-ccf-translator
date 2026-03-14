@@ -5,10 +5,12 @@
 # if str(PROJECT_ROOT) not in sys.path:
 #     sys.path.insert(0, str(PROJECT_ROOT))
 
-import unittest
-import numpy as np
 import json
 import os
+import unittest
+
+import numpy as np
+
 from brainglobe_ccf_translator import Volume
 
 
@@ -56,13 +58,22 @@ test_case_files = [
     "allen_to_demba_P56.json",
 ]
 
-# Dynamically create test methods for each test case file
-for test_case_file in test_case_files:
 
-    def test_method(self, test_case_file=test_case_file):
+# Factory to avoid module-level pytest collection of the helper
+def _make_test(test_case_file):
+    def _test(self):
         self.run_test_case(test_case_file)
 
-    setattr(TestVolume, f'test_{test_case_file.split(".")[0]}', test_method)
+    return _test
+
+
+# Dynamically create test methods for each test case file
+for test_case_file in test_case_files:
+    setattr(
+        TestVolume,
+        f"test_{test_case_file.split('.')[0]}",
+        _make_test(test_case_file),
+    )
 
 if __name__ == "__main__":
     unittest.main()

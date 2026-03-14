@@ -1,6 +1,8 @@
-import numpy as np
-import nibabel as nib
 import ast
+
+import nibabel as nib
+import numpy as np
+
 import brainglobe_ccf_translator.Volume as Volume
 
 
@@ -34,7 +36,7 @@ def read_volume(path):
             age_PND=dictionary["age_PND"],
             segmentation_file=dictionary["segmentation_file"],
         )
-    except:
+    except Exception:
         raise (
             "Failed to open volume. This function only works with volumes that were saved using ccft translator."
         )

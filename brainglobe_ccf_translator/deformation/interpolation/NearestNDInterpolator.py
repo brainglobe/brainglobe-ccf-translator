@@ -1,8 +1,7 @@
+import numpy as np
 from scipy.interpolate.interpnd import NDInterpolatorBase
 from scipy.spatial import cKDTree
-import numpy as np
 
-import numpy as np
 
 def _ndim_coords_from_arrays(points, ndim=None):
     """
@@ -34,7 +33,9 @@ def _ndim_coords_from_arrays(points, ndim=None):
         # ensure shapes match
         for j in range(1, n):
             if p[j].shape != p[0].shape:
-                raise ValueError("coordinate arrays do not have the same shape")
+                raise ValueError(
+                    "coordinate arrays do not have the same shape"
+                )
 
         # create output array (..., ndim)
         out = np.empty(p[0].shape + (n,), dtype=float)
@@ -55,6 +56,7 @@ def _ndim_coords_from_arrays(points, ndim=None):
 
     # Already multi-dimensional
     return points
+
 
 class NearestNDInterpolator(NDInterpolatorBase):
     """NearestNDInterpolator(x, y).
@@ -141,7 +143,12 @@ class NearestNDInterpolator(NDInterpolatorBase):
 
     def __init__(self, x, y, rescale=False, tree_options=None):
         NDInterpolatorBase.__init__(
-            self, x, y, rescale=rescale, need_contiguous=False, need_values=False
+            self,
+            x,
+            y,
+            rescale=rescale,
+            need_contiguous=False,
+            need_values=False,
         )
         if tree_options is None:
             tree_options = dict()
@@ -193,7 +200,7 @@ class NearestNDInterpolator(NDInterpolatorBase):
         # if distance_upper_bound is set to not be infinite,
         # then we need to consider the case where cKDtree
         # does not find any points within distance_upper_bound to return.
-        # It marks those points as having infinte distance, which is what will be used
+        # It marks those points as having infinite distance, which is what will be used
         # below to mask the array and return only the points that were deemed
         # to have a close enough neighbor to return something useful.
         dist, i = self.tree.query(xi_flat, **query_options)
@@ -207,7 +214,9 @@ class NearestNDInterpolator(NDInterpolatorBase):
             interp_shape = flattened_shape[:-1]
 
         if np.issubdtype(self.values.dtype, np.complexfloating):
-            interp_values = np.full(interp_shape, np.nan, dtype=self.values.dtype)
+            interp_values = np.full(
+                interp_shape, np.nan, dtype=self.values.dtype
+            )
         else:
             interp_values = np.full(interp_shape, np.nan)
 

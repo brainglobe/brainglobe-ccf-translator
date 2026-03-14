@@ -1,16 +1,17 @@
-from .deformation.route_calculation import (
-    find_hamiltonian_path,
-    calculate_route,
-    find_path_through_nodes,
-    create_G,
-)
-import os
-import pandas as pd
-import nibabel as nib
 import copy
-import numpy as np
-from .Volume import Volume
+import os
 from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+from .deformation.route_calculation import (
+    calculate_route,
+    create_G,
+    find_path_through_nodes,
+)
+from .space_utils import validate_space_name
+from .Volume import Volume
 
 
 class VolumeSeries:
@@ -21,6 +22,8 @@ class VolumeSeries:
         )
         metadata = pd.read_csv(metadata_path)
         self.metadata = metadata
+        for vol in self.Volumes:
+            vol.space = validate_space_name(vol.space, self.metadata)
 
     def calculate_hamiltonian(self):
         terminals = {f"{i.space}_P{i.age_PND}" for i in self.Volumes}
@@ -45,20 +48,28 @@ class VolumeSeries:
 
     def find_volume_by_age_and_space(self, age, space):
         return next(
-            (vol for vol in self.Volumes if vol.age_PND == age and vol.space == space),
+            (
+                vol
+                for vol in self.Volumes
+                if vol.age_PND == age and vol.space == space
+            ),
             None,
         )
 
     def filter_metadata(self):
         """Filter metadata to only include entries with vector magnitude of 1."""
-        vector_numeric = pd.to_numeric(self.metadata["vector"], errors="coerce")
+        vector_numeric = pd.to_numeric(
+            self.metadata["vector"], errors="coerce"
+        )
         mask = np.abs(vector_numeric) == 1
         return self.metadata[mask]
 
     def interpolate_series(self):
         route = self.calculate_hamiltonian()
         existing_route = [
-            i for i in route if i in [f"{i.space}_P{i.age_PND}" for i in self.Volumes]
+            i
+            for i in route
+            if i in [f"{i.space}_P{i.age_PND}" for i in self.Volumes]
         ]
         if not route:
             print("No valid route was found. Exiting.")
@@ -72,8 +83,12 @@ class VolumeSeries:
             start_age, start_space = self.split_volume_name(start)
             end_age, end_space = self.split_volume_name(end)
 
-            left_volume = self.find_volume_by_age_and_space(start_age, start_space)
-            right_volume = self.find_volume_by_age_and_space(end_age, end_space)
+            left_volume = self.find_volume_by_age_and_space(
+                start_age, start_space
+            )
+            right_volume = self.find_volume_by_age_and_space(
+                end_age, end_space
+            )
 
             if left_volume is None or right_volume is None:
                 print(f"Volume not found for start {start} or end {end}")
@@ -96,8 +111,8 @@ class VolumeSeries:
                 left_factor = 1 - right_factor
 
                 new_values = (
-                    left_volume_temp.values * left_factor +
-                    right_volume_temp.values * right_factor
+                    left_volume_temp.values * left_factor
+                    + right_volume_temp.values * right_factor
                 )
 
                 target_volume = Volume(
@@ -108,7 +123,6 @@ class VolumeSeries:
                     segmentation_file=left_volume_temp.segmentation_file,
                 )
                 self.Volumes.append(target_volume)
-
 
     def save(self, output_dir):
         if not output_dir:
