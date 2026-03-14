@@ -1,12 +1,15 @@
+from pathlib import Path
+
 import numpy as np
 from brainglobe_atlasapi.bg_atlas import BrainGlobeAtlas
 from scipy.ndimage import zoom
-from pathlib import Path
 
 test_data_dir = Path(__file__).parent
 
 
-def generate_test_data(atlas_name, zoom_factor, output_name, include_annotation=True):
+def generate_test_data(
+    atlas_name, zoom_factor, output_name, include_annotation=True
+):
     """Generate downsampled test data from a BrainGlobe atlas."""
     test_atlas = BrainGlobeAtlas(atlas_name)
     reference = zoom(test_atlas.reference, zoom_factor)
@@ -29,7 +32,12 @@ def generate_test_data(atlas_name, zoom_factor, output_name, include_annotation=
 atlas_configs = [
     ("allen_mouse_100um", 0.5, "allen_mouse_200um", True),
     ("princeton_mouse_20um", 0.1, "princeton_mouse_200um", True),
-    ("perens_stereotaxic_mri_mouse_25um", 0.125, "perens_stereotaxic_mri_mouse_200um", False),
+    (
+        "perens_stereotaxic_mri_mouse_25um",
+        0.125,
+        "perens_stereotaxic_mri_mouse_200um",
+        False,
+    ),
     ("demba_allen_seg_dev_mouse_p5_20um", 0.1, "demba_P5_mouse_200um", True),
     ("demba_allen_seg_dev_mouse_p4_20um", 0.1, "demba_P4_mouse_200um", True),
     ("demba_allen_seg_dev_mouse_p7_20um", 0.1, "demba_P7_mouse_200um", True),
@@ -40,7 +48,6 @@ atlas_configs = [
 ]
 
 for atlas_name, zoom_factor, output_name, include_annotation in atlas_configs:
-    generate_test_data(atlas_name, zoom_factor, output_name, include_annotation)
-
-
-
+    generate_test_data(
+        atlas_name, zoom_factor, output_name, include_annotation
+    )
