@@ -1,19 +1,8 @@
 # Deploying to PyPI
 
-## Automatic Deployment (Recommended)
+Release instructions are maintained in the BrainGlobe developer docs:
 
-The package is automatically published to PyPI when you push a version tag:
+https://brainglobe.info/community/developers/new_releases.html
 
-1. Update your version as needed
-2. Create and push a tag: `git tag v0.1.0 && git push --tags`
-3. The GitHub Action will run tests, build, and upload to PyPI
-
-**Note:** You need to add a `TWINE_API_KEY` secret to your repository with your PyPI API token.
-
-## Manual Deployment
-
-```bash
-pip install build twine
-python -m build
-twine upload dist/*
-```
+This file intentionally stays as a pointer so this repository does not
+duplicate release instructions that are maintained centrally.
