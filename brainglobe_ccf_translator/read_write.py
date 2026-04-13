@@ -3,7 +3,7 @@ import ast
 import nibabel as nib
 import numpy as np
 
-import brainglobe_ccf_translator.Volume as Volume
+from .Volume import Volume
 
 
 def save_volume(ccft_vol, save_path):
@@ -22,22 +22,30 @@ def save_volume(ccft_vol, save_path):
 
 def read_volume(path):
     img = nib.load(path)
-    byte_string = img.header["descrip"]
     try:
-        # Decode the byte string to a regular string
-        string_representation = byte_string.decode("utf-8")
+        string_representation = (
+            bytes(img.header["descrip"]).decode("utf-8").rstrip("\x00")
+        )
         # Convert the string to a dictionary
         dictionary = ast.literal_eval(string_representation)
+        if not isinstance(dictionary, dict):
+            raise TypeError("Volume metadata is not a dictionary.")
         data = np.asanyarray(img.dataobj)
         ccft_vol = Volume(
-            data=data,
+            values=data,
             space=dictionary["space"],
-            voxel_size_micron=img.affine[0],
+            voxel_size_micron=img.header.get_zooms()[0],
             age_PND=dictionary["age_PND"],
             segmentation_file=dictionary["segmentation_file"],
         )
-    except Exception:
-        raise (
+    except (
+        SyntaxError,
+        TypeError,
+        ValueError,
+        KeyError,
+        UnicodeDecodeError,
+    ) as exc:
+        raise ValueError(
             "Failed to open volume. This function only works with volumes that were saved using ccft translator."
-        )
+        ) from exc
     return ccft_vol

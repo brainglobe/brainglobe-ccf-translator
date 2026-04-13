@@ -2,6 +2,7 @@
 name = "brainglobe_ccf_translator"
 description = "a package to translate data between common coordinate frameworks"
 readme = "README.md"
+license = { file = "LICENSE" }
 authors = [
     { name = "Harry Carey", email = "harry.carey@medisin.uio.no" }
 ]
@@ -11,6 +12,7 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python"
 ]
 urls = { "Homepage" = "https://github.com/brainglobe/brainglobe-ccf-translator" }
@@ -96,7 +98,7 @@ lint.select = [
   #"C90", # McCabe complexity
 ]
 lint.ignore = [
-  "E501",  # line too long - let Black handle formatting
+  "E501",  # line too long - let ruff-format handle formatting
 ]
 fix = true
 
@@ -104,13 +106,11 @@ fix = true
 [tool.tox]
 legacy_tox_ini = """
 [tox]
-envlist = py{39,310,311}
+envlist = py{311,312,313}
 isolated_build = True
 
 [gh-actions]
 python =
-    3.9: py39
-    3.10: py310
     3.11: py311
     3.12: py312
     3.13: py313
@@ -128,9 +128,6 @@ skip = '.git'
 check-hidden = true
 ignore-words-list = "doesnt,infinte,tht,assertIn"
 
-
-[tool.black]
-line-length = 79
 
 [tool.mypy]
 ignore_missing_imports = true

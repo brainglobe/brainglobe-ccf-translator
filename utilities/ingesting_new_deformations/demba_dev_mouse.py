@@ -1,5 +1,4 @@
 import math
-import os
 import sys
 import urllib
 from pathlib import Path
@@ -35,14 +34,10 @@ deformation_urls = {
 key_ages = [56, 28, 21, 14, 7, 4]
 space_name = "demba_dev_mouse"
 voxel_size_micron = 20
-save_path = os.path.expanduser(
-    f"~/.brainglobe/deformation_fields/{space_name}"
-)
-working_path = os.path.expanduser(f"~/brainglobe_workingdir/{space_name}/")
-if not os.path.exists(save_path):
-    os.makedirs(save_path, exist_ok=True)
-if not os.path.exists(working_path):
-    os.makedirs(working_path, exist_ok=True)
+save_path = Path.home() / ".brainglobe" / "deformation_fields" / space_name
+working_path = Path.home() / "brainglobe_workingdir" / space_name
+save_path.mkdir(parents=True, exist_ok=True)
+working_path.mkdir(parents=True, exist_ok=True)
 
 
 def open_deformation_field(deformation):
@@ -78,11 +73,11 @@ for i in range(len(key_ages) - 1):
     # using ccft terminology we would say that the elastix deform is in
     # the 28 space pulling values in from 56 (for the p28 volume that is)
     url = deformation_urls[age]
-    original_elastix_volume_path = os.path.join(
-        working_path, f"downloaded_deformation_{age}.nii.gz"
+    original_elastix_volume_path = (
+        working_path / f"downloaded_deformation_{age}.nii.gz"
     )
 
-    if not os.path.exists(original_elastix_volume_path):
+    if not original_elastix_volume_path.exists():
         print(f"Downloading deformation for age {age}...")
         urllib.request.urlretrieve(url, original_elastix_volume_path)
 
@@ -94,7 +89,7 @@ for i in range(len(key_ages) - 1):
     # here we make it a single day transform so in our example 28 pulling values from 29
     elastix_arr /= magnitude
     save_volume(
-        elastix_arr, f"{save_path}/{age}_pull_{age + 1}_v{VERSION}.nii.gz"
+        elastix_arr, save_path / f"{age}_pull_{age + 1}_v{VERSION}.nii.gz"
     )
     for day in range(1, magnitude + 1):
         temp_arr = elastix_arr.copy()
@@ -104,5 +99,5 @@ for i in range(len(key_ages) - 1):
         temp_age = age + day
         save_volume(
             temp_arr,
-            f"{save_path}/{temp_age}_pull_{temp_age - 1}_v{VERSION}.nii.gz",
+            save_path / f"{temp_age}_pull_{temp_age - 1}_v{VERSION}.nii.gz",
         )
