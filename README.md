@@ -1,3 +1,15 @@
+[![Docs](https://img.shields.io/badge/Docs-brainglobe--ccf--translator-blue)](https://brainglobe.info/documentation/index.html)
+[![Get in Touch](https://img.shields.io/badge/Get%20in%20Touch-BrainGlobe-blue)](https://brainglobe.info/contact.html)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Tests](https://github.com/brainglobe/brainglobe-ccf-translator/actions/workflows/test_and_deploy.yml/badge.svg)](https://github.com/brainglobe/brainglobe-ccf-translator/actions/workflows/test_and_deploy.yml)
+[![Codecov](https://codecov.io/gh/brainglobe/brainglobe-ccf-translator/graph/badge.svg)](https://codecov.io/gh/brainglobe/brainglobe-ccf-translator)
+[![Python Version](https://img.shields.io/pypi/pyversions/brainglobe-ccf-translator.svg)](https://pypi.org/project/brainglobe-ccf-translator)
+[![PyPI](https://img.shields.io/pypi/v/brainglobe-ccf-translator.svg)](https://pypi.org/project/brainglobe-ccf-translator)
+[![Downloads](https://static.pepy.tech/badge/brainglobe-ccf-translator)](https://pepy.tech/project/brainglobe-ccf-translator)
+[![Code Style: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/format.json)](https://github.com/astral-sh/ruff)
+[![Pre-commit](https://img.shields.io/badge/pre--commit-enabled-green?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+[![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-green.svg)](https://brainglobe.info/community/developers/index.html)
+
 # brainglobe-ccf-translator
 ![PyPI - Version](https://img.shields.io/pypi/v/brainglobe-ccf-translator)
 
@@ -46,7 +58,6 @@ the name in CCF translator usually copies the name of the atlas in the brainglob
 | Princeton lightsheet mouse | princeton_mouse| 56
 | Dorr MRI mouse | dorr_mouse_mri | 84
 
-
 We also support brainglobe atlas api names which are in existing coordinate frameworks. For instance you can specify osten_mouse and CCF translator will autoconvert this to allen_mouse.
 | atlas api name | converts to  | supported age range
 | -------------- | ----------- | -----------
@@ -82,7 +93,6 @@ Transforming a volume is equally simple, here we get the volume from the braingl
 ```python
 from brainglobe_atlasapi.bg_atlas import BrainGlobeAtlas
 import brainglobe_ccf_translator
-
 
 voxel_size_micron = 10
 space_name = r"allen_mouse"
