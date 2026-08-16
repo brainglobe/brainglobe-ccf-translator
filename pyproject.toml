@@ -30,7 +30,6 @@ dev = [
   "pytest",
   "pytest-cov",
   "coverage",
-  "tox",
   "mypy",
   "pre-commit",
   "ruff",
@@ -56,7 +55,7 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
-addopts = "--cov=brainglobe_ccf_translator"
+addopts = "--cov=brainglobe_ccf_translator --cov-report=xml --color=yes -vv"
 filterwarnings = [
     "error",
 ]
@@ -102,32 +101,10 @@ lint.ignore = [
 ]
 fix = true
 
-
-[tool.tox]
-legacy_tox_ini = """
-[tox]
-envlist = py{311,312,313}
-isolated_build = True
-
-[gh-actions]
-python =
-    3.11: py311
-    3.12: py312
-    3.13: py313
-
-[testenv]
-extras =
-    dev
-commands =
-    pytest -v --color=yes --cov=brainglobe_ccf_translator --cov-report=xml
-"""
-
-
 [tool.codespell]
 skip = '.git'
 check-hidden = true
 ignore-words-list = "doesnt,infinte,tht,assertIn"
-
 
 [tool.mypy]
 ignore_missing_imports = true
