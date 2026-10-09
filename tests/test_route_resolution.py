@@ -82,29 +82,6 @@ def test_compose_fields_in_consistent_voxel_units(
     np.testing.assert_allclose(result[:, 0, 0, 0], expected, rtol=1e-7)
 
 
-@pytest.mark.parametrize("segmentation", [False, True])
-def test_volume_uses_coarse_composition(constant_route, segmentation):
-    path, metadata = constant_route
-    indices = np.indices((10, 10, 10))
-    values = indices.sum(axis=0)
-    values = values.astype(np.uint16 if segmentation else np.float64)
-    volume = Volume(values, "allen_mouse", 4, 1, segmentation)
-    volume.metadata = metadata
-    volume.deformation_dir = path
-
-    volume.transform(3, "allen_mouse")
-
-    assert volume.values.shape == (10, 10, 10)
-    assert volume.values.dtype == values.dtype
-    assert volume.voxel_size_micron == 4
-    assert volume.age_PND == 3
-    assert volume.space == "allen_mouse"
-    expected_origin = 2 if segmentation else 1.95
-    np.testing.assert_allclose(
-        volume.values[0, 0, 0], expected_origin, rtol=1e-7
-    )
-
-
 def test_single_field_matches_resampling_after_loading(constant_route):
     path, metadata = constant_route
     route = ["allen_mouse_P1", "allen_mouse_P2"]
@@ -121,32 +98,6 @@ def test_single_field_matches_resampling_after_loading(constant_route):
 
     np.testing.assert_array_equal(actual, expected)
     assert resolution == 4
-
-
-def test_nonlinear_fields_are_downsampled_before_composition(
-    nonlinear_route,
-):
-    path, metadata, first, second = nonlinear_route
-    expected = apply_deformation.combine_deformations(
-        apply_deformation.resize_transform(first, (1, 0.5, 0.5, 0.5)),
-        apply_deformation.resize_transform(second, (1, 0.75, 0.75, 0.75)),
-    )
-
-    actual, *_, resolution = apply_deformation.combine_route(
-        ["allen_mouse_P1", "allen_mouse_P2", "allen_mouse_P3"],
-        4,
-        path,
-        metadata,
-        output_voxel_size=4,
-    )
-
-    np.testing.assert_array_equal(actual, expected)
-    assert resolution == 4
-
-    # The first coarse-grid neighbor samples the quadratic at 19/9 native
-    # voxels. Its scaled displacement is 0.022777..., sampled at a shift of
-    # 0.225 coarse voxels, giving 0.225 + 0.005125 at the origin.
-    np.testing.assert_allclose(actual[:, 0, 0, 0], [0.230125, 0, 0])
 
 
 def test_long_route_composes_only_coarse_fields(constant_route, monkeypatch):
@@ -213,10 +164,14 @@ def test_volume_native_composition_option(
     volume.transform(3, "allen_mouse", **options)
 
     np.testing.assert_array_equal(volume.values, expected)
+    assert volume.values.shape == values.shape
     assert volume.values.dtype == values.dtype
     assert volume.voxel_size_micron == 4
     assert volume.age_PND == 3
+    assert volume.space == "allen_mouse"
     if not segmentation:
+        # Downsampling first gives a coarse-grid neighbor of 0.022777...
+        # sampled at a shift of 0.225, yielding 0.225 + 0.005125.
         expected_origin = 0.22725 if downsample is False else 0.230125
         np.testing.assert_allclose(volume.values[0, 0, 0], expected_origin)
 

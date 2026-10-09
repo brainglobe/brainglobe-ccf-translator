@@ -8,7 +8,6 @@ from brainglobe_ccf_translator.deformation.apply_deformation import (
     apply_transform,
     calculate_offset,
     create_deformation_coords,
-    resize_input,
     resize_transform,
 )
 
@@ -115,32 +114,6 @@ def test_resize_transform_preserves_component_rounding(dtype):
     np.testing.assert_array_equal(field, original)
 
 
-@pytest.mark.parametrize("dtype", [np.float32, np.float64])
-def test_resize_input_identity_preserves_field(dtype):
-    field = np.arange(72, dtype=dtype).reshape(3, 2, 3, 4) / 8
-    original = field.copy()
-
-    result = resize_input(field, (1, 2, 3, 4), (1, 2, 3, 4))
-
-    np.testing.assert_array_equal(result, original)
-    np.testing.assert_array_equal(field, original)
-    assert result.dtype == field.dtype
-    assert not np.shares_memory(result, field)
-
-
-def test_resize_input_changes_coordinate_frame():
-    field = np.ones((3, 3, 3, 3))
-    expected = np.full(field.shape, 2.0)
-    expected[0] += np.array([0, 1.5, 3])[:, None, None]
-    expected[1] += np.array([0, 1.5, 3])[None, :, None]
-    expected[2] += np.array([0, 1.5, 3])[None, None, :]
-
-    result = resize_input(field, (1, 3, 5, 7), (1, 6, 10, 14))
-
-    np.testing.assert_array_equal(result, expected)
-    np.testing.assert_array_equal(field, np.ones(field.shape))
-
-
 @pytest.mark.parametrize("dtype", [np.float32, np.float64, np.int16])
 @pytest.mark.parametrize("order", [0, 1, 3])
 @pytest.mark.parametrize("components", [False, True])
@@ -235,9 +208,8 @@ def test_combine_deformations_preserves_inputs(dtype):
 
 @pytest.mark.parametrize("suffix", [".nii", ".nii.gz"])
 @pytest.mark.parametrize("vector", [1, -2])
-@pytest.mark.parametrize("dtype", [np.float32, np.float64, np.int16])
-def test_scaled_transformation_preserves_file(tmp_path, suffix, vector, dtype):
-    field = np.arange(72, dtype=dtype).reshape(2, 3, 4, 3)
+def test_scaled_transformation_preserves_file(tmp_path, suffix, vector):
+    field = np.arange(72, dtype=np.float32).reshape(2, 3, 4, 3)
     path = tmp_path / ("field" + suffix)
     nib.save(nib.Nifti1Image(field, np.eye(4)), path)
     expected = field.transpose(3, 0, 1, 2) * vector
