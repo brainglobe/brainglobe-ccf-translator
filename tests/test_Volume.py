@@ -28,11 +28,13 @@ class TestVolume(unittest.TestCase):
         test_case = self.load_test_case(test_case_filename)
         input_data_path = test_case["input"]
         expected_output_path = test_case["expected_output"]
-        input_data = np.load(input_data_path)
-        expected_output_data = np.load(expected_output_path)
+        with np.load(input_data_path) as input_data:
+            input_values = input_data["reference"]
+        with np.load(expected_output_path) as expected_output_data:
+            expected_values = expected_output_data["reference"]
 
         vol = Volume(  # Assuming volume is a class named Volume
-            input_data["reference"],
+            input_values,
             test_case["space"],
             test_case["voxel_size_micron"],
             test_case["age_PND"],
@@ -44,9 +46,7 @@ class TestVolume(unittest.TestCase):
             test_case["target_space"],
         )
 
-        np.testing.assert_array_almost_equal(
-            vol.values, expected_output_data["reference"]
-        )
+        np.testing.assert_array_almost_equal(vol.values, expected_values)
         # self.assertEqual(vol.age_PND, )
         # self.assertEqual(vol.space, expected_output['space'])
 

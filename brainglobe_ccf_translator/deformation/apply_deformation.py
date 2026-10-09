@@ -6,6 +6,8 @@ import numpy as np
 import requests
 from scipy.ndimage import map_coordinates
 
+from .lazy_deformation import LazyDeformation
+
 _COORDINATE_CHUNK_BYTES = 16 * 1024**2
 
 
@@ -101,6 +103,8 @@ def apply_transform(data, deformation, order, apply_to_coords=False):
 
 
 def combine_deformations(deformation_a, deformation_b):
+    if isinstance(deformation_a, LazyDeformation):
+        return deformation_a.combine(deformation_b)
     deformation_a = apply_transform(
         deformation_a, deformation_b, order=1, apply_to_coords=True
     )
@@ -110,6 +114,8 @@ def combine_deformations(deformation_a, deformation_b):
 
 def resize_transform(arr, scale):
     """performs a regular grid interpolation"""
+    if isinstance(arr, LazyDeformation):
+        return arr.resize(scale)
     # Axis bounds come from the shape; a dense 4D index grid can use
     # more memory than the deformation field itself.
     x_new_indices = np.linspace(
@@ -221,9 +227,14 @@ def handle_padding(
     temp_padding = np.array([x_pad, y_pad, z_pad])
     deform_padding = np.concatenate(([[0, 0]], temp_padding), axis=0)
     if deform_arr is not None:
-        deform_arr = pad_neg(deform_arr, deform_padding, mode="constant")
-        for i in range(len(temp_padding)):
-            deform_arr[i] += temp_padding[i][0]
+        if isinstance(deform_arr, LazyDeformation):
+            deform_arr = deform_arr.pad(deform_padding).add_offset(
+                temp_padding[:, 0]
+            )
+        else:
+            deform_arr = pad_neg(deform_arr, deform_padding, mode="constant")
+            for i in range(len(temp_padding)):
+                deform_arr[i] += temp_padding[i][0]
         # Update target_shape to match new deformation field shape
         target_shape = np.array(deform_arr.shape[1:])
     return deform_arr, temp_padding, target_shape
@@ -239,11 +250,14 @@ def handle_dim_order(
     dim_order_sum = dim_order_sum[dim_order]
     if deform_arr is not None:
         target_shape = target_shape[dim_order]
-        deform_dim = np.array(dim_order.copy())
-        deform_dim = deform_dim + 1
-        deform_dim = [0, *deform_dim]
-        deform_arr = np.transpose(deform_arr, deform_dim)
-        deform_arr = deform_arr[dim_order]
+        if isinstance(deform_arr, LazyDeformation):
+            deform_arr = deform_arr.transpose(dim_order)
+        else:
+            deform_dim = np.array(dim_order.copy())
+            deform_dim = deform_dim + 1
+            deform_dim = [0, *deform_dim]
+            deform_arr = np.transpose(deform_arr, deform_dim)
+            deform_arr = deform_arr[dim_order]
     return deform_arr, target_shape, pad_sum, temp_padding, dim_order_sum
 
 
@@ -254,8 +268,11 @@ def handle_dim_flip(deform_arr, dim_flip, pad_sum, flip_sum):
             pad_sum[i] = pad_sum[i][::-1]
             flip_sum[i] = not flip_sum[i]
             if deform_arr is not None:
-                deform_arr[i] *= -1
-                deform_arr = np.flip(deform_arr, axis=i + 1)
+                if isinstance(deform_arr, LazyDeformation):
+                    deform_arr = deform_arr.flip(i)
+                else:
+                    deform_arr[i] *= -1
+                    deform_arr = np.flip(deform_arr, axis=i + 1)
     return deform_arr, pad_sum, flip_sum
 
 
@@ -283,25 +300,30 @@ def load_and_combine_deformation(
     target_shape,
     output_voxel_size=None,
 ):
-    new_voxel_size = float(
-        translation_metadata["transformation_resolution_micron"][0]
-    )
     if deform_arr is None:
-        old_voxel_size = new_voxel_size
-        if output_voxel_size is not None:
-            old_voxel_size = max(old_voxel_size, output_voxel_size)
-        final_voxel_size = old_voxel_size
-
-    deform_b = _open_scaled_transformation(deform_path, vector)
-    if new_voxel_size != old_voxel_size:
-        deform_b = resize_transformation(
-            deform_b,
-            np.array(deform_b.shape[1:]) * (new_voxel_size / old_voxel_size),
+        deform_arr = _open_scaled_transformation(deform_path, vector)
+        old_voxel_size = float(
+            translation_metadata["transformation_resolution_micron"][0]
         )
-
-    if deform_arr is None:
-        deform_arr = deform_b
+        final_voxel_size = old_voxel_size
+        if (
+            output_voxel_size is not None
+            and output_voxel_size > old_voxel_size
+        ):
+            deform_arr = LazyDeformation.from_array(deform_arr)
     else:
+        new_voxel_size = float(
+            translation_metadata["transformation_resolution_micron"][0]
+        )
+        deform_b = _open_scaled_transformation(deform_path, vector)
+        if isinstance(deform_arr, LazyDeformation):
+            deform_b = LazyDeformation.from_array(deform_b)
+        if new_voxel_size != old_voxel_size:
+            deform_b = resize_transformation(
+                deform_b,
+                np.array(deform_b.shape[1:])
+                * (new_voxel_size / old_voxel_size),
+            )
         deform_arr = combine_deformations(deform_arr, deform_b)
     target_shape = np.array(deform_arr.shape[1:])
 
@@ -311,11 +333,7 @@ def load_and_combine_deformation(
 def combine_route(
     route, original_voxel_size, base_path, metadata, output_voxel_size=None
 ):
-    """Compose a route, optionally downsampling fields before composition.
-
-    A coarser output voxel size reduces intermediate work but changes the
-    interpolation order compared with downsampling the composed field.
-    """
+    """Compose a route, optionally evaluating only a coarser output grid."""
     deform_arr = None
     target_shape = None
     final_voxel_size = None
@@ -334,6 +352,17 @@ def combine_route(
         + metadata["target_age_pnd"].astype(str)
     )
     temp_padding = None
+
+    field_count = 0
+    if output_voxel_size is not None:
+        field_count = sum(
+            extract_metadata(
+                metadata, source_metadata, target_metadata, start, stop
+            )["file_name"][0]
+            != "False"
+            for start, stop in zip(route, route[1:])
+        )
+    remaining_fields = field_count
 
     for i in range(1, len(route)):
         start = route[i - 1]
@@ -375,6 +404,18 @@ def combine_route(
             )
 
         if translation_metadata["file_name"][0] != "False":
+            remaining_fields -= 1
+            # On long routes keep the prefix dense, then defer the final
+            # composition. This retains at most two native fields and avoids
+            # recursively expanding neighborhoods through the whole route.
+            if (
+                remaining_fields == 0
+                and deform_arr is not None
+                and not isinstance(deform_arr, LazyDeformation)
+                and output_voxel_size is not None
+                and output_voxel_size > final_voxel_size
+            ):
+                deform_arr = LazyDeformation.from_array(deform_arr)
             vector = int(translation_metadata["vector"][0])
             deform_path = os.path.join(
                 base_path,
@@ -393,7 +434,7 @@ def combine_route(
                     old_voxel_size,
                     final_voxel_size,
                     target_shape,
-                    output_voxel_size,
+                    output_voxel_size if field_count <= 2 else None,
                 )
             )
 
@@ -405,4 +446,9 @@ def combine_route(
                 original_input_shape=(1, *deform_arr.shape[1:]),
                 new_input_shape=(1, *target_shape),
             )
+    if isinstance(deform_arr, LazyDeformation):
+        deform_arr = deform_arr.resize(
+            (1, *([final_voxel_size / output_voxel_size] * 3))
+        ).materialize()
+        final_voxel_size = output_voxel_size
     return deform_arr, pad_sum, flip_sum, dim_order_sum, final_voxel_size
