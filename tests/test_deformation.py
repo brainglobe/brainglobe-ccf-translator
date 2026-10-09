@@ -1,6 +1,9 @@
+import nibabel as nib
 import numpy as np
 import pytest
+from scipy.ndimage import map_coordinates
 
+from brainglobe_ccf_translator.deformation import apply_deformation
 from brainglobe_ccf_translator.deformation.apply_deformation import (
     apply_transform,
     calculate_offset,
@@ -135,4 +138,128 @@ def test_resize_input_changes_coordinate_frame():
     result = resize_input(field, (1, 3, 5, 7), (1, 6, 10, 14))
 
     np.testing.assert_array_equal(result, expected)
+    np.testing.assert_array_equal(field, np.ones(field.shape))
+
+
+@pytest.mark.parametrize("dtype", [np.float32, np.float64, np.int16])
+@pytest.mark.parametrize("order", [0, 1, 3])
+@pytest.mark.parametrize("components", [False, True])
+def test_apply_transform_across_chunk_boundaries(
+    monkeypatch, dtype, order, components
+):
+    rng = np.random.default_rng(42)
+    data = (rng.normal(size=(3, 7, 6, 5)) * 100).astype(dtype)[:, ::-1]
+    if not components:
+        data = data[0]
+    deformation = rng.uniform(-1, 1, size=(3, 5, 4, 3)).astype(dtype)
+    deformation = deformation[:, ::-1]
+    original_data = data.copy()
+    original_deformation = deformation.copy()
+    # Two planes per chunk, including a short final chunk. Displacements
+    # sample across slab boundaries and outside the input volume.
+    monkeypatch.setattr(
+        apply_deformation, "_COORDINATE_CHUNK_BYTES", 3 * 4 * 3 * 8 * 2
+    )
+    coordinates = np.indices(deformation.shape[1:]) + deformation
+    if components:
+        expected = np.stack(
+            [
+                map_coordinates(component, coordinates, order=order)
+                for component in data
+            ]
+        ).astype(float)
+    else:
+        expected = map_coordinates(data, coordinates, order=order)
+
+    result = apply_transform(data, deformation, order, components)
+
+    np.testing.assert_array_equal(result, expected)
+    assert result.dtype == expected.dtype
+    np.testing.assert_array_equal(data, original_data)
+    np.testing.assert_array_equal(deformation, original_deformation)
+
+
+@pytest.mark.parametrize("dtype", [np.float32, np.float64, np.int16])
+def test_resize_transform_across_chunk_boundaries(monkeypatch, dtype):
+    rng = np.random.default_rng(42)
+    field = (rng.normal(size=(3, 5, 4, 3)) * 100).astype(dtype)[:, ::-1]
+    original = field.copy()
+    scale = (1, 1.4, 1.5, 2 / 3)
+    shape = (7, 6, 2)
+    monkeypatch.setattr(
+        apply_deformation, "_COORDINATE_CHUNK_BYTES", 3 * 6 * 2 * 8 * 2
+    )
+    axes = [
+        np.linspace(0, size - 1, count)
+        for size, count in zip(field.shape[1:], shape)
+    ]
+    coordinates = np.array(np.meshgrid(*axes, indexing="ij"))
+    expected = np.stack(
+        [
+            map_coordinates(component, coordinates, order=1)
+            for component in field
+        ]
+    ).astype(float)
+    expected *= np.array(scale[1:])[:, None, None, None]
+
+    result = resize_transform(field, scale)
+
+    np.testing.assert_array_equal(result, expected)
+    assert result.dtype == expected.dtype
+    np.testing.assert_array_equal(field, original)
+
+
+@pytest.mark.parametrize("dtype", [np.float32, np.float64, np.int16])
+def test_combine_deformations_preserves_inputs(dtype):
+    rng = np.random.default_rng(42)
+    first = (rng.normal(size=(3, 5, 4, 3)) * 10).astype(dtype)
+    second = rng.uniform(-1, 1, size=(3, 5, 4, 3)).astype(dtype)
+    original_first, original_second = first.copy(), second.copy()
+    coordinates = np.indices(second.shape[1:]) + second
+    expected = (
+        np.stack(
+            [
+                map_coordinates(component, coordinates, order=1)
+                for component in first
+            ]
+        ).astype(float)
+        + second
+    )
+
+    result = apply_deformation.combine_deformations(first, second)
+
+    np.testing.assert_array_equal(result, expected)
+    np.testing.assert_array_equal(first, original_first)
+    np.testing.assert_array_equal(second, original_second)
+
+
+@pytest.mark.parametrize("suffix", [".nii", ".nii.gz"])
+@pytest.mark.parametrize("vector", [1, -2])
+@pytest.mark.parametrize("dtype", [np.float32, np.float64, np.int16])
+def test_scaled_transformation_preserves_file(tmp_path, suffix, vector, dtype):
+    field = np.arange(72, dtype=dtype).reshape(2, 3, 4, 3)
+    path = tmp_path / ("field" + suffix)
+    nib.save(nib.Nifti1Image(field, np.eye(4)), path)
+    expected = field.transpose(3, 0, 1, 2) * vector
+
+    result = apply_deformation._open_scaled_transformation(path, vector)
+
+    np.testing.assert_array_equal(result, expected)
+    assert result.dtype == expected.dtype
+    # Subsequent route operations also need a writable, private field.
+    result += 1
+    np.testing.assert_array_equal(np.asarray(nib.load(path).dataobj), field)
+
+
+def test_scaled_transformation_handles_readonly_data(monkeypatch):
+    field = np.ones((3, 2, 3, 4))
+    field.flags.writeable = False
+    monkeypatch.setattr(
+        apply_deformation, "open_transformation", lambda _: field
+    )
+
+    result = apply_deformation._open_scaled_transformation("unused", -2)
+
+    np.testing.assert_array_equal(result, np.full(field.shape, -2.0))
+    assert result.flags.writeable
     np.testing.assert_array_equal(field, np.ones(field.shape))

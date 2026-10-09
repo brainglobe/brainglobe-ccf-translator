@@ -4,8 +4,47 @@ import os
 import nibabel as nib
 import numpy as np
 import requests
-import scipy
 from scipy.ndimage import map_coordinates
+
+_COORDINATE_CHUNK_BYTES = 16 * 1024**2
+
+
+def _coordinate_blocks(shape, dtype=np.float64):
+    """Reuse a small coordinate buffer, with at least one output plane."""
+    plane_bytes = 3 * int(np.prod(shape[1:])) * np.dtype(dtype).itemsize
+    depth = max(1, _COORDINATE_CHUNK_BYTES // max(1, plane_bytes))
+    depth = min(depth, max(1, shape[0]))
+    coordinates = np.empty((3, min(depth, shape[0]), *shape[1:]), dtype=dtype)
+    for start in range(0, shape[0], depth):
+        stop = min(start + depth, shape[0])
+        yield slice(start, stop), coordinates[:, : stop - start]
+
+
+def _deformation_coordinate_blocks(deformation):
+    shape = deformation.shape[1:]
+    axes = [np.arange(size) for size in shape]
+    dtype = np.result_type(np.int_, deformation.dtype)
+    for slab, coordinates in _coordinate_blocks(shape, dtype):
+        for axis, ticks in enumerate(axes):
+            axis_shape = [1, 1, 1]
+            axis_shape[axis] = -1
+            if axis == 0:
+                ticks = ticks[slab]
+            # Add global indices directly to preserve floating-point rounding.
+            np.add(
+                ticks.reshape(axis_shape),
+                deformation[axis, slab],
+                out=coordinates[axis],
+            )
+        yield slab, coordinates
+
+
+def _map_coordinates_into(data, coordinates, order, output):
+    if data.dtype == output.dtype:
+        map_coordinates(data, coordinates, order=order, output=output)
+    else:
+        # Preserve SciPy's rounding to the input dtype before assignment.
+        output[...] = map_coordinates(data, coordinates, order=order)
 
 
 def invert_dim_order(order):
@@ -41,27 +80,23 @@ def open_transformation(transform_path):
 
 
 def apply_transform(data, deformation, order, apply_to_coords=False):
-    deformation_coords = create_deformation_coords(deformation)
+    if order > 1:
+        # Keep spline prefiltering to once per component, not once per slab.
+        blocks = [(slice(None), create_deformation_coords(deformation))]
+    else:
+        blocks = _deformation_coordinate_blocks(deformation)
     if apply_to_coords:
         out_data = np.empty(deformation.shape)
-        for i in range(data.shape[0]):
-            if data.dtype == out_data.dtype:
-                scipy.ndimage.map_coordinates(
-                    data[i],
-                    deformation_coords,
-                    order=order,
-                    output=out_data[i],
-                )
-            else:
-                # SciPy rounds to the input dtype before assignment. Keep
-                # that rounding for float32 and integer inputs.
-                out_data[i] = scipy.ndimage.map_coordinates(
-                    data[i], deformation_coords, order=order
-                )
     else:
-        out_data = scipy.ndimage.map_coordinates(
-            data, deformation_coords, order=order
-        )
+        out_data = np.empty(deformation.shape[1:], dtype=data.dtype)
+    for slab, coordinates in blocks:
+        if apply_to_coords:
+            for i in range(data.shape[0]):
+                _map_coordinates_into(
+                    data[i], coordinates, order, out_data[i, slab]
+                )
+        else:
+            _map_coordinates_into(data, coordinates, order, out_data[slab])
     return out_data
 
 
@@ -69,7 +104,8 @@ def combine_deformations(deformation_a, deformation_b):
     deformation_a = apply_transform(
         deformation_a, deformation_b, order=1, apply_to_coords=True
     )
-    return deformation_a + deformation_b
+    deformation_a += deformation_b
+    return deformation_a
 
 
 def resize_transform(arr, scale):
@@ -90,18 +126,14 @@ def resize_transform(arr, scale):
     new_shape[1] = int(new_shape[1] * scale[1])
     new_shape[2] = int(new_shape[2] * scale[2])
     new_shape[3] = int(new_shape[3] * scale[3])
-    # A single coordinate array also avoids SciPy copying a list of grids
-    # into an array for each of the three component interpolations.
-    new_indices = np.empty((3, *new_shape[1:]))
-    new_indices[0] = z_new_indices[:, None, None]
-    new_indices[1] = y_new_indices[None, :, None]
-    new_indices[2] = x_new_indices[None, None, :]
-    new_array = np.zeros(new_shape)
-    for i in range(3):
-        if arr.dtype == new_array.dtype:
-            map_coordinates(arr[i], new_indices, order=1, output=new_array[i])
-        else:
-            new_array[i] = map_coordinates(arr[i], new_indices, order=1)
+    new_array = np.empty(new_shape)
+    for slab, new_indices in _coordinate_blocks(new_shape[1:]):
+        # Slice the full linspace so slab boundaries keep identical rounding.
+        new_indices[0] = z_new_indices[slab, None, None]
+        new_indices[1] = y_new_indices[None, :, None]
+        new_indices[2] = x_new_indices[None, None, :]
+        for i in range(3):
+            _map_coordinates_into(arr[i], new_indices, 1, new_array[i, slab])
     new_array[0] *= scale[1]
     new_array[1] *= scale[2]
     new_array[2] *= scale[3]
@@ -227,6 +259,20 @@ def handle_dim_flip(deform_arr, dim_flip, pad_sum, flip_sum):
     return deform_arr, pad_sum, flip_sum
 
 
+def _open_scaled_transformation(path, vector):
+    deformation = open_transformation(path)
+    # Newly loaded fields are private to this route. Nibabel's default mmap
+    # mode is copy-on-write, so scaling never changes the file on disk.
+    if (
+        deformation.flags.writeable
+        and np.result_type(deformation, vector) == deformation.dtype
+    ):
+        if vector != 1:
+            deformation *= vector
+        return deformation
+    return deformation * vector
+
+
 def load_and_combine_deformation(
     deform_arr,
     deform_path,
@@ -237,7 +283,7 @@ def load_and_combine_deformation(
     target_shape,
 ):
     if deform_arr is None:
-        deform_arr = open_transformation(deform_path) * vector
+        deform_arr = _open_scaled_transformation(deform_path, vector)
         old_voxel_size = float(
             translation_metadata["transformation_resolution_micron"][0]
         )
@@ -247,7 +293,7 @@ def load_and_combine_deformation(
         new_voxel_size = float(
             translation_metadata["transformation_resolution_micron"][0]
         )
-        deform_b = open_transformation(deform_path) * vector
+        deform_b = _open_scaled_transformation(deform_path, vector)
 
         if new_voxel_size != old_voxel_size:
             deform_b = resize_transformation(
