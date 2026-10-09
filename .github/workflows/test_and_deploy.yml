@@ -29,12 +29,54 @@ jobs:
         os: [ubuntu-latest]
         python-version: ["3.12", "3.13", "3.14"]
         include:
-          - os: macos-latest
+          # Intel standard runners have 14 GB RAM; macos-latest has 7 GB.
+          - os: macos-15-intel
             python-version: "3.14"
           - os: windows-latest
             python-version: "3.14"
 
     steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Configure deformation download directory
+        shell: bash
+        run: |
+          python - <<'PY'
+          import configparser
+          from pathlib import Path
+
+          # Keep downloads outside the checkout: the shared test action
+          # checks out and cleans the workspace again before running tox.
+          downloads = Path("../ccf-ci-downloads").resolve()
+          downloads.mkdir(parents=True, exist_ok=True)
+          config = configparser.ConfigParser()
+          config["default_dirs"] = {
+              "brainglobe_dir": str(downloads),
+              "interm_download_dir": str(downloads),
+          }
+          path = Path.home() / ".config/brainglobe/bg_config.conf"
+          path.parent.mkdir(parents=True, exist_ok=True)
+          with path.open("w") as output:
+              config.write(output)
+          PY
+
+      # The full test data is 22 GiB. Cache the P5 route's 8.4 GiB within
+      # the default 10 GB allowance, sharing one archive across the matrix.
+      - name: Cache P5 deformation downloads
+        uses: actions/cache@v6
+        with:
+          enableCrossOsArchive: true
+          key: ccf-p5-deformation-fields-v1-${{ hashFiles('brainglobe_ccf_translator/metadata/translation_metadata.csv') }}
+          path: |
+            ../ccf-ci-downloads/deformation_fields/demba_dev_mouse/28_pull_29_v1.1.nii.gz
+            ../ccf-ci-downloads/deformation_fields/demba_dev_mouse/21_pull_22_v1.1.nii.gz
+            ../ccf-ci-downloads/deformation_fields/demba_dev_mouse/14_pull_15_v1.1.nii.gz
+            ../ccf-ci-downloads/deformation_fields/demba_dev_mouse/7_pull_8_v1.1.nii.gz
+            ../ccf-ci-downloads/deformation_fields/demba_dev_mouse/5_pull_4_v1.1.nii.gz
+
       - uses: neuroinformatics-unit/actions/test@v2
         with:
           python-version: ${{ matrix.python-version }}
