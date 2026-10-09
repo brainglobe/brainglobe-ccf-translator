@@ -23,7 +23,9 @@ def plot_mid_slice(volume_data, title, ax):
     ax.axis("off")
 
 
-def plot_overlay(transformed_data, target_data, trans_res, target_res, title, ax):
+def plot_overlay(
+    transformed_data, target_data, trans_res, target_res, title, ax
+):
     """Plot two images overlaid with different colors, aligned by corner origin"""
     mid_idx_trans = transformed_data.shape[0] // 2
     mid_idx_target = target_data.shape[0] // 2

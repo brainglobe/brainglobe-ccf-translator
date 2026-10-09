@@ -24,7 +24,9 @@ class PointSet:
         try:
             metadata = pd.read_csv(metadata_path)
         except FileNotFoundError:
-            raise FileNotFoundError(f"Metadata file not found at {metadata_path}")
+            raise FileNotFoundError(
+                f"Metadata file not found at {metadata_path}"
+            )
         except pd.errors.ParserError:
             raise ValueError(f"Error parsing metadata file at {metadata_path}")
 

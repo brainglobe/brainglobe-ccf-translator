@@ -52,8 +52,12 @@ def collect_known_spaces(metadata: pd.DataFrame) -> Set[str]:
         raise ValueError(
             "Metadata must contain 'source_space' and 'target_space' columns."
         )
-    source_spaces: Iterable[str] = metadata["source_space"].astype(str).str.lower()
-    target_spaces: Iterable[str] = metadata["target_space"].astype(str).str.lower()
+    source_spaces: Iterable[str] = (
+        metadata["source_space"].astype(str).str.lower()
+    )
+    target_spaces: Iterable[str] = (
+        metadata["target_space"].astype(str).str.lower()
+    )
     return set(source_spaces) | set(target_spaces)
 
 

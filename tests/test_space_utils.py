@@ -28,7 +28,9 @@ class TestSpaceUtils(unittest.TestCase):
         ]
         for alias in aliases:
             self.assertEqual(normalise_space_name(alias), "allen_mouse")
-            self.assertEqual(validate_space_name(alias, self.metadata), "allen_mouse")
+            self.assertEqual(
+                validate_space_name(alias, self.metadata), "allen_mouse"
+            )
 
     def test_unknown_space_raises(self):
         with self.assertRaises(ValueError):
@@ -36,7 +38,9 @@ class TestSpaceUtils(unittest.TestCase):
 
     def test_near_miss_suggests_synonym(self):
         with self.assertRaises(ValueError) as ctx:
-            validate_space_name("allen_mouse_fbluebrain_barrels", self.metadata)
+            validate_space_name(
+                "allen_mouse_fbluebrain_barrels", self.metadata
+            )
 
         msg = str(ctx.exception)
         self.assertIn("allen_mouse_bluebrain_barrels", msg)

@@ -48,7 +48,9 @@ def get_atlas_name(space, age):
     return atlas_info
 
 
-def plot_point_in_volume(ax, volume, point, plane, title, color="red", marker_size=100):
+def plot_point_in_volume(
+    ax, volume, point, plane, title, color="red", marker_size=100
+):
     """
     Plot a single plane with a point marked.
 
@@ -197,7 +199,9 @@ def main():
     output_dir = Path(__file__).parent / "points_manual_test_output"
     output_dir.mkdir(exist_ok=True)
 
-    test_cases_dir = os.path.join(os.path.dirname(__file__), "PointSet_test_cases")
+    test_cases_dir = os.path.join(
+        os.path.dirname(__file__), "PointSet_test_cases"
+    )
 
     test_case_files = [
         "demba_dev_mouse_56.json",
@@ -217,7 +221,9 @@ def main():
             print(f"Validating: {filename}")
             print("=" * 60)
             try:
-                validate_test_case(filepath, output_dir, recalculate=RECALCULATE)
+                validate_test_case(
+                    filepath, output_dir, recalculate=RECALCULATE
+                )
             except Exception as e:
                 print(f"Error validating {filename}: {e}")
         else:

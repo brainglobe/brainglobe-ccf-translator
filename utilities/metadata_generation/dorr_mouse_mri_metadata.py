@@ -3,8 +3,12 @@ import numpy as np
 import pandas as pd
 
 VERSION = "1.0"
-metadata_path = r"../../brainglobe_ccf_translator/metadata/translation_metadata.csv"
-perens = brainglobe_atlasapi.BrainGlobeAtlas("perens_stereotaxic_mri_mouse_25um")
+metadata_path = (
+    r"../../brainglobe_ccf_translator/metadata/translation_metadata.csv"
+)
+perens = brainglobe_atlasapi.BrainGlobeAtlas(
+    "perens_stereotaxic_mri_mouse_25um"
+)
 dorr = brainglobe_atlasapi.BrainGlobeAtlas("dorr_mouse_mri_32um")
 perens_shape = np.array(perens.shape) * 25
 dorr_shape = ((np.array(dorr.shape) * 32) / 25).round()
@@ -61,18 +65,30 @@ for i in range(len(target_spaces)):
     if target == "perens_stereotaxic_mri_mouse":
         metadata_template["source_age_pnd"].append(84)
         metadata_template["target_age_pnd"].append(56)
-        metadata_template["target_X_physical_size_micron"].append(perens_shape[0])
-        metadata_template["target_Y_physical_size_micron"].append(perens_shape[1])
-        metadata_template["target_Z_physical_size_micron"].append(perens_shape[1])
+        metadata_template["target_X_physical_size_micron"].append(
+            perens_shape[0]
+        )
+        metadata_template["target_Y_physical_size_micron"].append(
+            perens_shape[1]
+        )
+        metadata_template["target_Z_physical_size_micron"].append(
+            perens_shape[1]
+        )
         metadata_template["X_physical_size_micron"].append(dorr_shape[0])
         metadata_template["Y_physical_size_micron"].append(dorr_shape[1])
         metadata_template["Z_physical_size_micron"].append(dorr_shape[2])
     if target == "dorr_mouse_mri":
         metadata_template["source_age_pnd"].append(56)
         metadata_template["target_age_pnd"].append(84)
-        metadata_template["target_X_physical_size_micron"].append(dorr_shape[0])
-        metadata_template["target_Y_physical_size_micron"].append(dorr_shape[1])
-        metadata_template["target_Z_physical_size_micron"].append(dorr_shape[2])
+        metadata_template["target_X_physical_size_micron"].append(
+            dorr_shape[0]
+        )
+        metadata_template["target_Y_physical_size_micron"].append(
+            dorr_shape[1]
+        )
+        metadata_template["target_Z_physical_size_micron"].append(
+            dorr_shape[2]
+        )
         metadata_template["X_physical_size_micron"].append(perens_shape[0])
         metadata_template["Y_physical_size_micron"].append(perens_shape[1])
         metadata_template["Z_physical_size_micron"].append(perens_shape[2])

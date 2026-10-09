@@ -53,7 +53,9 @@ def open_deformation_field(deformation):
     deformation_arr_scaled = np.squeeze(deformation_arr, 3)
     deformation_arr_scaled = np.transpose(deformation_arr_scaled, (3, 0, 1, 2))
     dim_scale_reshaped = dim_scale.reshape(-1, 1, 1, 1)
-    deformation_arr_scaled_multiplied = deformation_arr_scaled * dim_scale_reshaped
+    deformation_arr_scaled_multiplied = (
+        deformation_arr_scaled * dim_scale_reshaped
+    )
     return deformation_arr_scaled_multiplied
 
 
@@ -71,7 +73,9 @@ for i in range(len(key_ages) - 1):
     # using ccft terminology we would say that the elastix deform is in
     # the 28 space pulling values in from 56 (for the p28 volume that is)
     url = deformation_urls[age]
-    original_elastix_volume_path = working_path / f"downloaded_deformation_{age}.nii.gz"
+    original_elastix_volume_path = (
+        working_path / f"downloaded_deformation_{age}.nii.gz"
+    )
 
     if not original_elastix_volume_path.exists():
         print(f"Downloading deformation for age {age}...")
@@ -84,7 +88,9 @@ for i in range(len(key_ages) - 1):
     magnitude = key_ages[i] - age
     # here we make it a single day transform so in our example 28 pulling values from 29
     elastix_arr /= magnitude
-    save_volume(elastix_arr, save_path / f"{age}_pull_{age + 1}_v{VERSION}.nii.gz")
+    save_volume(
+        elastix_arr, save_path / f"{age}_pull_{age + 1}_v{VERSION}.nii.gz"
+    )
     for day in range(1, magnitude + 1):
         temp_arr = elastix_arr.copy()
         temp_arr *= day

@@ -28,8 +28,13 @@ def test_resize_transform_preserves_linear_field(shape, scale):
 
     result = resize_transform(field, (1, *scale))
 
-    output_shape = tuple(int(size * factor) for size, factor in zip(shape, scale))
-    axes = [np.linspace(0, size - 1, count) for size, count in zip(shape, output_shape)]
+    output_shape = tuple(
+        int(size * factor) for size, factor in zip(shape, scale)
+    )
+    axes = [
+        np.linspace(0, size - 1, count)
+        for size, count in zip(shape, output_shape)
+    ]
     z_out, y_out, x_out = np.meshgrid(*axes, indexing="ij")
     expected = np.stack(
         (
@@ -66,7 +71,9 @@ def test_apply_transform_preserves_component_rounding(dtype):
     deformation[0] = 0.25
     # Interpolate a quarter of the way between two samples. SciPy rounds
     # to the input dtype before the component is stored as float64.
-    expected = 0.75 * field[:, 0].astype(float) + 0.25 * field[:, 1].astype(float)
+    expected = 0.75 * field[:, 0].astype(float) + 0.25 * field[:, 1].astype(
+        float
+    )
     if np.issubdtype(dtype, np.integer):
         expected = np.round(expected)
     expected = expected.astype(dtype).astype(float).reshape(3, 1, 1, 1)
@@ -110,7 +117,9 @@ def test_resize_transform_preserves_component_rounding(dtype):
 @pytest.mark.parametrize("dtype", [np.float32, np.float64, np.int16])
 @pytest.mark.parametrize("order", [0, 1, 3])
 @pytest.mark.parametrize("components", [False, True])
-def test_apply_transform_across_chunk_boundaries(monkeypatch, dtype, order, components):
+def test_apply_transform_across_chunk_boundaries(
+    monkeypatch, dtype, order, components
+):
     rng = np.random.default_rng(42)
     data = (rng.normal(size=(3, 7, 6, 5)) * 100).astype(dtype)[:, ::-1]
     if not components:
@@ -121,11 +130,16 @@ def test_apply_transform_across_chunk_boundaries(monkeypatch, dtype, order, comp
     original_deformation = deformation.copy()
     # Two planes per chunk, including a short final chunk. Displacements
     # sample across slab boundaries and outside the input volume.
-    monkeypatch.setattr(apply_deformation, "_COORDINATE_CHUNK_BYTES", 3 * 4 * 3 * 8 * 2)
+    monkeypatch.setattr(
+        apply_deformation, "_COORDINATE_CHUNK_BYTES", 3 * 4 * 3 * 8 * 2
+    )
     coordinates = np.indices(deformation.shape[1:]) + deformation
     if components:
         expected = np.stack(
-            [map_coordinates(component, coordinates, order=order) for component in data]
+            [
+                map_coordinates(component, coordinates, order=order)
+                for component in data
+            ]
         ).astype(float)
     else:
         expected = map_coordinates(data, coordinates, order=order)
@@ -145,13 +159,19 @@ def test_resize_transform_across_chunk_boundaries(monkeypatch, dtype):
     original = field.copy()
     scale = (1, 1.4, 1.5, 2 / 3)
     shape = (7, 6, 2)
-    monkeypatch.setattr(apply_deformation, "_COORDINATE_CHUNK_BYTES", 3 * 6 * 2 * 8 * 2)
+    monkeypatch.setattr(
+        apply_deformation, "_COORDINATE_CHUNK_BYTES", 3 * 6 * 2 * 8 * 2
+    )
     axes = [
-        np.linspace(0, size - 1, count) for size, count in zip(field.shape[1:], shape)
+        np.linspace(0, size - 1, count)
+        for size, count in zip(field.shape[1:], shape)
     ]
     coordinates = np.array(np.meshgrid(*axes, indexing="ij"))
     expected = np.stack(
-        [map_coordinates(component, coordinates, order=1) for component in field]
+        [
+            map_coordinates(component, coordinates, order=1)
+            for component in field
+        ]
     ).astype(float)
     expected *= np.array(scale[1:])[:, None, None, None]
 
@@ -171,7 +191,10 @@ def test_combine_deformations_preserves_inputs(dtype):
     coordinates = np.indices(second.shape[1:]) + second
     expected = (
         np.stack(
-            [map_coordinates(component, coordinates, order=1) for component in first]
+            [
+                map_coordinates(component, coordinates, order=1)
+                for component in first
+            ]
         ).astype(float)
         + second
     )
@@ -203,7 +226,9 @@ def test_scaled_transformation_preserves_file(tmp_path, suffix, vector):
 def test_scaled_transformation_handles_readonly_data(monkeypatch):
     field = np.ones((3, 2, 3, 4))
     field.flags.writeable = False
-    monkeypatch.setattr(apply_deformation, "open_transformation", lambda _: field)
+    monkeypatch.setattr(
+        apply_deformation, "open_transformation", lambda _: field
+    )
 
     result = apply_deformation._open_scaled_transformation("unused", -2)
 

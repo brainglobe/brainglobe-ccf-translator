@@ -92,7 +92,9 @@ def apply_transform(data, deformation, order, apply_to_coords=False):
     for slab, coordinates in blocks:
         if apply_to_coords:
             for i in range(data.shape[0]):
-                _map_coordinates_into(data[i], coordinates, order, out_data[i, slab])
+                _map_coordinates_into(
+                    data[i], coordinates, order, out_data[i, slab]
+                )
         else:
             _map_coordinates_into(data, coordinates, order, out_data[slab])
     return out_data
@@ -110,9 +112,15 @@ def resize_transform(arr, scale):
     """performs a regular grid interpolation"""
     # Axis bounds come from the shape; a dense 4D index grid can use
     # more memory than the deformation field itself.
-    x_new_indices = np.linspace(0, arr.shape[3] - 1, int(arr.shape[3] * scale[3]))
-    y_new_indices = np.linspace(0, arr.shape[2] - 1, int(arr.shape[2] * scale[2]))
-    z_new_indices = np.linspace(0, arr.shape[1] - 1, int(arr.shape[1] * scale[1]))
+    x_new_indices = np.linspace(
+        0, arr.shape[3] - 1, int(arr.shape[3] * scale[3])
+    )
+    y_new_indices = np.linspace(
+        0, arr.shape[2] - 1, int(arr.shape[2] * scale[2])
+    )
+    z_new_indices = np.linspace(
+        0, arr.shape[1] - 1, int(arr.shape[1] * scale[1])
+    )
 
     new_shape = np.array(arr.shape)
     new_shape[1] = int(new_shape[1] * scale[1])
@@ -203,7 +211,9 @@ def extract_metadata(metadata, source_metadata, target_metadata, start, stop):
     return translation_metadata.to_dict(orient="list")
 
 
-def handle_padding(deform_arr, temp_padding, original_voxel_size, target_shape):
+def handle_padding(
+    deform_arr, temp_padding, original_voxel_size, target_shape
+):
     padding = np.array(json.loads(temp_padding))
     x_pad = padding[0] / original_voxel_size
     y_pad = padding[1] / original_voxel_size
@@ -273,7 +283,9 @@ def load_and_combine_deformation(
     target_shape,
     output_voxel_size=None,
 ):
-    new_voxel_size = float(translation_metadata["transformation_resolution_micron"][0])
+    new_voxel_size = float(
+        translation_metadata["transformation_resolution_micron"][0]
+    )
     if deform_arr is None:
         old_voxel_size = new_voxel_size
         if output_voxel_size is not None:
@@ -312,10 +324,14 @@ def combine_route(
     flip_sum = [False, False, False]
     dim_order_sum = np.array([0, 1, 2])
     source_metadata = (
-        metadata["source_space"] + "_P" + metadata["source_age_pnd"].astype(str)
+        metadata["source_space"]
+        + "_P"
+        + metadata["source_age_pnd"].astype(str)
     )
     target_metadata = (
-        metadata["target_space"] + "_P" + metadata["target_age_pnd"].astype(str)
+        metadata["target_space"]
+        + "_P"
+        + metadata["target_age_pnd"].astype(str)
     )
     temp_padding = None
 
@@ -326,7 +342,10 @@ def combine_route(
             metadata, source_metadata, target_metadata, start, stop
         )
 
-        if translation_metadata["padding_micron"][0] != "[[0, 0], [0, 0], [0, 0]]":
+        if (
+            translation_metadata["padding_micron"][0]
+            != "[[0, 0], [0, 0], [0, 0]]"
+        ):
             deform_arr, temp_padding, target_shape = handle_padding(
                 deform_arr,
                 translation_metadata["padding_micron"][0],
