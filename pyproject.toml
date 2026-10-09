@@ -101,6 +101,27 @@ lint.ignore = [
 ]
 fix = true
 
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py{312,313,314}
+isolated_build = True
+
+[gh-actions]
+python =
+    3.12: py312
+    3.13: py313
+    3.14: py314
+
+[testenv]
+extras =
+    dev
+commands =
+    pytest -v --color=yes --cov=brainglobe_ccf_translator --cov-report=xml
+"""
+
+
 [tool.codespell]
 skip = '.git'
 check-hidden = true
