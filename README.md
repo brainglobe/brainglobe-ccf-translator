@@ -83,6 +83,12 @@ print(f"new points are {pset.values}")
 new points are [[267 250 286] [452 247 414]]
  ```
 **Transforming volumes**
+Volume transforms downsample deformation fields to the volume's voxel size
+before composing them when the volume is coarser than the first field. This
+reduces work for long routes and can change resampled intensities and labels
+compared with composing at native resolution before downsampling. Point
+transforms continue to compose fields at their native working resolution.
+
 All of our transforms assume you retrieved the atlas from the brianglobe-atlasapi.
 To run the volume examples you will want to install brainglobe-atlasapi using the following
 ```

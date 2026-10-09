@@ -106,7 +106,7 @@ def test_single_field_matches_resampling_after_loading(constant_route):
     assert resolution == 4
 
 
-def test_deferred_composition_preserves_nonlinear_field(
+def test_nonlinear_fields_are_downsampled_before_composition(
     constant_route, monkeypatch
 ):
     path, metadata = constant_route
@@ -121,8 +121,12 @@ def test_deferred_composition_preserves_nonlinear_field(
             first if str(name).endswith("2.nii.gz") else second
         ).copy(),
     )
+    expected = apply_deformation.combine_deformations(
+        apply_deformation.resize_transform(first, (1, 0.5, 0.5, 0.5)),
+        apply_deformation.resize_transform(second, (1, 0.75, 0.75, 0.75)),
+    )
 
-    actual, *_ = apply_deformation.combine_route(
+    actual, *_, resolution = apply_deformation.combine_route(
         ["allen_mouse_P1", "allen_mouse_P2", "allen_mouse_P3"],
         4,
         path,
@@ -130,42 +134,39 @@ def test_deferred_composition_preserves_nonlinear_field(
         output_voxel_size=4,
     )
 
-    native, *_, resolution = apply_deformation.combine_route(
-        ["allen_mouse_P1", "allen_mouse_P2", "allen_mouse_P3"],
-        4,
-        path,
-        metadata,
-    )
-    expected = apply_deformation.resize_transform(
-        native, (1, *([resolution / 4] * 3))
-    )
     np.testing.assert_array_equal(actual, expected)
+    assert resolution == 4
 
-    # Compose at the original resolution before resampling: a shift of .45
-    # native voxels interpolates the quadratic field between zero and .01.
-    shift = 0.3 * (3 / 4)
-    np.testing.assert_allclose(
-        actual[:, 0, 0, 0], [shift + 0.45 * 0.01 * (2 / 4), 0, 0]
-    )
+    # The first coarse-grid neighbor samples the quadratic at 19/9 native
+    # voxels. Its scaled displacement is 0.022777..., sampled at a shift of
+    # 0.225 coarse voxels, giving 0.225 + 0.005125 at the origin.
+    np.testing.assert_allclose(actual[:, 0, 0, 0], [0.230125, 0, 0])
 
 
-def test_long_route_defers_final_composition(constant_route):
+def test_long_route_composes_only_coarse_fields(constant_route, monkeypatch):
     path, metadata = constant_route
     last = metadata.iloc[-1].copy()
     last.source_age_pnd = 4
     last.target_age_pnd = 3
     metadata = pd.concat([metadata, last.to_frame().T], ignore_index=True)
-    route = [f"allen_mouse_P{age}" for age in range(1, 5)]
-    native, *_, resolution = apply_deformation.combine_route(
-        route, 4, path, metadata
+    shapes = []
+    combine = apply_deformation.combine_deformations
+
+    def record_composition(first, second):
+        shapes.append((first.shape, second.shape))
+        return combine(first, second)
+
+    monkeypatch.setattr(
+        apply_deformation, "combine_deformations", record_composition
     )
-    expected = apply_deformation.resize_transform(
-        native, (1, *([resolution / 4] * 3))
+    result, *_, resolution = apply_deformation.combine_route(
+        [f"allen_mouse_P{age}" for age in range(1, 5)],
+        4,
+        path,
+        metadata,
+        output_voxel_size=4,
     )
 
-    actual, *_, resolution = apply_deformation.combine_route(
-        route, 4, path, metadata, output_voxel_size=4
-    )
-
-    np.testing.assert_array_equal(actual, expected)
     assert resolution == 4
+    assert result.shape == (3, 10, 10, 10)
+    assert shapes == [((3, 10, 10, 10), (3, 10, 10, 10))] * 2
