@@ -16,12 +16,20 @@ def invert_dim_order(order):
 
 
 def create_deformation_coords(deformation_arr):
-    coords = np.mgrid[
-        0 : deformation_arr.shape[1],
-        0 : deformation_arr.shape[2],
-        0 : deformation_arr.shape[3],
-    ]
-    deformed_coords = coords + deformation_arr
+    shape = deformation_arr.shape[1:]
+    # Preserve promotion from the original integer grid, including float32
+    # fields producing float64 coordinates, without allocating a dense grid.
+    deformed_coords = np.empty(
+        (3, *shape), dtype=np.result_type(np.int_, deformation_arr.dtype)
+    )
+    for axis, size in enumerate(shape):
+        axis_shape = [1, 1, 1]
+        axis_shape[axis] = size
+        np.add(
+            np.arange(size).reshape(axis_shape),
+            deformation_arr[axis],
+            out=deformed_coords[axis],
+        )
     return deformed_coords
 
 
@@ -37,11 +45,20 @@ def apply_transform(data, deformation, order, apply_to_coords=False):
     if apply_to_coords:
         out_data = np.empty(deformation.shape)
         for i in range(data.shape[0]):
-            out_data[i] = scipy.ndimage.map_coordinates(
-                data[i], deformation_coords, order=order
-            )
+            if data.dtype == out_data.dtype:
+                scipy.ndimage.map_coordinates(
+                    data[i],
+                    deformation_coords,
+                    order=order,
+                    output=out_data[i],
+                )
+            else:
+                # SciPy rounds to the input dtype before assignment. Keep
+                # that rounding for float32 and integer inputs.
+                out_data[i] = scipy.ndimage.map_coordinates(
+                    data[i], deformation_coords, order=order
+                )
     else:
-        out_data = np.empty(deformation[0].shape)
         out_data = scipy.ndimage.map_coordinates(
             data, deformation_coords, order=order
         )
@@ -69,19 +86,25 @@ def resize_transform(arr, scale):
         0, arr.shape[1] - 1, int(arr.shape[1] * scale[1])
     )
 
-    new_indices = np.meshgrid(
-        z_new_indices, y_new_indices, x_new_indices, indexing="ij"
-    )
     new_shape = np.array(arr.shape)
     new_shape[1] = int(new_shape[1] * scale[1])
     new_shape[2] = int(new_shape[2] * scale[2])
     new_shape[3] = int(new_shape[3] * scale[3])
+    # A single coordinate array also avoids SciPy copying a list of grids
+    # into an array for each of the three component interpolations.
+    new_indices = np.empty((3, *new_shape[1:]))
+    new_indices[0] = z_new_indices[:, None, None]
+    new_indices[1] = y_new_indices[None, :, None]
+    new_indices[2] = x_new_indices[None, None, :]
     new_array = np.zeros(new_shape)
     for i in range(3):
-        new_array[i] = map_coordinates(arr[i], new_indices, order=1)
-    new_array[0] = new_array[0] * scale[1]
-    new_array[1] = new_array[1] * scale[2]
-    new_array[2] = new_array[2] * scale[3]
+        if arr.dtype == new_array.dtype:
+            map_coordinates(arr[i], new_indices, order=1, output=new_array[i])
+        else:
+            new_array[i] = map_coordinates(arr[i], new_indices, order=1)
+    new_array[0] *= scale[1]
+    new_array[1] *= scale[2]
+    new_array[2] *= scale[3]
     return new_array
 
 
@@ -124,27 +147,26 @@ def calculate_offset(original_input_shape, output_shape):
         span = max(length - 1.0, 0.0)
         return np.linspace(0.0, span, samples)
 
-    x = _axis_lin(original_input_shape[1], output_shape[1])
-    y = _axis_lin(original_input_shape[2], output_shape[2])
-    z = _axis_lin(original_input_shape[3], output_shape[3])
-    X, Y, Z = np.meshgrid(x, y, z, indexing="ij")
-    original_coordinates = np.stack([X, Y, Z])
-    target_coordinates = np.indices(output_shape[1:])
-    coordinate_difference = original_coordinates - target_coordinates
+    coordinate_difference = np.empty((3, *output_shape[1:]))
+    for axis, (length, samples) in enumerate(
+        zip(original_input_shape[1:], output_shape[1:])
+    ):
+        axis_shape = [1, 1, 1]
+        axis_shape[axis] = samples
+        offset = _axis_lin(length, samples) - np.arange(samples)
+        coordinate_difference[axis] = offset.reshape(axis_shape)
     return coordinate_difference
 
 
 def resize_input(arr, original_input_shape, new_input_shape):
     out_arr = arr.copy()
     output_shape = out_arr.shape
-    initial_offset = calculate_offset(original_input_shape, output_shape)
-    out_arr -= initial_offset
+    out_arr -= calculate_offset(original_input_shape, output_shape)
     scale = np.array(new_input_shape) / np.array(original_input_shape)
     out_arr[0] *= scale[1]
     out_arr[1] *= scale[2]
     out_arr[2] *= scale[3]
-    new_offset = calculate_offset(new_input_shape, output_shape)
-    out_arr += new_offset
+    out_arr += calculate_offset(new_input_shape, output_shape)
     return out_arr
 
 
