@@ -281,36 +281,41 @@ def load_and_combine_deformation(
     old_voxel_size,
     final_voxel_size,
     target_shape,
+    output_voxel_size=None,
 ):
+    new_voxel_size = float(
+        translation_metadata["transformation_resolution_micron"][0]
+    )
     if deform_arr is None:
-        deform_arr = _open_scaled_transformation(deform_path, vector)
-        old_voxel_size = float(
-            translation_metadata["transformation_resolution_micron"][0]
-        )
+        old_voxel_size = new_voxel_size
+        if output_voxel_size is not None:
+            old_voxel_size = max(old_voxel_size, output_voxel_size)
         final_voxel_size = old_voxel_size
-        target_shape = np.array(deform_arr.shape[1:])
-    else:
-        new_voxel_size = float(
-            translation_metadata["transformation_resolution_micron"][0]
+
+    deform_b = _open_scaled_transformation(deform_path, vector)
+    if new_voxel_size != old_voxel_size:
+        deform_b = resize_transformation(
+            deform_b,
+            np.array(deform_b.shape[1:]) * (new_voxel_size / old_voxel_size),
         )
-        deform_b = _open_scaled_transformation(deform_path, vector)
 
-        if new_voxel_size != old_voxel_size:
-            deform_b = resize_transformation(
-                deform_b,
-                (
-                    np.array(deform_b.shape[1:])
-                    * (new_voxel_size / old_voxel_size)
-                ),
-            )
-
+    if deform_arr is None:
+        deform_arr = deform_b
+    else:
         deform_arr = combine_deformations(deform_arr, deform_b)
-        target_shape = np.array(deform_arr.shape[1:])
+    target_shape = np.array(deform_arr.shape[1:])
 
     return deform_arr, final_voxel_size, target_shape, old_voxel_size
 
 
-def combine_route(route, original_voxel_size, base_path, metadata):
+def combine_route(
+    route, original_voxel_size, base_path, metadata, output_voxel_size=None
+):
+    """Compose a route, optionally downsampling fields before composition.
+
+    A coarser output voxel size reduces intermediate work but changes the
+    interpolation order compared with downsampling the composed field.
+    """
     deform_arr = None
     target_shape = None
     final_voxel_size = None
@@ -388,6 +393,7 @@ def combine_route(route, original_voxel_size, base_path, metadata):
                     old_voxel_size,
                     final_voxel_size,
                     target_shape,
+                    output_voxel_size,
                 )
             )
 

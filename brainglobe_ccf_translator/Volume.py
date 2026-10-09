@@ -78,6 +78,7 @@ class Volume:
                 self.voxel_size_micron,
                 self.deformation_dir,
                 self.metadata,
+                output_voxel_size=self.voxel_size_micron,
             )
         )
         array = np.transpose(array, dim_order_sum)
