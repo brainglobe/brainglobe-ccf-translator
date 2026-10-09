@@ -62,7 +62,13 @@ class Volume:
         self.metadata = metadata
         self.space = validate_space_name(space, self.metadata)
 
-    def transform(self, target_age, target_space):
+    def transform(self, target_age, target_space, *, downsample=True):
+        """Transform in place, downsampling deformation fields by default.
+
+        Set ``downsample=False`` to compose fields at their native working
+        resolution before resampling the composed field to the volume grid.
+        The volume's voxel size is unchanged in either mode.
+        """
         array = self.values
         source = f"{self.space}_P{self.age_PND}"
         target_space = validate_space_name(target_space, self.metadata)
@@ -78,6 +84,9 @@ class Volume:
                 self.voxel_size_micron,
                 self.deformation_dir,
                 self.metadata,
+                output_voxel_size=(
+                    self.voxel_size_micron if downsample else None
+                ),
             )
         )
         array = np.transpose(array, dim_order_sum)

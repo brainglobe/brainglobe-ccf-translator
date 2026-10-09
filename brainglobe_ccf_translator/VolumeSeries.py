@@ -64,7 +64,11 @@ class VolumeSeries:
         mask = np.abs(vector_numeric) == 1
         return self.metadata[mask]
 
-    def interpolate_series(self):
+    def interpolate_series(self, *, downsample=True):
+        """Interpolate ages, optionally retaining native field composition.
+
+        ``downsample`` is forwarded to each volume transform.
+        """
         route = self.calculate_hamiltonian()
         existing_route = [
             i
@@ -103,8 +107,12 @@ class VolumeSeries:
                 left_volume_temp = copy.deepcopy(left_volume)
                 right_volume_temp = copy.deepcopy(right_volume)
 
-                left_volume_temp.transform(target_age, target_space)
-                right_volume_temp.transform(target_age, target_space)
+                left_volume_temp.transform(
+                    target_age, target_space, downsample=downsample
+                )
+                right_volume_temp.transform(
+                    target_age, target_space, downsample=downsample
+                )
 
                 target_pos = sub_route.index(target)
                 right_factor = (left_pos - target_pos) / (left_pos - right_pos)
