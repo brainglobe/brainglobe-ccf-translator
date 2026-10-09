@@ -57,15 +57,16 @@ def combine_deformations(deformation_a, deformation_b):
 
 def resize_transform(arr, scale):
     """performs a regular grid interpolation"""
-    _, z_indices, y_indices, x_indices = np.indices(arr.shape)
+    # Axis bounds come from the shape; a dense 4D index grid can use
+    # more memory than the deformation field itself.
     x_new_indices = np.linspace(
-        x_indices.min(), x_indices.max(), int(arr.shape[3] * scale[3])
+        0, arr.shape[3] - 1, int(arr.shape[3] * scale[3])
     )
     y_new_indices = np.linspace(
-        y_indices.min(), y_indices.max(), int(arr.shape[2] * scale[2])
+        0, arr.shape[2] - 1, int(arr.shape[2] * scale[2])
     )
     z_new_indices = np.linspace(
-        z_indices.min(), z_indices.max(), int(arr.shape[1] * scale[1])
+        0, arr.shape[1] - 1, int(arr.shape[1] * scale[1])
     )
 
     new_indices = np.meshgrid(
