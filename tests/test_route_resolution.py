@@ -13,9 +13,7 @@ def constant_route(tmp_path, monkeypatch):
     rows = []
     for age, resolution, size in [(2, 2, 20), (3, 3, 14)]:
         field = np.empty((3, size, size, size), dtype=np.float32)
-        field[:] = (resolution * np.array([0.1, 0.2, 0.3]))[
-            :, None, None, None
-        ]
+        field[:] = (resolution * np.array([0.1, 0.2, 0.3]))[:, None, None, None]
         name = f"{age}.nii.gz"
         path = tmp_path / "allen_mouse" / name
         path.parent.mkdir(exist_ok=True)
@@ -53,17 +51,13 @@ def nonlinear_route(constant_route, monkeypatch):
     monkeypatch.setattr(
         apply_deformation,
         "open_transformation",
-        lambda name: (
-            first if str(name).endswith("2.nii.gz") else second
-        ).copy(),
+        lambda name: (first if str(name).endswith("2.nii.gz") else second).copy(),
     )
     return path, metadata, first, second
 
 
 @pytest.mark.parametrize("output_resolution", [None, 1, 2, 4])
-def test_compose_fields_in_consistent_voxel_units(
-    constant_route, output_resolution
-):
+def test_compose_fields_in_consistent_voxel_units(constant_route, output_resolution):
     path, metadata = constant_route
     result, _, _, _, resolution = apply_deformation.combine_route(
         ["allen_mouse_P1", "allen_mouse_P2", "allen_mouse_P3"],
@@ -85,12 +79,8 @@ def test_compose_fields_in_consistent_voxel_units(
 def test_single_field_matches_resampling_after_loading(constant_route):
     path, metadata = constant_route
     route = ["allen_mouse_P1", "allen_mouse_P2"]
-    native, *_, resolution = apply_deformation.combine_route(
-        route, 4, path, metadata
-    )
-    expected = apply_deformation.resize_transform(
-        native, (1, *([resolution / 4] * 3))
-    )
+    native, *_, resolution = apply_deformation.combine_route(route, 4, path, metadata)
+    expected = apply_deformation.resize_transform(native, (1, *([resolution / 4] * 3)))
 
     actual, *_, resolution = apply_deformation.combine_route(
         route, 4, path, metadata, output_voxel_size=4
@@ -113,9 +103,7 @@ def test_long_route_composes_only_coarse_fields(constant_route, monkeypatch):
         shapes.append((first.shape, second.shape))
         return combine(first, second)
 
-    monkeypatch.setattr(
-        apply_deformation, "combine_deformations", record_composition
-    )
+    monkeypatch.setattr(apply_deformation, "combine_deformations", record_composition)
     result, *_, resolution = apply_deformation.combine_route(
         [f"allen_mouse_P{age}" for age in range(1, 5)],
         4,
@@ -131,9 +119,7 @@ def test_long_route_composes_only_coarse_fields(constant_route, monkeypatch):
 
 @pytest.mark.parametrize("downsample", [None, True, False])
 @pytest.mark.parametrize("segmentation", [False, True])
-def test_volume_native_composition_option(
-    nonlinear_route, downsample, segmentation
-):
+def test_volume_native_composition_option(nonlinear_route, downsample, segmentation):
     path, metadata, first, second = nonlinear_route
     values = np.indices((10, 10, 10)).sum(axis=0)
     values = values.astype(np.uint16 if segmentation else np.float64)
@@ -177,13 +163,10 @@ def test_volume_native_composition_option(
 
 
 @pytest.mark.parametrize("downsample", [None, True, False])
-def test_series_forwards_composition_option(
-    constant_route, monkeypatch, downsample
-):
+def test_series_forwards_composition_option(constant_route, monkeypatch, downsample):
     _, metadata = constant_route
     volumes = [
-        Volume(np.full((2, 2, 2), age - 1.0), "allen_mouse", 4, age)
-        for age in (1, 3)
+        Volume(np.full((2, 2, 2), age - 1.0), "allen_mouse", 4, age) for age in (1, 3)
     ]
     series = VolumeSeries(volumes)
     series.metadata = metadata

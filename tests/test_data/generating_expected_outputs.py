@@ -41,9 +41,7 @@ np.savez_compressed(
     annotation=annotation_transformed,
 )
 
-allen_atlas = np.load(
-    os.path.join(test_data_dir, "volumes", "allen_mouse_200um.npz")
-)
+allen_atlas = np.load(os.path.join(test_data_dir, "volumes", "allen_mouse_200um.npz"))
 reference = allen_atlas["reference"]
 annotation = allen_atlas["annotation"]
 volume = brainglobe_ccf_translator.Volume(
@@ -75,9 +73,7 @@ np.savez_compressed(
 
 ############################
 
-allen_atlas = np.load(
-    os.path.join(test_data_dir, "volumes", "allen_mouse_200um.npz")
-)
+allen_atlas = np.load(os.path.join(test_data_dir, "volumes", "allen_mouse_200um.npz"))
 reference = allen_atlas["reference"]
 annotation = allen_atlas["annotation"]
 volume = brainglobe_ccf_translator.Volume(
@@ -110,25 +106,19 @@ np.savez_compressed(
 
 ############################
 
-demba_p4 = np.load(
-    os.path.join(test_data_dir, "volumes", "demba_P4_mouse_200um.npz")
-)
+demba_p4 = np.load(os.path.join(test_data_dir, "volumes", "demba_P4_mouse_200um.npz"))
 demba_p4 = demba_p4["reference"]
 volume_p4 = brainglobe_ccf_translator.Volume(
     values=demba_p4, space="demba_dev_mouse", age_PND=4, voxel_size_micron=200
 )
-demba_p7 = np.load(
-    os.path.join(test_data_dir, "volumes", "demba_P7_mouse_200um.npz")
-)
+demba_p7 = np.load(os.path.join(test_data_dir, "volumes", "demba_P7_mouse_200um.npz"))
 demba_p7 = demba_p7["reference"]
 volume_p7 = brainglobe_ccf_translator.Volume(
     values=demba_p7, space="demba_dev_mouse", age_PND=7, voxel_size_micron=200
 )
 
 
-demba_p8 = np.load(
-    os.path.join(test_data_dir, "volumes", "demba_P8_mouse_200um.npz")
-)
+demba_p8 = np.load(os.path.join(test_data_dir, "volumes", "demba_P8_mouse_200um.npz"))
 demba_p8 = demba_p8["reference"]
 volume_p8 = brainglobe_ccf_translator.Volume(
     values=demba_p8, space="demba_dev_mouse", age_PND=8, voxel_size_micron=200

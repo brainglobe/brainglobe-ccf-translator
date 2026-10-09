@@ -38,8 +38,7 @@ metadata = metadata.loc[
 demba = metadata[metadata["source_space"].str.contains("demba")]
 other = metadata[~metadata["source_space"].str.contains("demba")]
 demba = demba[
-    demba["source_age_pnd"].isin(key_ages)
-    & demba["target_age_pnd"].isin(key_ages)
+    demba["source_age_pnd"].isin(key_ages) & demba["target_age_pnd"].isin(key_ages)
 ]
 
 metadata = pd.concat([demba, other])

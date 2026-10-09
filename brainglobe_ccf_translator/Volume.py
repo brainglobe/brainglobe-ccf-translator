@@ -53,9 +53,7 @@ class Volume:
         try:
             metadata = pd.read_csv(metadata_path)
         except FileNotFoundError:
-            raise FileNotFoundError(
-                f"Metadata file not found at {metadata_path}"
-            )
+            raise FileNotFoundError(f"Metadata file not found at {metadata_path}")
         except pd.errors.ParserError:
             raise ValueError(f"Error parsing metadata file at {metadata_path}")
 
@@ -84,9 +82,7 @@ class Volume:
                 self.voxel_size_micron,
                 self.deformation_dir,
                 self.metadata,
-                output_voxel_size=(
-                    self.voxel_size_micron if downsample else None
-                ),
+                output_voxel_size=(self.voxel_size_micron if downsample else None),
             )
         )
         array = np.transpose(array, dim_order_sum)
@@ -97,18 +93,14 @@ class Volume:
             # original_input_shape = np.array([456.0, 668.0, 320.0])
             if final_voxel_size != self.voxel_size_micron:
                 original_input_shape = np.shape(array)
-                original_input_shape = np.array(original_input_shape)[
-                    dim_order_sum
-                ]
+                original_input_shape = np.array(original_input_shape)[dim_order_sum]
 
                 deform_arr = apply_deformation.resize_transform(
                     deform_arr,
                     (1, *([final_voxel_size / self.voxel_size_micron] * 3)),
                 )
             order = 0 if self.segmentation_file else 1
-            array = apply_deformation.apply_transform(
-                array, deform_arr, order=order
-            )
+            array = apply_deformation.apply_transform(array, deform_arr, order=order)
         else:
             array = apply_deformation.pad_neg(array, pad_sum, mode="constant")
         self.values = array

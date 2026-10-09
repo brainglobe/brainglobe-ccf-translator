@@ -7,9 +7,7 @@ from scipy.ndimage import zoom
 test_data_dir = Path(__file__).parent
 
 
-def generate_test_data(
-    atlas_name, zoom_factor, output_name, include_annotation=True
-):
+def generate_test_data(atlas_name, zoom_factor, output_name, include_annotation=True):
     """Generate downsampled test data from a BrainGlobe atlas."""
     test_atlas = BrainGlobeAtlas(atlas_name)
     reference = zoom(test_atlas.reference, zoom_factor)
@@ -48,6 +46,4 @@ atlas_configs = [
 ]
 
 for atlas_name, zoom_factor, output_name, include_annotation in atlas_configs:
-    generate_test_data(
-        atlas_name, zoom_factor, output_name, include_annotation
-    )
+    generate_test_data(atlas_name, zoom_factor, output_name, include_annotation)

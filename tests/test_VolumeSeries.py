@@ -59,9 +59,7 @@ class TestVolumeSeries(unittest.TestCase):
                 f"demba_dev_mouse_P{v.age_PND}_interpolated.npz",
             )
             expected_volume_data = np.load(expected_volume_path)["reference"]
-            np.testing.assert_array_almost_equal(
-                v.values, expected_volume_data
-            )
+            np.testing.assert_array_almost_equal(v.values, expected_volume_data)
 
 
 # List of test case filenames

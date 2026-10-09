@@ -29,9 +29,7 @@ def open_deformation_field(deformation):
     deformation_arr_scaled = np.squeeze(deformation_arr, 3)
     deformation_arr_scaled = np.transpose(deformation_arr_scaled, (3, 0, 1, 2))
     dim_scale_reshaped = dim_scale.reshape(-1, 1, 1, 1)
-    deformation_arr_scaled_multiplied = (
-        deformation_arr_scaled * dim_scale_reshaped
-    )
+    deformation_arr_scaled_multiplied = deformation_arr_scaled * dim_scale_reshaped
     return deformation_arr_scaled_multiplied
 
 
@@ -61,28 +59,20 @@ for i in range(len(original_elastix_volume_paths)):
     target = target_spaces[i]
     elastix_img = nib.load(original_elastix_volume_path)
     elastix_arr = open_deformation_field(elastix_img).astype(np.float32)
-    elastix_arr = resize_input(
-        elastix_arr, (1, *current_input_size), elastix_arr.shape
-    )
+    elastix_arr = resize_input(elastix_arr, (1, *current_input_size), elastix_arr.shape)
 
     elastix_arr = elastix_arr[:, :, :, ::-1]
     elastix_arr[2] *= -1
-    elastix_arr = resize_input(
-        elastix_arr, elastix_arr.shape, (1, *new_input_size)
-    )
+    elastix_arr = resize_input(elastix_arr, elastix_arr.shape, (1, *new_input_size))
     elastix_arr = np.transpose(elastix_arr, [0, 2, 1, 3])
     elastix_arr = elastix_arr[[1, 0, 2]]
 
-    save_path = (
-        f"~/.brainglobe/deformation_fields/deformation_fields/{source}/"
-    )
+    save_path = f"~/.brainglobe/deformation_fields/deformation_fields/{source}/"
     if not os.path.isdir(save_path):
         os.mkdir(save_path)
     save_volume(elastix_arr, f"{save_path}/{source}_pull_{target}.nii.gz")
     inverted_arr = invert_deformation(elastix_arr, new_input_size[[1, 0, 2]])
-    save_path = (
-        f"~/.brainglobe/deformation_fields/deformation_fields/{target}/"
-    )
+    save_path = f"~/.brainglobe/deformation_fields/deformation_fields/{target}/"
     if not os.path.isdir(save_path):
         os.mkdir(save_path)
     save_volume(inverted_arr, f"{save_path}/{target}_pull_{source}.nii.gz")
