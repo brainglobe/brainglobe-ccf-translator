@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from brainglobe_ccf_translator import Volume
+from brainglobe_ccf_translator import Volume, VolumeSeries
 from brainglobe_ccf_translator.deformation import apply_deformation
 
 
@@ -41,6 +41,23 @@ def constant_route(tmp_path, monkeypatch):
         lambda path: fields[str(path)].copy(),
     )
     return tmp_path, pd.DataFrame(rows)
+
+
+@pytest.fixture
+def nonlinear_route(constant_route, monkeypatch):
+    path, metadata = constant_route
+    first = np.zeros((3, 20, 20, 20))
+    first[0] = (np.arange(20) ** 2 * 0.01)[:, None, None]
+    second = np.zeros((3, 14, 14, 14))
+    second[0] = 0.3
+    monkeypatch.setattr(
+        apply_deformation,
+        "open_transformation",
+        lambda name: (
+            first if str(name).endswith("2.nii.gz") else second
+        ).copy(),
+    )
+    return path, metadata, first, second
 
 
 @pytest.mark.parametrize("output_resolution", [None, 1, 2, 4])
@@ -107,20 +124,9 @@ def test_single_field_matches_resampling_after_loading(constant_route):
 
 
 def test_nonlinear_fields_are_downsampled_before_composition(
-    constant_route, monkeypatch
+    nonlinear_route,
 ):
-    path, metadata = constant_route
-    first = np.zeros((3, 20, 20, 20))
-    first[0] = (np.arange(20) ** 2 * 0.01)[:, None, None]
-    second = np.zeros((3, 14, 14, 14))
-    second[0] = 0.3
-    monkeypatch.setattr(
-        apply_deformation,
-        "open_transformation",
-        lambda name: (
-            first if str(name).endswith("2.nii.gz") else second
-        ).copy(),
-    )
+    path, metadata, first, second = nonlinear_route
     expected = apply_deformation.combine_deformations(
         apply_deformation.resize_transform(first, (1, 0.5, 0.5, 0.5)),
         apply_deformation.resize_transform(second, (1, 0.75, 0.75, 0.75)),
@@ -170,3 +176,83 @@ def test_long_route_composes_only_coarse_fields(constant_route, monkeypatch):
     assert resolution == 4
     assert result.shape == (3, 10, 10, 10)
     assert shapes == [((3, 10, 10, 10), (3, 10, 10, 10))] * 2
+
+
+@pytest.mark.parametrize("downsample", [None, True, False])
+@pytest.mark.parametrize("segmentation", [False, True])
+def test_volume_native_composition_option(
+    nonlinear_route, downsample, segmentation
+):
+    path, metadata, first, second = nonlinear_route
+    values = np.indices((10, 10, 10)).sum(axis=0)
+    values = values.astype(np.uint16 if segmentation else np.float64)
+    volume = Volume(values, "allen_mouse", 4, 1, segmentation)
+    volume.metadata = metadata
+    volume.deformation_dir = path
+
+    if downsample is False:
+        # Original behavior: compose on the first field's native 2 µm grid,
+        # then resample the composition onto the volume's 4 µm grid.
+        deformation = apply_deformation.combine_deformations(
+            first,
+            apply_deformation.resize_transform(second, (1, 1.5, 1.5, 1.5)),
+        )
+        deformation = apply_deformation.resize_transform(
+            deformation, (1, 0.5, 0.5, 0.5)
+        )
+    else:
+        deformation = apply_deformation.combine_deformations(
+            apply_deformation.resize_transform(first, (1, 0.5, 0.5, 0.5)),
+            apply_deformation.resize_transform(second, (1, 0.75, 0.75, 0.75)),
+        )
+    expected = apply_deformation.apply_transform(
+        values, deformation, order=0 if segmentation else 1
+    )
+
+    options = {} if downsample is None else {"downsample": downsample}
+    volume.transform(3, "allen_mouse", **options)
+
+    np.testing.assert_array_equal(volume.values, expected)
+    assert volume.values.dtype == values.dtype
+    assert volume.voxel_size_micron == 4
+    assert volume.age_PND == 3
+    if not segmentation:
+        expected_origin = 0.22725 if downsample is False else 0.230125
+        np.testing.assert_allclose(volume.values[0, 0, 0], expected_origin)
+
+
+@pytest.mark.parametrize("downsample", [None, True, False])
+def test_series_forwards_composition_option(
+    constant_route, monkeypatch, downsample
+):
+    _, metadata = constant_route
+    volumes = [
+        Volume(np.full((2, 2, 2), age - 1.0), "allen_mouse", 4, age)
+        for age in (1, 3)
+    ]
+    series = VolumeSeries(volumes)
+    series.metadata = metadata
+    monkeypatch.setattr(
+        series,
+        "calculate_hamiltonian",
+        lambda: [f"allen_mouse_P{age}" for age in (1, 2, 3)],
+    )
+    calls = []
+
+    def transform(volume, target_age, target_space, *, downsample=True):
+        calls.append(downsample)
+        volume.values += 1 if downsample else 2
+        volume.age_PND = target_age
+        volume.space = target_space
+
+    monkeypatch.setattr(Volume, "transform", transform)
+    options = {} if downsample is None else {"downsample": downsample}
+    series.interpolate_series(**options)
+
+    selected = downsample is not False
+    assert calls == [selected, selected]
+    interpolated = series.find_volume_by_age_and_space(2, "allen_mouse")
+    np.testing.assert_array_equal(interpolated.values, 2 if selected else 3)
+    np.testing.assert_array_equal(volumes[0].values, 0)
+    np.testing.assert_array_equal(volumes[1].values, 2)
+    assert interpolated.voxel_size_micron == 4

@@ -89,6 +89,8 @@ reduces work for long routes and can change resampled intensities and labels
 compared with composing at native resolution before downsampling. Point
 transforms continue to compose fields at their native working resolution.
 
+by default we downsample the deformation fields to match the resolution of your volume. This is much faster and uses less memory but is slightly less accurate. For a more accurate result set downsample=False in Volume.transform and VolumeSeries.interpolate_series. 
+
 All of our transforms assume you retrieved the atlas from the brianglobe-atlasapi.
 To run the volume examples you will want to install brainglobe-atlasapi using the following
 ```
