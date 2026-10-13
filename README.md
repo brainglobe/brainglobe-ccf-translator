@@ -103,7 +103,7 @@ source_age = 56
 target_age= 32
 
 ccft_vol = brainglobe_ccf_translator.Volume(
-    values = atlas.reference,
+    values = atlas.template,
     space = 'allen_mouse',
     voxel_size_micron=voxel_size_micron,
     segmentation_file=False,
