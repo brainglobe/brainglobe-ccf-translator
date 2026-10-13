@@ -83,6 +83,8 @@ print(f"new points are {pset.values}")
 new points are [[267 250 286] [452 247 414]]
  ```
 **Transforming volumes**
+by default we downsample the deformation fields to match the resolution of your volume. This is much faster and uses less memory but is slightly less accurate. For a more accurate result set downsample=False in Volume.transform and VolumeSeries.interpolate_series.
+
 All of our transforms assume you retrieved the atlas from the brianglobe-atlasapi.
 To run the volume examples you will want to install brainglobe-atlasapi using the following
 ```

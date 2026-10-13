@@ -55,7 +55,7 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
-addopts = "--cov=brainglobe_ccf_translator --cov-report=xml --color=yes -vv"
+addopts = "--cov=brainglobe_ccf_translator --cov-report=xml --color=yes -vv --durations=10"
 filterwarnings = [
     "error",
 ]

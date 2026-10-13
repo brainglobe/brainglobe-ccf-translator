@@ -4,8 +4,47 @@ import os
 import nibabel as nib
 import numpy as np
 import requests
-import scipy
 from scipy.ndimage import map_coordinates
+
+_COORDINATE_CHUNK_BYTES = 16 * 1024**2
+
+
+def _coordinate_blocks(shape, dtype=np.float64):
+    """Reuse a small coordinate buffer, with at least one output plane."""
+    plane_bytes = 3 * int(np.prod(shape[1:])) * np.dtype(dtype).itemsize
+    depth = max(1, _COORDINATE_CHUNK_BYTES // max(1, plane_bytes))
+    depth = min(depth, max(1, shape[0]))
+    coordinates = np.empty((3, min(depth, shape[0]), *shape[1:]), dtype=dtype)
+    for start in range(0, shape[0], depth):
+        stop = min(start + depth, shape[0])
+        yield slice(start, stop), coordinates[:, : stop - start]
+
+
+def _deformation_coordinate_blocks(deformation):
+    shape = deformation.shape[1:]
+    axes = [np.arange(size) for size in shape]
+    dtype = np.result_type(np.int_, deformation.dtype)
+    for slab, coordinates in _coordinate_blocks(shape, dtype):
+        for axis, ticks in enumerate(axes):
+            axis_shape = [1, 1, 1]
+            axis_shape[axis] = -1
+            if axis == 0:
+                ticks = ticks[slab]
+            # Add global indices directly to preserve floating-point rounding.
+            np.add(
+                ticks.reshape(axis_shape),
+                deformation[axis, slab],
+                out=coordinates[axis],
+            )
+        yield slab, coordinates
+
+
+def _map_coordinates_into(data, coordinates, order, output):
+    if data.dtype == output.dtype:
+        map_coordinates(data, coordinates, order=order, output=output)
+    else:
+        # Preserve SciPy's rounding to the input dtype before assignment.
+        output[...] = map_coordinates(data, coordinates, order=order)
 
 
 def invert_dim_order(order):
@@ -16,12 +55,20 @@ def invert_dim_order(order):
 
 
 def create_deformation_coords(deformation_arr):
-    coords = np.mgrid[
-        0 : deformation_arr.shape[1],
-        0 : deformation_arr.shape[2],
-        0 : deformation_arr.shape[3],
-    ]
-    deformed_coords = coords + deformation_arr
+    shape = deformation_arr.shape[1:]
+    # Preserve promotion from the original integer grid, including float32
+    # fields producing float64 coordinates, without allocating a dense grid.
+    deformed_coords = np.empty(
+        (3, *shape), dtype=np.result_type(np.int_, deformation_arr.dtype)
+    )
+    for axis, size in enumerate(shape):
+        axis_shape = [1, 1, 1]
+        axis_shape[axis] = size
+        np.add(
+            np.arange(size).reshape(axis_shape),
+            deformation_arr[axis],
+            out=deformed_coords[axis],
+        )
     return deformed_coords
 
 
@@ -33,18 +80,23 @@ def open_transformation(transform_path):
 
 
 def apply_transform(data, deformation, order, apply_to_coords=False):
-    deformation_coords = create_deformation_coords(deformation)
+    if order > 1:
+        # Keep spline prefiltering to once per component, not once per slab.
+        blocks = [(slice(None), create_deformation_coords(deformation))]
+    else:
+        blocks = _deformation_coordinate_blocks(deformation)
     if apply_to_coords:
         out_data = np.empty(deformation.shape)
-        for i in range(data.shape[0]):
-            out_data[i] = scipy.ndimage.map_coordinates(
-                data[i], deformation_coords, order=order
-            )
     else:
-        out_data = np.empty(deformation[0].shape)
-        out_data = scipy.ndimage.map_coordinates(
-            data, deformation_coords, order=order
-        )
+        out_data = np.empty(deformation.shape[1:], dtype=data.dtype)
+    for slab, coordinates in blocks:
+        if apply_to_coords:
+            for i in range(data.shape[0]):
+                _map_coordinates_into(
+                    data[i], coordinates, order, out_data[i, slab]
+                )
+        else:
+            _map_coordinates_into(data, coordinates, order, out_data[slab])
     return out_data
 
 
@@ -52,35 +104,39 @@ def combine_deformations(deformation_a, deformation_b):
     deformation_a = apply_transform(
         deformation_a, deformation_b, order=1, apply_to_coords=True
     )
-    return deformation_a + deformation_b
+    deformation_a += deformation_b
+    return deformation_a
 
 
 def resize_transform(arr, scale):
     """performs a regular grid interpolation"""
-    _, z_indices, y_indices, x_indices = np.indices(arr.shape)
+    # Axis bounds come from the shape; a dense 4D index grid can use
+    # more memory than the deformation field itself.
     x_new_indices = np.linspace(
-        x_indices.min(), x_indices.max(), int(arr.shape[3] * scale[3])
+        0, arr.shape[3] - 1, int(arr.shape[3] * scale[3])
     )
     y_new_indices = np.linspace(
-        y_indices.min(), y_indices.max(), int(arr.shape[2] * scale[2])
+        0, arr.shape[2] - 1, int(arr.shape[2] * scale[2])
     )
     z_new_indices = np.linspace(
-        z_indices.min(), z_indices.max(), int(arr.shape[1] * scale[1])
+        0, arr.shape[1] - 1, int(arr.shape[1] * scale[1])
     )
 
-    new_indices = np.meshgrid(
-        z_new_indices, y_new_indices, x_new_indices, indexing="ij"
-    )
     new_shape = np.array(arr.shape)
     new_shape[1] = int(new_shape[1] * scale[1])
     new_shape[2] = int(new_shape[2] * scale[2])
     new_shape[3] = int(new_shape[3] * scale[3])
-    new_array = np.zeros(new_shape)
-    for i in range(3):
-        new_array[i] = map_coordinates(arr[i], new_indices, order=1)
-    new_array[0] = new_array[0] * scale[1]
-    new_array[1] = new_array[1] * scale[2]
-    new_array[2] = new_array[2] * scale[3]
+    new_array = np.empty(new_shape)
+    for slab, new_indices in _coordinate_blocks(new_shape[1:]):
+        # Slice the full linspace so slab boundaries keep identical rounding.
+        new_indices[0] = z_new_indices[slab, None, None]
+        new_indices[1] = y_new_indices[None, :, None]
+        new_indices[2] = x_new_indices[None, None, :]
+        for i in range(3):
+            _map_coordinates_into(arr[i], new_indices, 1, new_array[i, slab])
+    new_array[0] *= scale[1]
+    new_array[1] *= scale[2]
+    new_array[2] *= scale[3]
     return new_array
 
 
@@ -123,27 +179,26 @@ def calculate_offset(original_input_shape, output_shape):
         span = max(length - 1.0, 0.0)
         return np.linspace(0.0, span, samples)
 
-    x = _axis_lin(original_input_shape[1], output_shape[1])
-    y = _axis_lin(original_input_shape[2], output_shape[2])
-    z = _axis_lin(original_input_shape[3], output_shape[3])
-    X, Y, Z = np.meshgrid(x, y, z, indexing="ij")
-    original_coordinates = np.stack([X, Y, Z])
-    target_coordinates = np.indices(output_shape[1:])
-    coordinate_difference = original_coordinates - target_coordinates
+    coordinate_difference = np.empty((3, *output_shape[1:]))
+    for axis, (length, samples) in enumerate(
+        zip(original_input_shape[1:], output_shape[1:])
+    ):
+        axis_shape = [1, 1, 1]
+        axis_shape[axis] = samples
+        offset = _axis_lin(length, samples) - np.arange(samples)
+        coordinate_difference[axis] = offset.reshape(axis_shape)
     return coordinate_difference
 
 
 def resize_input(arr, original_input_shape, new_input_shape):
     out_arr = arr.copy()
     output_shape = out_arr.shape
-    initial_offset = calculate_offset(original_input_shape, output_shape)
-    out_arr -= initial_offset
+    out_arr -= calculate_offset(original_input_shape, output_shape)
     scale = np.array(new_input_shape) / np.array(original_input_shape)
     out_arr[0] *= scale[1]
     out_arr[1] *= scale[2]
     out_arr[2] *= scale[3]
-    new_offset = calculate_offset(new_input_shape, output_shape)
-    out_arr += new_offset
+    out_arr += calculate_offset(new_input_shape, output_shape)
     return out_arr
 
 
@@ -204,6 +259,20 @@ def handle_dim_flip(deform_arr, dim_flip, pad_sum, flip_sum):
     return deform_arr, pad_sum, flip_sum
 
 
+def _open_scaled_transformation(path, vector):
+    deformation = open_transformation(path)
+    # Newly loaded fields are private to this route. Nibabel's default mmap
+    # mode is copy-on-write, so scaling never changes the file on disk.
+    if (
+        deformation.flags.writeable
+        and np.result_type(deformation, vector) == deformation.dtype
+    ):
+        if vector != 1:
+            deformation *= vector
+        return deformation
+    return deformation * vector
+
+
 def load_and_combine_deformation(
     deform_arr,
     deform_path,
@@ -212,36 +281,41 @@ def load_and_combine_deformation(
     old_voxel_size,
     final_voxel_size,
     target_shape,
+    output_voxel_size=None,
 ):
+    new_voxel_size = float(
+        translation_metadata["transformation_resolution_micron"][0]
+    )
     if deform_arr is None:
-        deform_arr = open_transformation(deform_path) * vector
-        old_voxel_size = float(
-            translation_metadata["transformation_resolution_micron"][0]
-        )
+        old_voxel_size = new_voxel_size
+        if output_voxel_size is not None:
+            old_voxel_size = max(old_voxel_size, output_voxel_size)
         final_voxel_size = old_voxel_size
-        target_shape = np.array(deform_arr.shape[1:])
-    else:
-        new_voxel_size = float(
-            translation_metadata["transformation_resolution_micron"][0]
+
+    deform_b = _open_scaled_transformation(deform_path, vector)
+    if new_voxel_size != old_voxel_size:
+        deform_b = resize_transformation(
+            deform_b,
+            np.array(deform_b.shape[1:]) * (new_voxel_size / old_voxel_size),
         )
-        deform_b = open_transformation(deform_path) * vector
 
-        if new_voxel_size != old_voxel_size:
-            deform_b = resize_transformation(
-                deform_b,
-                (
-                    np.array(deform_b.shape[1:])
-                    * (new_voxel_size / old_voxel_size)
-                ),
-            )
-
+    if deform_arr is None:
+        deform_arr = deform_b
+    else:
         deform_arr = combine_deformations(deform_arr, deform_b)
-        target_shape = np.array(deform_arr.shape[1:])
+    target_shape = np.array(deform_arr.shape[1:])
 
     return deform_arr, final_voxel_size, target_shape, old_voxel_size
 
 
-def combine_route(route, original_voxel_size, base_path, metadata):
+def combine_route(
+    route, original_voxel_size, base_path, metadata, output_voxel_size=None
+):
+    """Compose a route, optionally downsampling fields before composition.
+
+    A coarser output voxel size reduces intermediate work but changes the
+    interpolation order compared with downsampling the composed field.
+    """
     deform_arr = None
     target_shape = None
     final_voxel_size = None
@@ -319,15 +393,8 @@ def combine_route(route, original_voxel_size, base_path, metadata):
                     old_voxel_size,
                     final_voxel_size,
                     target_shape,
+                    output_voxel_size,
                 )
             )
 
-    if deform_arr is not None:
-        current_shape = np.array(deform_arr.shape[1:])
-        if not np.array_equal(current_shape, target_shape):
-            deform_arr = resize_input(
-                deform_arr,
-                original_input_shape=(1, *deform_arr.shape[1:]),
-                new_input_shape=(1, *target_shape),
-            )
     return deform_arr, pad_sum, flip_sum, dim_order_sum, final_voxel_size
