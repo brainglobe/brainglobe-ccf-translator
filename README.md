@@ -59,7 +59,7 @@ the name in CCF translator usually copies the name of the atlas in the brainglob
 | Princeton lightsheet mouse | princeton_mouse| 56
 | Dorr MRI mouse | dorr_mouse_mri | 84
 | Waxholm Space Sprague Dawley rat | whs_sd_rat | 80
-| SWC female Lister Hooded rat (STPT) | swc_female_rat | 80*
+| SWC female Lister Hooded rat (STPT) | swc_female_rat | 80
 
 
 We also support brainglobe atlas api names which are in existing coordinate frameworks. For instance you can specify osten_mouse and CCF translator will autoconvert this to allen_mouse.
