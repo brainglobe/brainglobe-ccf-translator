@@ -61,7 +61,6 @@ the name in CCF translator usually copies the name of the atlas in the brainglob
 | Waxholm Space Sprague Dawley rat | whs_sd_rat | 80
 | SWC female Lister Hooded rat (STPT) | swc_female_rat | 80*
 
-\*swc_female_rat was built from animals aged 7-15 weeks. It uses age 80 as a placeholder until CCF translator supports spaces without a single age.
 
 We also support brainglobe atlas api names which are in existing coordinate frameworks. For instance you can specify osten_mouse and CCF translator will autoconvert this to allen_mouse.
 | atlas api name | converts to  | supported age range
