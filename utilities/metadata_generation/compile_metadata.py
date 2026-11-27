@@ -6,6 +6,7 @@
 demba_metadata_path = "demba_metadata.py"
 gubra_metadata_path = "perens_metadata.py"
 princeton_metadata_path = "princeton_metadata.py"
+swc_female_rat_metadata_path = "swc_female_rat_metadata.py"
 
 
 # Function to execute a Python file
@@ -19,3 +20,4 @@ def execute_file(file_path):
 execute_file(demba_metadata_path)
 execute_file(gubra_metadata_path)
 execute_file(princeton_metadata_path)
+execute_file(swc_female_rat_metadata_path)
